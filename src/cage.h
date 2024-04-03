@@ -9,34 +9,20 @@
 
 class Shader;
 
-class ARAP
+class Cage
 {
 private:
     Shape m_shape;
 
 public:
-    ARAP();
+    Cage();
 
     void init(Eigen::Vector3f &min, Eigen::Vector3f &max);
     void move(int vertex, Eigen::Vector3f pos);
 
     HalfEdgeMesh heMesh;
 
-    //----------------------- ARAP computation  -----------------------//
-    void iterativeOptimize(std::vector<Eigen::Vector3f> new_vertices, const std::unordered_set<int>& anchors, int vertex, Vector3f targetPosition);
-    void iterativeOptimizeParallel(std::vector<Eigen::Vector3f> new_vertices, const std::unordered_set<int>& anchors, int vertex, Vector3f targetPosition);
-
     void initialize(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition);
-    void update(Eigen::MatrixXf p, const std::unordered_set<int>& anchors);
-
-    void computeEdgeWeights();
-    float cotangentOfAngle(const Eigen::Vector3f& u, const Eigen::Vector3f& v);
-    void computeVertexRotation();
-
-    Eigen::MatrixXf L;
-    Eigen::MatrixXf RHS;
-    void assembleL(const std::unordered_set<int>& anchors);
-    void assenbleRHS(const std::unordered_set<int>& anchors);
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 

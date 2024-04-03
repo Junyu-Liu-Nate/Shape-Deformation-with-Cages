@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # Sets project name
-project(arap LANGUAGES CXX C)
+project(green_coordinates LANGUAGES CXX C)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -30,7 +30,7 @@ include_directories(libs)
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/mainwindow.cpp
-    src/arap.cpp
+    src/cage.cpp
     src/glwidget.cpp
     src/graphics/camera.cpp
     src/graphics/graphicsdebug.cpp
@@ -39,7 +39,7 @@ add_executable(${PROJECT_NAME}
     src/graphics/shape.cpp
 
     src/mainwindow.h
-    src/arap.h
+    src/cage.h
     src/glwidget.h
     src/graphics/camera.h
     src/graphics/graphicsdebug.h

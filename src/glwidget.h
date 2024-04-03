@@ -4,7 +4,7 @@
 #define GL_SILENCE_DEPRECATION
 #endif
 
-#include "arap.h"
+#include "cage.h"
 #include "graphics/camera.h"
 #include "graphics/shader.h"
 
@@ -44,7 +44,7 @@ private slots:
     void tick();
 
 private:
-    ARAP    m_arap;
+    Cage    m_arap;
     Camera  m_camera;
     Shader *m_defaultShader;
     Shader *m_pointShader;
