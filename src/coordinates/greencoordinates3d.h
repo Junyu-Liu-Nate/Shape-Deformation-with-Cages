@@ -1,5 +1,5 @@
-#ifndef GREENCOORDINATES_H
-#define GREENCOORDINATES_H
+#ifndef GREENCOORDINATES3D_H
+#define GREENCOORDINATES3D_H
 
 #include "mesh_struct/halfedgemesh.h"
 #include <Eigen/Geometry>
@@ -8,10 +8,10 @@
 using namespace std;
 using namespace Eigen;
 
-class GreenCoordinates
+class GreenCoordinates3D
 {
 public:
-    GreenCoordinates();
+    GreenCoordinates3D();
 
     vector<float> phiCoords;
     vector<float> psiCoords;
@@ -24,4 +24,4 @@ private:
     Vector3f calculateFaceNormal(const Face& face);
 };
 
-#endif // GREENCOORDINATES_H
+#endif // GREENCOORDINATES3D_H

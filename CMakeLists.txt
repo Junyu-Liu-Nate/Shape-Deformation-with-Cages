@@ -50,7 +50,7 @@ add_executable(${PROJECT_NAME}
     util/tiny_obj_loader.h
     util/unsupportedeigenthing/OpenGLSupport
     src/mesh_struct/halfedgemesh.h src/mesh_struct/halfedgemesh.cpp
-    src/coordinates/greencoordinates.h src/coordinates/greencoordinates.cpp
+    src/coordinates/greencoordinates3d.h src/coordinates/greencoordinates3d.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`

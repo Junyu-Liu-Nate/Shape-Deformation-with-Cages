@@ -1,11 +1,11 @@
-#include "greencoordinates.h"
+#include "greencoordinates3d.h"
 
-GreenCoordinates::GreenCoordinates()
+GreenCoordinates3D::GreenCoordinates3D()
 {
 
 }
 
-void GreenCoordinates::constructGreenCoordinates(const Vector3f& vertexPos, HalfEdgeMesh& cage) {
+void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, HalfEdgeMesh& cage) {
     //--- Initialize all coords as 0
     phiCoords.resize(cage.vertices.size());
     std::fill(phiCoords.begin(), phiCoords.end(), 0.0f);
@@ -54,7 +54,7 @@ void GreenCoordinates::constructGreenCoordinates(const Vector3f& vertexPos, Half
     }
 }
 
-float GreenCoordinates::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3f eta) {
+float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3f eta) {
     //--- Calculate alpha
     float alphaNominator = (v2 - v1).dot(p - v1);
     float alphaDenominator = (v2 - v1).norm() * (p - v1).norm();
@@ -95,7 +95,7 @@ float GreenCoordinates::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3f 
 }
 
 
-Eigen::Vector3f GreenCoordinates::calculateFaceNormal(const Face& face) {
+Eigen::Vector3f GreenCoordinates3D::calculateFaceNormal(const Face& face) {
     // Ensure valid half-edge pointers
     if (!face.halfEdges[0] || !face.halfEdges[1] || !face.halfEdges[2]) {
         throw std::runtime_error("Face has invalid half-edges.");
