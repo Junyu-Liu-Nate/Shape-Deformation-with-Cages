@@ -1,4 +1,4 @@
-#include "cage.h"
+#include "cage3d.h"
 #include "graphics/meshloader.h"
 
 #include <iostream>
@@ -9,9 +9,9 @@
 using namespace std;
 using namespace Eigen;
 
-Cage::Cage() {}
+Cage3D::Cage3D() {}
 
-void Cage::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
+void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 {
     vector<Vector3f> vertices;
     vector<Vector3i> triangles;
@@ -35,7 +35,7 @@ void Cage::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 }
 
 // Move an anchored vertex, defined by its index, to targetPosition
-void Cage::move(int vertex, Vector3f targetPosition)
+void Cage3D::move(int vertex, Vector3f targetPosition)
 {
     std::vector<Eigen::Vector3f> new_vertices = m_shape.getVertices();
     const std::unordered_set<int>& anchors = m_shape.getAnchors();
@@ -61,7 +61,7 @@ void Cage::move(int vertex, Vector3f targetPosition)
 }
 
 // Set the cage vertex position to target position
-void Cage::initialize(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition) {
+void Cage3D::initialize(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition) {
     #pragma omp parallel for
     for (int i = 0; i < new_vertices.size(); i++) {
         if (i == vertex) {

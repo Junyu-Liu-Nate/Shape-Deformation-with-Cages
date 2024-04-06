@@ -30,7 +30,7 @@ include_directories(libs)
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/mainwindow.cpp
-    src/cage.cpp
+    src/cage3d.cpp
     src/glwidget.cpp
     src/graphics/camera.cpp
     src/graphics/graphicsdebug.cpp
@@ -39,7 +39,7 @@ add_executable(${PROJECT_NAME}
     src/graphics/shape.cpp
 
     src/mainwindow.h
-    src/cage.h
+    src/cage3d.h
     src/glwidget.h
     src/graphics/camera.h
     src/graphics/graphicsdebug.h
