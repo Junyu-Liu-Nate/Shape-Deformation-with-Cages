@@ -48,6 +48,15 @@ void HalfEdgeMesh::buildHalfEdgeStructure(const std::vector<Eigen::Vector3f>& _v
         for (int i = 0; i < 3; ++i) {
             faceHalfEdges[i]->next = faceHalfEdges[(i + 1) % 3];
         }
+
+        // Create and setup the face
+        faces.emplace_back(); // Create a new face
+        Face& newFace = faces.back();
+
+        // Assign the halfEdges to the face
+        for (int i = 0; i < 3; ++i) {
+            newFace.halfEdges[i] = faceHalfEdges[i];
+        }
     }
 
     // Set up twin halfEdges
