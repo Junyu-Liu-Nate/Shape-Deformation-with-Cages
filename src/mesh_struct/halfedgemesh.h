@@ -12,29 +12,42 @@ using namespace Eigen;
 
 struct HalfEdge;
 struct Vertex;
+struct Face;
 
 struct HalfEdge {
     HalfEdge* twin;
     HalfEdge* next;
     Vertex* vertex;
 
-    float weight = 0.0f;
-
-    // Adding a constructor for convenience
+    // Constructor for convenience
     HalfEdge() : twin(nullptr), next(nullptr), vertex(nullptr) {}
 };
 
 struct Vertex {
     int vertexIdx;
 
-    Eigen::Vector3f position;
+    Eigen::Vector3f position; // Actual position
     Eigen::Vector3f nextPosition;
+
     HalfEdge* halfEdge;
 
-    Matrix3f R = Matrix3f::Identity();
+    // Variables used for calculating Green Coordinates
+    Eigen::Vector3f calculatePosition;
+    float s;
+    float I;
+    float II;
+    Vector3f q;
+    Vector3f N;
 
-    // Adding a constructor for convenience
+    // Constructor for convenience
     Vertex(const Eigen::Vector3f& pos) : position(pos), halfEdge(nullptr) {}
+};
+
+struct Face {
+    HalfEdge* halfEdges[3];  // Array to store pointers to the face's half-edges
+
+    // Constructor for convenience
+    Face() : halfEdges{nullptr, nullptr, nullptr} {}
 };
 
 struct pair_hash {
@@ -50,6 +63,7 @@ public:
 
     std::vector<Vertex> vertices;
     std::list<HalfEdge> halfEdges;
+    std::list<Face> faces;
 
     void buildHalfEdgeStructure(const std::vector<Eigen::Vector3f>& _vertices,
                                 const std::vector<Eigen::Vector3i>& _faces);

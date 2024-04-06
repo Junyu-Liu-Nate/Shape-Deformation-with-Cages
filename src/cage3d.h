@@ -9,13 +9,13 @@
 
 class Shader;
 
-class Cage
+class Cage3D
 {
 private:
     Shape m_shape;
 
 public:
-    Cage();
+    Cage3D();
 
     void init(Eigen::Vector3f &min, Eigen::Vector3f &max);
     void move(int vertex, Eigen::Vector3f pos);
