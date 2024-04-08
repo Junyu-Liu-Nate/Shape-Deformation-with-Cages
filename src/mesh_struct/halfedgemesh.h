@@ -5,6 +5,7 @@
 #include <Eigen/Core>
 #include <unordered_map>
 #include <unordered_set>
+#include <iostream>
 #include <Eigen/SVD>
 
 using namespace std;
@@ -31,7 +32,7 @@ struct Vertex {
 
     HalfEdge* halfEdge;
 
-    // Variables used for calculating Green Coordinates
+    // Variables used for calculating Green Coordinates (For Cages)
     Eigen::Vector3f calculatePosition;
     float s;
     float I;
@@ -48,6 +49,29 @@ struct Face {
 
     // Constructor for convenience
     Face() : halfEdges{nullptr, nullptr, nullptr} {}
+
+    Eigen::Vector3f getNormal() const {
+        if (halfEdges[0] == nullptr || halfEdges[1] == nullptr || halfEdges[2] == nullptr) {
+            // Invalid face, return zero vector as placeholder
+            return Eigen::Vector3f(0.0f, 0.0f, 0.0f);
+        }
+        // Obtain the position of the vertices
+        Eigen::Vector3f p0 = halfEdges[0]->vertex->position;
+        Eigen::Vector3f p1 = halfEdges[1]->vertex->position;
+        Eigen::Vector3f p2 = halfEdges[2]->vertex->position;
+
+        // Compute two vectors on the face
+        Eigen::Vector3f v1 = p1 - p0;
+        Eigen::Vector3f v2 = p2 - p0;
+
+        // Compute the cross product to get the face normal
+        Eigen::Vector3f normal = v1.cross(v2);
+
+        // Normalize the normal to ensure it's a unit vector
+        normal.normalize();
+
+        return normal;
+    }
 };
 
 struct pair_hash {
@@ -63,7 +87,7 @@ public:
 
     std::vector<Vertex> vertices;
     std::list<HalfEdge> halfEdges;
-    std::list<Face> faces;
+    std::vector<Face> faces;
 
     void buildHalfEdgeStructure(const std::vector<Eigen::Vector3f>& _vertices,
                                 const std::vector<Eigen::Vector3i>& _faces);

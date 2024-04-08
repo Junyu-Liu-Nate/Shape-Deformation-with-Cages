@@ -4,6 +4,7 @@
 #include "mesh_struct/halfedgemesh.h"
 #include <Eigen/Geometry>
 #include <Eigen/Dense>
+#include <iostream>
 
 using namespace std;
 using namespace Eigen;

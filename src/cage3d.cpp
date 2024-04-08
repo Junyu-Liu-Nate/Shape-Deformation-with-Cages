@@ -16,13 +16,24 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3f> vertices;
     vector<Vector3i> triangles;
 
-    // If this doesn't work for you, remember to change your working directory
-    if (MeshLoader::loadTriMesh("meshes/armadillo.obj", vertices, triangles)) {
-        m_shape.init(vertices, triangles);
+    //--- Read in cage
+    if (MeshLoader::loadTriMesh("meshes/3d/bar_cage_3d.OBJ", vertices, triangles)) {
+        m_shape_cage.init(vertices, triangles);
     }
 
     // Build halfedge structure for the cage
+    std::cout << triangles.size() << std::endl;
     heMesh.buildHalfEdgeStructure(vertices, triangles);
+
+    //--- Read in object
+    vector<Vector3f> objectVertices;
+    vector<Vector3i> objectTriangles;
+
+    if (MeshLoader::loadTriMesh("meshes/3d/bar_model_3d.OBJ", objectVertices, objectTriangles)) {
+        m_shape_object.init(objectVertices, objectTriangles);
+    }
+
+    buildVertexList(objectVertices);
 
     // Students, please don't touch this code: get min and max for viewport stuff
     MatrixX3f all_vertices = MatrixX3f(vertices.size(), 3);
@@ -37,12 +48,16 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 // Move an anchored vertex, defined by its index, to targetPosition
 void Cage3D::move(int vertex, Vector3f targetPosition)
 {
-    std::vector<Eigen::Vector3f> new_vertices = m_shape.getVertices();
-    const std::unordered_set<int>& anchors = m_shape.getAnchors();
+    std::vector<Eigen::Vector3f> new_vertices = m_shape_cage.getVertices();
+    const std::unordered_set<int>& anchors = m_shape_cage.getAnchors();
 
     // Update cage vertex positions
     initialize(new_vertices, vertex, targetPosition);
     heMesh.updateVertexPos(new_vertices);
+
+    // Update object vertex positions
+    object3D.updateVertices(heMesh);
+    std::vector<Eigen::Vector3f> new_object_vertices = object3D.getVertices();
 
     // Here are some helpful controls for the application
     //
@@ -57,7 +72,9 @@ void Cage3D::move(int vertex, Vector3f targetPosition)
     //
     // - Minus and equal keys (click repeatedly) to change the size of the vertices
 
-    m_shape.setVertices(new_vertices);
+    m_shape_cage.setVertices(new_vertices);
+    std::cout << new_object_vertices.at(0) << std::endl << std::endl;
+    m_shape_object.setVertices(new_object_vertices);
 }
 
 // Set the cage vertex position to target position
@@ -70,5 +87,16 @@ void Cage3D::initialize(std::vector<Eigen::Vector3f> new_vertices, int vertex, V
         else {
             heMesh.vertices.at(i).nextPosition = new_vertices.at(i);
         }
+    }
+}
+
+void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
+    object3D.vertexList.resize(objectVertices.size());
+    for (int i = 0; i < objectVertices.size(); i++) {
+        ObjectVertex objectVertex;
+        objectVertex.position = objectVertices.at(i);
+        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
+
+        object3D.vertexList.at(i) = objectVertex;
     }
 }

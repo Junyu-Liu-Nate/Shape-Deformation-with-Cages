@@ -57,6 +57,27 @@ void HalfEdgeMesh::buildHalfEdgeStructure(const std::vector<Eigen::Vector3f>& _v
         for (int i = 0; i < 3; ++i) {
             newFace.halfEdges[i] = faceHalfEdges[i];
         }
+
+//        bool validFace = true; // Flag to check face validity
+
+//        // Assign the halfEdges to the face and check for identical vertices
+//        for (int i = 0; i < 3; ++i) {
+//            newFace.halfEdges[i] = faceHalfEdges[i];
+//            // Check for identical vertices
+//            for (int j = i + 1; j < 3; ++j) {
+//                if (faceHalfEdges[i]->vertex == faceHalfEdges[j]->vertex) {
+//                    std::cerr << "Invalid face: contains identical vertices." << std::endl;
+//                    validFace = false;
+//                    break;
+//                }
+//            }
+//            if (!validFace) break;
+//        }
+
+//        if (!validFace) {
+//            faces.pop_back(); // Remove the invalid face
+//            continue; // Skip further processing for this face
+//        }
     }
 
     // Set up twin halfEdges
