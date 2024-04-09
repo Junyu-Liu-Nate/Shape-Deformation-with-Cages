@@ -12,7 +12,10 @@ void HalfEdgeMesh::buildHalfEdgeStructure(const std::vector<Eigen::Vector3f>& _v
     int idx = 0;
     for (const auto& pos : _vertices) {
         vertices.emplace_back(pos);
-        vertices.back().vertexIdx = idx++;  // Store the index
+        Vertex& newVertex = vertices.back();
+        newVertex.vertexIdx = idx++;  // Store the index
+        newVertex.position = pos;     // Set current position
+        newVertex.initialPosition = pos;  // Set initial position as well
     }
 
     // Create a map for edge lookup
@@ -57,27 +60,6 @@ void HalfEdgeMesh::buildHalfEdgeStructure(const std::vector<Eigen::Vector3f>& _v
         for (int i = 0; i < 3; ++i) {
             newFace.halfEdges[i] = faceHalfEdges[i];
         }
-
-//        bool validFace = true; // Flag to check face validity
-
-//        // Assign the halfEdges to the face and check for identical vertices
-//        for (int i = 0; i < 3; ++i) {
-//            newFace.halfEdges[i] = faceHalfEdges[i];
-//            // Check for identical vertices
-//            for (int j = i + 1; j < 3; ++j) {
-//                if (faceHalfEdges[i]->vertex == faceHalfEdges[j]->vertex) {
-//                    std::cerr << "Invalid face: contains identical vertices." << std::endl;
-//                    validFace = false;
-//                    break;
-//                }
-//            }
-//            if (!validFace) break;
-//        }
-
-//        if (!validFace) {
-//            faces.pop_back(); // Remove the invalid face
-//            continue; // Skip further processing for this face
-//        }
     }
 
     // Set up twin halfEdges
@@ -96,8 +78,7 @@ void HalfEdgeMesh::buildHalfEdgeStructure(const std::vector<Eigen::Vector3f>& _v
 
 void HalfEdgeMesh::updateVertexPos(std::vector<Eigen::Vector3f>& outVertices) {
     for (Vertex& vertex : vertices) {
-        outVertices[vertex.vertexIdx] = vertex.nextPosition;
-        vertex.position = vertex.nextPosition;
+        outVertices[vertex.vertexIdx] = vertex.position;
     }
 }
 

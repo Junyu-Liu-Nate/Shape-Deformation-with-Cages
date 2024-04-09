@@ -20,8 +20,11 @@ public:
     Object3D();
 
     vector<ObjectVertex> vertexList;
+
     void updateVertices(const HalfEdgeMesh& heMesh);
     vector<Vector3f> getVertices();
+
+    float calculateS(const Face face);
 };
 
 #endif // OBJECT3D_H

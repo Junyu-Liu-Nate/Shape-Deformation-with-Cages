@@ -21,8 +21,6 @@ public:
 
 private:
     float gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3f eta);
-
-    Vector3f calculateFaceNormal(const Face& face);
 };
 
 #endif // GREENCOORDINATES3D_H

@@ -23,8 +23,8 @@ public:
     void move(int vertex, Eigen::Vector3f pos);
 
     HalfEdgeMesh heMesh;
-
-    void initialize(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition);
+    
+    void updateCage(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition);
 
     Object3D object3D;
     void buildVertexList(vector<Vector3f> objectVertices);

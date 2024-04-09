@@ -6,31 +6,26 @@ Object3D::Object3D()
 }
 
 void Object3D::updateVertices(const HalfEdgeMesh& heMesh) {
-    int counter = 0;
     for (ObjectVertex& objectVertex : vertexList) {
         Vector3f term1 = Vector3f(0,0,0);
         for (int i = 0; i < objectVertex.greenCord.phiCoords.size(); i++) {
             term1 += objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position;
+//            std::cout << objectVertex.greenCord.phiCoords.at(i) << " ";
         }
+//        std::cout << std::endl;
 
         Vector3f term2 = Vector3f(0,0,0);
         for (int i = 0; i < objectVertex.greenCord.psiCoords.size(); i++) {
-            // TODO: calculate s_j
-            term2 += objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).getNormal() * 0.5;
-            // TODO: psiCoords contain nan
-            // TODO: Normal calculation is problematic
-//            std::cout << heMesh.faces.at(i).getNormal() << std::endl << std::endl;
+            // TODO: s can be toggled between 1 and the calculation
+            float s = calculateS(heMesh.faces.at(i));
+            term2 += objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal() * s;
+//            std::cout << objectVertex.greenCord.psiCoords.at(i) << " ";
         }
 
         objectVertex.position = term1 + term2;
-
-        if (counter == 0) {
-//            std::cout << term1 << std::endl;
-//            std::cout << term2 << std::endl << std::endl;
-        }
-        counter++;
+//        objectVertex.position = term2;
     }
-//    std::cout << vertexList.at(0).position << std::endl;
+//    std::cout << std::endl;
 }
 
 vector<Vector3f> Object3D::getVertices() {
@@ -42,4 +37,27 @@ vector<Vector3f> Object3D::getVertices() {
     }
 
     return returnVertices;
+}
+
+float Object3D::calculateS(const Face face) {
+    Vector3f p0 = face.halfEdges[0]->vertex->initialPosition;
+    Vector3f p1 = face.halfEdges[1]->vertex->initialPosition;
+    Vector3f p2 = face.halfEdges[2]->vertex->initialPosition;
+
+    Vector3f u = p1 - p0;
+    Vector3f v = p2 - p0;
+
+    Vector3f p0_prime = face.halfEdges[0]->vertex->position;
+    Vector3f p1_prime = face.halfEdges[1]->vertex->position;
+    Vector3f p2_prime = face.halfEdges[2]->vertex->position;
+
+    Vector3f u_prime = p1_prime - p0_prime;
+    Vector3f v_prime = p2_prime - p0_prime;
+
+    float nominator = sqrt(pow(u_prime.norm(),2) * pow(v.norm(),2) - 2*u_prime.dot(v_prime)*u.dot(v) + pow(v_prime.norm(),2) * pow(u.norm(),2));
+    float denomonator = sqrt(8) * face.calculateArea();
+
+    float s = nominator / denomonator;
+
+    return s;
 }
