@@ -17,7 +17,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3i> triangles;
 
     //----- Read in cage
-    if (MeshLoader::loadTriMesh("meshes/3d/bar_cage_3d.OBJ", vertices, triangles)) {
+    if (MeshLoader::loadTriMesh("meshes/3d/bar_cage_3d_complex.obj", vertices, triangles)) {
         m_shape_cage.init(vertices, triangles);
     }
 
