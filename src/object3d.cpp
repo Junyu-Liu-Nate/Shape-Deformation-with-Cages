@@ -10,22 +10,17 @@ void Object3D::updateVertices(const HalfEdgeMesh& heMesh) {
         Vector3f term1 = Vector3f(0,0,0);
         for (int i = 0; i < objectVertex.greenCord.phiCoords.size(); i++) {
             term1 += objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position;
-//            std::cout << objectVertex.greenCord.phiCoords.at(i) << " ";
         }
-//        std::cout << std::endl;
 
         Vector3f term2 = Vector3f(0,0,0);
         for (int i = 0; i < objectVertex.greenCord.psiCoords.size(); i++) {
             // TODO: s can be toggled between 1 and the calculation
             float s = calculateS(heMesh.faces.at(i));
             term2 += objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal() * s;
-//            std::cout << objectVertex.greenCord.psiCoords.at(i) << " ";
         }
 
         objectVertex.position = term1 + term2;
-//        objectVertex.position = term2;
     }
-//    std::cout << std::endl;
 }
 
 vector<Vector3f> Object3D::getVertices() {

@@ -17,7 +17,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3i> triangles;
 
     //----- Read in cage
-    if (MeshLoader::loadTriMesh("meshes/3d/bar_cage_3d_complex.obj", vertices, triangles)) {
+    if (MeshLoader::loadTriMesh("meshes/3d/bar_cage_partial.obj", vertices, triangles)) {
         m_shape_cage.init(vertices, triangles);
     }
 
@@ -29,7 +29,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3f> objectVertices;
     vector<Vector3i> objectTriangles;
 
-    if (MeshLoader::loadTriMesh("meshes/3d/bar_model_3d.OBJ", objectVertices, objectTriangles)) {
+    if (MeshLoader::loadTriMesh("meshes/3d/bar.obj", objectVertices, objectTriangles)) {
         m_shape_object.init(objectVertices, objectTriangles);
     }
 
@@ -60,7 +60,6 @@ void Cage3D::move(int vertex, Vector3f targetPosition)
     std::vector<Eigen::Vector3f> new_object_vertices = object3D.getVertices();
 
     m_shape_cage.setVertices(new_vertices);
-//    std::cout << new_object_vertices.at(0) << std::endl << std::endl;
     m_shape_object.setVertices(new_object_vertices);
 }
 
@@ -82,8 +81,57 @@ void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
     for (int i = 0; i < objectVertices.size(); i++) {
         ObjectVertex objectVertex;
         objectVertex.position = objectVertices.at(i);
-        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
+//        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
+        if (!isPointOutsideMesh(objectVertex.position, heMesh)) {
+            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
+        }
+        else {
+            objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, heMesh);
+        }
 
         object3D.vertexList.at(i) = objectVertex;
     }
+}
+
+bool Cage3D::rayIntersectsTriangle(const Eigen::Vector3f& P, const Eigen::Vector3f& D, const Face& face) {
+    const float EPSILON = 0.0000001f;
+    Eigen::Vector3f vertex0 = face.halfEdges[0]->vertex->position;
+    Eigen::Vector3f vertex1 = face.halfEdges[1]->vertex->position;
+    Eigen::Vector3f vertex2 = face.halfEdges[2]->vertex->position;
+    Eigen::Vector3f edge1, edge2, h, s, q;
+    float a, f, u, v;
+    edge1 = vertex1 - vertex0;
+    edge2 = vertex2 - vertex0;
+    h = D.cross(edge2);
+    a = edge1.dot(h);
+    if (a > -EPSILON && a < EPSILON)
+        return false;    // This ray is parallel to this triangle.
+    f = 1.0/a;
+    s = P - vertex0;
+    u = f * (s.dot(h));
+    if (u < 0.0 || u > 1.0)
+        return false;
+    q = s.cross(edge1);
+    v = f * D.dot(q);
+    if (v < 0.0 || u + v > 1.0)
+        return false;
+    // At this point we know that there is a line intersection but not if it's within the segment
+    float t = f * edge2.dot(q);
+    if (t > EPSILON) // ray intersection
+        return true;
+    else // This means that there is a line intersection but not a ray intersection.
+        return false;
+}
+
+bool Cage3D::isPointOutsideMesh(const Eigen::Vector3f& point, HalfEdgeMesh& mesh) {
+    int intersections = 0;
+    Eigen::Vector3f rayDir(1.0f, 0.0f, 0.0f); // Arbitrary direction
+
+    for (const auto& face : mesh.faces) {
+        if (rayIntersectsTriangle(point, rayDir, face)) {
+            intersections++;
+        }
+    }
+
+    return intersections % 2 == 0;
 }

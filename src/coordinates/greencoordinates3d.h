@@ -18,6 +18,7 @@ public:
     vector<float> psiCoords;
 
     void constructGreenCoordinates(const Vector3f& vertexPos, HalfEdgeMesh& cage);
+    void constructGreenCoordinatesExterior(const Vector3f& vertexPos, HalfEdgeMesh& cage);
 
 private:
     float gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3f eta);

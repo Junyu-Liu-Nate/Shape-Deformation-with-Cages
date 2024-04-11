@@ -41,11 +41,9 @@ void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, Ha
 
         Vector3f omega = faceNormal * I;
         for (HalfEdge* halfEdge : face.halfEdges) {
-//            omega += halfEdge->vertex->N * I * halfEdge->vertex->I;
             omega += halfEdge->vertex->N * halfEdge->vertex->II;
         }
         float epsilon = 0.0; // TODO: Check how to set this
-//        std::cout << omega.norm() << std::endl;
         if (omega.norm() > epsilon) {
             for (HalfEdge* halfEdge : face.halfEdges) {
                 int vertexIdx = halfEdge->vertex->vertexIdx;
@@ -54,6 +52,54 @@ void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, Ha
         }
 
         j++;
+    }
+}
+
+void GreenCoordinates3D::constructGreenCoordinatesExterior(const Vector3f& vertexPos, HalfEdgeMesh& cage) {
+    //--- Construct the coordinates the same as internal at first
+    constructGreenCoordinates(vertexPos, cage);
+
+    //--- Add alphas and betas
+    int j = 0;
+    for (Face& face : cage.faces) {
+        // TODO: Need to figure out a way to define the EXIT FACE !!!!!!
+        if (face.calculateNormal() != Vector3f(0,-1,0)) {
+            j++;
+            continue;
+        }
+
+        vector<Vector3f> vList(3);
+        std::fill(vList.begin(), vList.end(), Vector3f(0,0,0));
+
+        for (int i = 0; i < 3; i++) {
+            vList.at(i) = face.halfEdges[i]->vertex->position;
+        }
+
+        Vector3f faceNormal = face.calculateNormal();
+
+        MatrixXf A(4, 4);
+//        cout << vList.at(0) << endl;
+        A << vList.at(0), vList.at(1), vList.at(2), faceNormal,
+            1, 1, 1, 0;
+//        cout << A << endl;
+        Vector4f b;
+        b << vertexPos, 1;
+//        cout << b << endl << endl;
+
+        Vector4f solution = A.colPivHouseholderQr().solve(b);
+//        cout << solution << endl;
+
+        for (int i = 0; i < 3; i++) {
+            int vertexIdx = face.halfEdges[i]->vertex->vertexIdx;
+            phiCoords.at(vertexIdx) += solution[i];
+//            cout << phiCoords.at(vertexIdx) << endl;
+        }
+
+        psiCoords.at(j) += solution[3];
+//        cout << psiCoords.at(j) << endl << endl;
+
+        j++;
+        break;
     }
 }
 
@@ -97,84 +143,3 @@ float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3
     return result;
 }
 
-//float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3f eta) {
-//    // Calculate alpha
-//    float alphaNominator = (v2 - v1).dot(p - v1);
-//    float alphaDenominator = (v2 - v1).norm() * (p - v1).norm();
-//    if (std::abs(alphaDenominator) < 1e-8) {  // Prevent division by zero
-//        std::cout << "alphaDenominator is zero" << std::endl;
-//        return NAN; // or handle more gracefully
-//    }
-//    float alpha = acos(alphaNominator / alphaDenominator);
-//    if (std::isnan(alpha)) {
-//        std::cout << "alpha is NaN" << std::endl;
-//    }
-
-//    // Calculate beta
-//    float betaNominator = (v1 - p).dot(v2 - p);
-//    float betaDenominator = (v1 - p).norm() * (v2 - p).norm();
-//    if (std::abs(betaDenominator) < 1e-8) {  // Prevent division by zero
-//        std::cout << "betaDenominator is zero" << std::endl;
-//        return NAN; // or handle more gracefully
-//    }
-//    float beta = acos(betaNominator / betaDenominator);
-//    if (std::isnan(beta)) {
-//        std::cout << "beta is NaN" << std::endl;
-//    }
-
-//    // Calculate lambda
-//    float lambda = (p - v1).norm() * (p - v1).norm() * sin(alpha) * sin(alpha);
-//    if (lambda < 0) {
-//        std::cout << "lambda is negative" << std::endl;
-//    }
-
-//    // Calculate c
-//    float c = (p - eta).norm() * (p - eta).norm();
-//    if (c < 0) {
-//        std::cout << "c is negative" << std::endl;
-//    }
-
-//    std::vector<float> thetaList(2, 0.0f);
-//    thetaList.at(0) = M_PI - alpha;
-//    thetaList.at(1) = M_PI - alpha - beta;
-//    std::vector<float> IList(2, 0.0f);
-//    for (int i = 0; i < 2; i++) {
-//        float theta = thetaList.at(i);
-//        float S = sin(theta);
-//        float C = cos(theta);
-
-//        float term1 = -copysign(1.0, S) * 0.5;
-
-//        if (std::abs(lambda + S*S*c) < 1e-8) {
-//            std::cout << "Division by zero in term2 calculation" << std::endl;
-//            return NAN; // or handle more gracefully
-//        }
-//        float term2 = 2 * sqrt(c) * atan((sqrt(c) * C) / sqrt(lambda + S*S*c));
-//        if (std::isnan(term2)) {
-//            std::cout << "term2 is NaN" << std::endl;
-//        }
-
-//        float term3a = (2 * sqrt(lambda) * S * S) / ((1 - C) * (1 - C));
-//        float term3b = 1 - 2*c*C / (c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S));
-//        if (term3a <= 0 || term3b <= 0) {
-//            std::cout << "Non-positive argument for log in term3 calculation" << std::endl;
-//            return NAN; // or handle more gracefully
-//        }
-//        float term3 = sqrt(lambda) * log(term3a * term3b);
-//        if (std::isnan(term3)) {
-//            std::cout << "term3 is NaN" << std::endl;
-//        }
-
-//        IList.at(i) = term1 * (term2 + term3);
-//        if (std::isnan(IList.at(i))) {
-//            std::cout << "IList[" << i << "] is NaN" << std::endl;
-//        }
-//    }
-
-//    float result = -1 / (4*M_PI) * abs(IList.at(0) - IList.at(1) - sqrt(c) * beta);
-//    if (std::isnan(result)) {
-//        std::cout << "Result is NaN" << std::endl;
-//    }
-
-//    return result;
-//}

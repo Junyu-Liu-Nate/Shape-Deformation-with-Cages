@@ -30,6 +30,9 @@ public:
     void buildVertexList(vector<Vector3f> objectVertices);
     void updatePosition();
 
+    bool rayIntersectsTriangle(const Eigen::Vector3f& P, const Eigen::Vector3f& D, const Face& face);
+    bool isPointOutsideMesh(const Eigen::Vector3f& point, HalfEdgeMesh& mesh);
+
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 
     int getClosestVertex(Eigen::Vector3f start, Eigen::Vector3f ray, float threshold)
