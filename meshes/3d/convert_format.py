@@ -1,3 +1,5 @@
+import os
+
 def convert_obj_to_simple_format(input_file_path, output_file_path):
     vertices = []  # List to store vertex positions
     faces = []  # List to store faces
@@ -28,7 +30,43 @@ def convert_obj_to_simple_format(input_file_path, output_file_path):
         for face in faces:
             file.write(f'f {face}\n')
 
+def off_to_obj(off_filename, obj_filename):
+    with open(off_filename, 'r') as file:
+        lines = file.readlines()
+    
+    # Determine start of vertex and face data
+    vertices = []
+    faces = []
+    vertex_count = int(lines[1].split()[0])  # Number of vertices
+    face_count = int(lines[1].split()[1])    # Number of faces
+
+    # Collect vertex data
+    for line in lines[2:2 + vertex_count]:
+        vertices.append(line.strip())
+
+    # Collect face data
+    for line in lines[2 + vertex_count:2 + vertex_count + face_count]:
+        parts = line.split()
+        if len(parts) > 1:
+            # Shift indices by 1 for OBJ format (1-based indexing)
+            faces.append(' '.join([str(int(index) + 1) for index in parts[1:]]))
+
+    # Write to the OBJ file
+    with open(obj_filename, 'w') as file:
+        file.write("# OBJ file generated from OFF file\n")
+        for vertex in vertices:
+            file.write(f"v {vertex}\n")
+        for face in faces:
+            file.write(f"f {face}\n")
+
 # Example usage
-input_file_path = 'cat_cage.obj'  # Replace with your input file path
-output_file_path = 'cat_cage_converted.obj'  # Replace with your desired output file path
-convert_obj_to_simple_format(input_file_path, output_file_path)
+shape_names = ['beast', 'blade', 'boy', 'filigree', 'flower', 'hand_bones', 'octopus']
+
+for shape_name in shape_names:
+    input_file_path = os.path.join(shape_name, shape_name + '.off')  
+    output_file_path = os.path.join(shape_name, shape_name + '.obj')  
+    off_to_obj(input_file_path, output_file_path)
+
+    input_file_path = os.path.join(shape_name, shape_name + '_bounding-proxy.off')  
+    output_file_path = os.path.join(shape_name, shape_name + '_bounding-proxy.obj')  
+    off_to_obj(input_file_path, output_file_path)
