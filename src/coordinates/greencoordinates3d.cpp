@@ -43,7 +43,7 @@ void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, Ha
         for (HalfEdge* halfEdge : face.halfEdges) {
             omega += halfEdge->vertex->N * halfEdge->vertex->II;
         }
-        float epsilon = 0.0; // TODO: Check how to set this
+        float epsilon = 0.00001; // TODO: Check how to set this
         if (omega.norm() > epsilon) {
             for (HalfEdge* halfEdge : face.halfEdges) {
                 int vertexIdx = halfEdge->vertex->vertexIdx;

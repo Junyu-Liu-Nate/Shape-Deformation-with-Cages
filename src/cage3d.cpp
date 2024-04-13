@@ -17,7 +17,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3i> triangles;
 
     //----- Read in cage
-    if (MeshLoader::loadTriMesh("meshes/3d/boy/boy_bounding-proxy.obj", vertices, triangles)) {
+    if (MeshLoader::loadTriMesh("meshes/3d/bar_cage.obj", vertices, triangles)) {
         m_shape_cage.init(vertices, triangles);
     }
 
@@ -29,7 +29,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3f> objectVertices;
     vector<Vector3i> objectTriangles;
 
-    if (MeshLoader::loadTriMesh("meshes/3d/boy/boy.obj", objectVertices, objectTriangles)) {
+    if (MeshLoader::loadTriMesh("meshes/3d/bar.obj", objectVertices, objectTriangles)) {
         m_shape_object.init(objectVertices, objectTriangles);
     }
 
@@ -76,23 +76,29 @@ void Cage3D::updateCage(std::vector<Eigen::Vector3f> new_vertices, int vertex, V
     }
 }
 
+//---- Build the Green Coordinates for all vertices
 void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
     object3D.vertexList.resize(objectVertices.size());
     for (int i = 0; i < objectVertices.size(); i++) {
         ObjectVertex objectVertex;
         objectVertex.position = objectVertices.at(i);
-//        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
-        if (!isPointOutsideMesh(objectVertex.position, heMesh)) {
-            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
-        }
-        else {
-            objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, heMesh);
-        }
+
+        // Build Green Coordinates
+//        if (!isPointOutsideMesh(objectVertex.position, heMesh)) {
+//            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
+//        }
+//        else {
+//            objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, heMesh);
+//        }
+
+        // Build MVC Coordinates
+        objectVertex.mvcCoord.constructMVC(objectVertex.position, heMesh);
 
         object3D.vertexList.at(i) = objectVertex;
     }
 }
 
+//---- Check whether a vertex is outside of the cage
 bool Cage3D::rayIntersectsTriangle(const Eigen::Vector3f& P, const Eigen::Vector3f& D, const Face& face) {
     const float EPSILON = 0.0000001f;
     Eigen::Vector3f vertex0 = face.halfEdges[0]->vertex->position;

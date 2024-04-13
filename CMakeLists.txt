@@ -53,6 +53,7 @@ add_executable(${PROJECT_NAME}
     src/coordinates/greencoordinates3d.h src/coordinates/greencoordinates3d.cpp
     src/mesh_struct/halfedgemeshobject.h src/mesh_struct/halfedgemeshobject.cpp
     src/object3d.h src/object3d.cpp
+    src/coordinates/mvc3d.h src/coordinates/mvc3d.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`

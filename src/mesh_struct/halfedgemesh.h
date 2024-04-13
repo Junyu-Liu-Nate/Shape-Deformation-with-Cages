@@ -40,6 +40,14 @@ struct Vertex {
     Vector3f q;
     Vector3f N;
 
+    // Variables used for calculating MVC
+    float mvc_d;
+    Vector3f mvc_u;
+    float mvc_l;
+    float mvc_theta;
+    float mvc_c;
+    float mvc_s;
+
     // Constructor
     Vertex(const Eigen::Vector3f& pos) : position(pos), halfEdge(nullptr) {}
 };
