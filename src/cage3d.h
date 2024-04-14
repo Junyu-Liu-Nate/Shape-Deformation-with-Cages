@@ -6,13 +6,15 @@
 #include <Eigen/Sparse>
 #include <QtConcurrent>
 #include "mesh_struct/halfedgemesh.h"
+#include "object3d.h"
 
 class Shader;
 
 class Cage3D
 {
 private:
-    Shape m_shape;
+    Shape m_shape_cage;
+    Shape m_shape_object;
 
 public:
     Cage3D();
@@ -21,33 +23,41 @@ public:
     void move(int vertex, Eigen::Vector3f pos);
 
     HalfEdgeMesh heMesh;
+    
+    void updateCage(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition);
 
-    void initialize(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition);
+    Object3D object3D;
+    void buildVertexList(vector<Vector3f> objectVertices);
+    void updatePosition();
+
+    bool rayIntersectsTriangle(const Eigen::Vector3f& P, const Eigen::Vector3f& D, const Face& face);
+    bool isPointOutsideMesh(const Eigen::Vector3f& point, HalfEdgeMesh& mesh);
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 
     int getClosestVertex(Eigen::Vector3f start, Eigen::Vector3f ray, float threshold)
     {
-        return m_shape.getClosestVertex(start, ray, threshold);
+        return m_shape_cage.getClosestVertex(start, ray, threshold);
     }
 
     void draw(Shader *shader, GLenum mode)
     {
-        m_shape.draw(shader, mode);
+        m_shape_cage.draw(shader, mode);
+        m_shape_object.draw(shader, mode);
     }
 
     SelectMode select(Shader *shader, int vertex)
     {
-        return m_shape.select(shader, vertex);
+        return m_shape_cage.select(shader, vertex);
     }
 
     bool selectWithSpecifiedMode(Shader *shader, int vertex, SelectMode mode)
     {
-        return m_shape.selectWithSpecifiedMode(shader, vertex, mode);
+        return m_shape_cage.selectWithSpecifiedMode(shader, vertex, mode);
     }
 
     bool getAnchorPos(int lastSelected, Eigen::Vector3f& pos, Eigen::Vector3f ray, Eigen::Vector3f start)
     {
-        return m_shape.getAnchorPos(lastSelected, pos, ray, start);
+        return m_shape_cage.getAnchorPos(lastSelected, pos, ray, start);
     }
 };

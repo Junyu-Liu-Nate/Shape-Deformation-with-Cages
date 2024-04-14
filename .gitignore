@@ -286,3 +286,5 @@ tmp/
 
 # Eigen
 Eigen
+meshes/3d/.history/
+meshes/3d/.vscode/

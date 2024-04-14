@@ -5,6 +5,7 @@
 #include <Eigen/Core>
 #include <unordered_map>
 #include <unordered_set>
+#include <iostream>
 #include <Eigen/SVD>
 
 using namespace std;
@@ -19,7 +20,7 @@ struct HalfEdge {
     HalfEdge* next;
     Vertex* vertex;
 
-    // Constructor for convenience
+    // Constructor
     HalfEdge() : twin(nullptr), next(nullptr), vertex(nullptr) {}
 };
 
@@ -27,11 +28,11 @@ struct Vertex {
     int vertexIdx;
 
     Eigen::Vector3f position; // Actual position
-    Eigen::Vector3f nextPosition;
+    Eigen::Vector3f initialPosition;
 
     HalfEdge* halfEdge;
 
-    // Variables used for calculating Green Coordinates
+    // Variables used for calculating Green Coordinates (For Cages)
     Eigen::Vector3f calculatePosition;
     float s;
     float I;
@@ -39,15 +40,69 @@ struct Vertex {
     Vector3f q;
     Vector3f N;
 
-    // Constructor for convenience
+    // Variables used for calculating MVC
+    float mvc_d;
+    Vector3f mvc_u;
+    float mvc_l;
+    float mvc_theta;
+    float mvc_c;
+    float mvc_s;
+
+    // Constructor
     Vertex(const Eigen::Vector3f& pos) : position(pos), halfEdge(nullptr) {}
 };
 
 struct Face {
     HalfEdge* halfEdges[3];  // Array to store pointers to the face's half-edges
 
-    // Constructor for convenience
+    // Constructor
     Face() : halfEdges{nullptr, nullptr, nullptr} {}
+
+    Eigen::Vector3f calculateNormal() const {
+        if (halfEdges[0] == nullptr || halfEdges[1] == nullptr || halfEdges[2] == nullptr) {
+            // Invalid face, return zero vector as placeholder
+            return Eigen::Vector3f(0.0f, 0.0f, 0.0f);
+        }
+        // Obtain the position of the vertices
+        Eigen::Vector3f p0 = halfEdges[0]->vertex->position;
+        Eigen::Vector3f p1 = halfEdges[1]->vertex->position;
+        Eigen::Vector3f p2 = halfEdges[2]->vertex->position;
+
+        // Compute two vectors on the face
+        Eigen::Vector3f v1 = p1 - p0;
+        Eigen::Vector3f v2 = p2 - p0;
+
+        // Compute the cross product to get the face normal
+        Eigen::Vector3f normal = v1.cross(v2);
+
+        // Normalize the normal to ensure it's a unit vector
+        normal.normalize();
+
+        return normal;
+    }
+
+    float calculateArea() const {
+        if (halfEdges[0] == nullptr || halfEdges[1] == nullptr || halfEdges[2] == nullptr) {
+            // Invalid face, return 0 as a placeholder
+            return 0.0f;
+        }
+        // Obtain the position of the vertices
+        Eigen::Vector3f p0 = halfEdges[0]->vertex->position;
+        Eigen::Vector3f p1 = halfEdges[1]->vertex->position;
+        Eigen::Vector3f p2 = halfEdges[2]->vertex->position;
+
+        // Compute two vectors on the face
+        Eigen::Vector3f v1 = p1 - p0;
+        Eigen::Vector3f v2 = p2 - p0;
+
+        // Compute the cross product to get the area of the parallelogram
+        Eigen::Vector3f crossProduct = v1.cross(v2);
+
+        // The area of the triangle is half the magnitude of the cross product
+        float area = 0.5f * crossProduct.norm();
+
+        return area;
+    }
 };
 
 struct pair_hash {
@@ -63,7 +118,7 @@ public:
 
     std::vector<Vertex> vertices;
     std::list<HalfEdge> halfEdges;
-    std::list<Face> faces;
+    std::vector<Face> faces;
 
     void buildHalfEdgeStructure(const std::vector<Eigen::Vector3f>& _vertices,
                                 const std::vector<Eigen::Vector3i>& _faces);

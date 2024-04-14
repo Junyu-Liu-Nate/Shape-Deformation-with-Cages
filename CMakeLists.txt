@@ -51,6 +51,12 @@ add_executable(${PROJECT_NAME}
     util/unsupportedeigenthing/OpenGLSupport
     src/mesh_struct/halfedgemesh.h src/mesh_struct/halfedgemesh.cpp
     src/coordinates/greencoordinates3d.h src/coordinates/greencoordinates3d.cpp
+    src/mesh_struct/halfedgemeshobject.h src/mesh_struct/halfedgemeshobject.cpp
+    src/object3d.h src/object3d.cpp
+    src/coordinates/mvc3d.h src/coordinates/mvc3d.cpp
+    src/coordinates/greencoordinates2d.h src/coordinates/greencoordinates2d.cpp
+    src/object2d.h src/object2d.cpp
+    src/cage2d.h src/cage2d.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`

@@ -18,7 +18,8 @@ void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, Ha
         for (HalfEdge* halfEdge : face.halfEdges) {
             halfEdge->vertex->calculatePosition = halfEdge->vertex->position - vertexPos;
         }
-        Vector3f faceNormal = calculateFaceNormal(face);
+
+        Vector3f faceNormal = face.calculateNormal();
         Vector3f p = (face.halfEdges[0]->vertex->calculatePosition.dot(faceNormal)) * faceNormal;
 
         for (HalfEdge* halfEdge : face.halfEdges) {
@@ -40,9 +41,9 @@ void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, Ha
 
         Vector3f omega = faceNormal * I;
         for (HalfEdge* halfEdge : face.halfEdges) {
-            omega += halfEdge->vertex->N * I * halfEdge->vertex->I;
+            omega += halfEdge->vertex->N * halfEdge->vertex->II;
         }
-        float epsilon = 0.5; // TODO: Check how to set this
+        float epsilon = 0.00001; // TODO: Check how to set this
         if (omega.norm() > epsilon) {
             for (HalfEdge* halfEdge : face.halfEdges) {
                 int vertexIdx = halfEdge->vertex->vertexIdx;
@@ -54,16 +55,64 @@ void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, Ha
     }
 }
 
+void GreenCoordinates3D::constructGreenCoordinatesExterior(const Vector3f& vertexPos, HalfEdgeMesh& cage) {
+    //--- Construct the coordinates the same as internal at first
+    constructGreenCoordinates(vertexPos, cage);
+
+    //--- Add alphas and betas
+    int j = 0;
+    for (Face& face : cage.faces) {
+        // TODO: Need to figure out a way to define the EXIT FACE !!!!!!
+        if (face.calculateNormal() != Vector3f(0,-1,0)) {
+            j++;
+            continue;
+        }
+
+        vector<Vector3f> vList(3);
+        std::fill(vList.begin(), vList.end(), Vector3f(0,0,0));
+
+        for (int i = 0; i < 3; i++) {
+            vList.at(i) = face.halfEdges[i]->vertex->position;
+        }
+
+        Vector3f faceNormal = face.calculateNormal();
+
+        MatrixXf A(4, 4);
+//        cout << vList.at(0) << endl;
+        A << vList.at(0), vList.at(1), vList.at(2), faceNormal,
+            1, 1, 1, 0;
+//        cout << A << endl;
+        Vector4f b;
+        b << vertexPos, 1;
+//        cout << b << endl << endl;
+
+        Vector4f solution = A.colPivHouseholderQr().solve(b);
+//        cout << solution << endl;
+
+        for (int i = 0; i < 3; i++) {
+            int vertexIdx = face.halfEdges[i]->vertex->vertexIdx;
+            phiCoords.at(vertexIdx) += solution[i];
+//            cout << phiCoords.at(vertexIdx) << endl;
+        }
+
+        psiCoords.at(j) += solution[3];
+//        cout << psiCoords.at(j) << endl << endl;
+
+        j++;
+        break;
+    }
+}
+
 float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3f eta) {
     //--- Calculate alpha
     float alphaNominator = (v2 - v1).dot(p - v1);
     float alphaDenominator = (v2 - v1).norm() * (p - v1).norm();
-    float alpha = acos(alphaDenominator / alphaNominator);
+    float alpha = acos(alphaNominator / alphaDenominator);
 
     //--- Calculate beta
     float betaNominator = (v1 - p).dot(v2 - p);
     float betaDenominator = (v1 - p).norm() * (v2 - p).norm();
-    float beta = acos(betaDenominator / betaNominator);
+    float beta = acos(betaNominator / betaDenominator);
 
     //--- Calculate lambda
     float lambda = (p - v1).norm() * (p - v1).norm() * sin(alpha) * sin(alpha);
@@ -71,10 +120,10 @@ float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3
     //--- Calculate c
     float c = (p - eta).norm() * (p - eta).norm();
 
-    std::vector<float> thetaList;
+    std::vector<float> thetaList(2, 0.0f);
     thetaList.at(0) = M_PI - alpha;
     thetaList.at(1) = M_PI - alpha - beta;
-    std::vector<float> IList;
+    std::vector<float> IList(2, 0.0f);
     for (int i = 0; i < 2; i++) {
         float theta = thetaList.at(i);
         float S = sin(theta);
@@ -94,19 +143,3 @@ float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3
     return result;
 }
 
-
-Eigen::Vector3f GreenCoordinates3D::calculateFaceNormal(const Face& face) {
-    // Ensure valid half-edge pointers
-    if (!face.halfEdges[0] || !face.halfEdges[1] || !face.halfEdges[2]) {
-        throw std::runtime_error("Face has invalid half-edges.");
-    }
-
-    Eigen::Vector3f edgeVec1 = face.halfEdges[1]->vertex->position - face.halfEdges[0]->vertex->position;
-    Eigen::Vector3f edgeVec2 = face.halfEdges[2]->vertex->position - face.halfEdges[0]->vertex->position;
-
-    Eigen::Vector3f normal = edgeVec1.cross(edgeVec2);
-
-    normal.normalize();
-
-    return normal;
-}

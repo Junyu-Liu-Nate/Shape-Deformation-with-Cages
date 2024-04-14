@@ -12,7 +12,10 @@ void HalfEdgeMesh::buildHalfEdgeStructure(const std::vector<Eigen::Vector3f>& _v
     int idx = 0;
     for (const auto& pos : _vertices) {
         vertices.emplace_back(pos);
-        vertices.back().vertexIdx = idx++;  // Store the index
+        Vertex& newVertex = vertices.back();
+        newVertex.vertexIdx = idx++;  // Store the index
+        newVertex.position = pos;     // Set current position
+        newVertex.initialPosition = pos;  // Set initial position as well
     }
 
     // Create a map for edge lookup
@@ -75,8 +78,7 @@ void HalfEdgeMesh::buildHalfEdgeStructure(const std::vector<Eigen::Vector3f>& _v
 
 void HalfEdgeMesh::updateVertexPos(std::vector<Eigen::Vector3f>& outVertices) {
     for (Vertex& vertex : vertices) {
-        outVertices[vertex.vertexIdx] = vertex.nextPosition;
-        vertex.position = vertex.nextPosition;
+        outVertices[vertex.vertexIdx] = vertex.position;
     }
 }
 
