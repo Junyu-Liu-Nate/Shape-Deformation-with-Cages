@@ -58,7 +58,7 @@ void MVC3D::constructMVC(const Vector3f& vertexPos, HalfEdgeMesh& cage) {
             }
             float nominator = halfEdge->vertex->mvc_theta - halfEdge->next->vertex->mvc_c * halfEdge->next->next->vertex->mvc_theta - halfEdge->next->next->vertex->mvc_c * halfEdge->next->vertex->mvc_theta;
             float denominator = halfEdge->vertex->mvc_d * sin(halfEdge->next->vertex->mvc_theta) * halfEdge->next->next->vertex->mvc_s;
-            wCoords.at(halfEdge->vertex->vertexIdx) = nominator / denominator;
+            wCoords.at(halfEdge->vertex->vertexIdx) += nominator / denominator;
         }
     }
 }
