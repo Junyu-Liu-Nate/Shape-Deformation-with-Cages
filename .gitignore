@@ -286,3 +286,18 @@ tmp/
 
 # Eigen
 Eigen
+/.qtc_clangd
+/.qtc
+/.qt
+.ninja_deps
+.ninja_log
+build.ninja
+/CMakeFiles
+/green_coordinates_autogen
+/StaticGLEW_autogen
+/Testing
+qtcsettings.cmake
+green_coordinates
+CMakeCache.txt.prev
+CMakeCache.txt
+cmake_install.cmake

@@ -51,6 +51,7 @@ add_executable(${PROJECT_NAME}
     util/unsupportedeigenthing/OpenGLSupport
     src/mesh_struct/halfedgemesh.h src/mesh_struct/halfedgemesh.cpp
     src/coordinates/greencoordinates3d.h src/coordinates/greencoordinates3d.cpp
+    src/render2d.h src/render2d.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
@@ -81,6 +82,8 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
     FILES
         resources/shaders/shader.frag
         resources/shaders/shader.vert
+        resources/shaders/texture.frag
+        resources/shaders/texture.vert
         resources/shaders/anchorPoint.vert
         resources/shaders/anchorPoint.geom
         resources/shaders/anchorPoint.frag

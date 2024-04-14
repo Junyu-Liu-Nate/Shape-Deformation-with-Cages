@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include "glwidget.h"
+#include "render2d.h"
 
 class MainWindow : public QWidget
 {
@@ -13,4 +14,6 @@ public:
 
 private:
     GLWidget *glWidget;
+    Render2D *render2d;
+
 };
