@@ -19,20 +19,54 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3f> vertices;
     vector<Vector3i> triangles;
 
-    //----- Read in cage
-    if (MeshLoader::loadTriMesh("meshes/3d/bar_cage_partial.obj", vertices, triangles)) {
-        m_shape_cage.init(vertices, triangles);
+    //--- Hardcode cage
+    // cage points
+    cagePoints.resize(4);
+    cagePoints.clear();
+    cagePoints.push_back(Vector2f(1, -1));
+    cagePoints.push_back(Vector2f(1, 1));
+    cagePoints.push_back(Vector2f(-1, 1));
+    cagePoints.push_back(Vector2f(-1, -1));
+
+    // cage edges
+    cageEdges.resize(4);
+    cageEdges.clear();
+    for(int i = 0; i < cagePoints.size(); ++i) {
+        std::pair<Vector2f, Vector2f> edge;
+
+        // Last position, do the first minus the last
+        if (i == cagePoints.size() - 1) {
+            edge.first = cagePoints[i];
+            edge.second = cagePoints[0];
+        }
+
+        // Store the value of the next element minus the current element
+        else {
+            edge.first = cagePoints[i];
+            edge.second = cagePoints[i + 1];
+        }
+        cageEdges.push_back(edge);
     }
 
-    // Build halfedge structure for the cage
-    heMesh.buildHalfEdgeStructure(vertices, triangles);
-    heMesh.updateVertexPos(vertices);
+    // cage mesh - used for rendering
+    vertices.clear();
+    vertices.push_back(Vector3f(1, -1, 0));
+    vertices.push_back(Vector3f(1, 1, 0));
+    vertices.push_back(Vector3f(-1, 1, 0));
+    vertices.push_back(Vector3f(-1, -1, 0));
+    triangles.clear();
+    triangles.push_back(Vector3i(0,1,2));
+    triangles.push_back(Vector3i(2,3,0));
+    triangles.push_back(Vector3i(1,0,2));
+    triangles.push_back(Vector3i(2,0,3));
+
+    m_shape_cage.init(vertices, triangles);
 
     //----- Read in object
     vector<Vector3f> objectVertices;
     vector<Vector3i> objectTriangles;
 
-    if (MeshLoader::loadTriMesh("meshes/3d/bar.obj", objectVertices, objectTriangles)) {
+    if (MeshLoader::loadTriMesh("meshes/2d/rectangle.obj", objectVertices, objectTriangles)) {
         m_shape_object.init(objectVertices, objectTriangles);
     }
 
@@ -56,10 +90,10 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
 
     // Update cage vertex positions
     updateCage(new_vertices, vertex, targetPosition);
-    heMesh.updateVertexPos(new_vertices);
+//    heMesh.updateVertexPos(new_vertices);
 
     // Update object vertex positions
-    object2D.updateVertices();
+    object2D.updateVertices(cagePoints, cageEdges);
     std::vector<Eigen::Vector3f> new_object_vertices = object2D.getVertices();
 
     m_shape_cage.setVertices(new_vertices);
@@ -68,17 +102,17 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
 
 // Set the cage vertex position to target position
 void Cage2D::updateCage(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition) {
-#pragma omp parallel for
     for (int i = 0; i < new_vertices.size(); i++) {
         if (i == vertex) {
-            heMesh.vertices.at(i).position = targetPosition;
+            cagePoints.at(i) = Vector2f(targetPosition.x(), targetPosition.y());
         }
         else {
-            heMesh.vertices.at(i).position = new_vertices.at(i);
+            cagePoints.at(i) = Vector2f(new_vertices.at(i).x(), new_vertices.at(i).y());
         }
     }
 }
 
+// Build coordinates for all vertices
 void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices) {
     object2D.vertexList.resize(objectVertices.size());
     for (int i = 0; i < objectVertices.size(); i++) {
@@ -86,7 +120,7 @@ void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices) {
         objectVertex.position = Vector2f(objectVertices.at(i).x(), objectVertices.at(i).y());
 
         // Build 2D Green Coordinates
-        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position);
+        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
 
         object2D.vertexList.at(i) = objectVertex;
     }

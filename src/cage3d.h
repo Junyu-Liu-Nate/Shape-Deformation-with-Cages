@@ -7,7 +7,6 @@
 #include <QtConcurrent>
 #include "mesh_struct/halfedgemesh.h"
 #include "object3d.h"
-#include "object2d.h"
 
 class Shader;
 
