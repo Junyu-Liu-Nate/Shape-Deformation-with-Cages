@@ -5,6 +5,7 @@
 #include <Eigen/SVD>
 #include "coordinates/greencoordinates3d.h"
 #include "coordinates/mvc3d.h"
+#include "coordinates/greencoordinates2d.h"
 #include "mesh_struct/halfedgemesh.h"
 
 using namespace std;
@@ -12,8 +13,11 @@ using namespace Eigen;
 
 struct ObjectVertex {
     Vector3f position;
+
     GreenCoordinates3D greenCord;
     MVC3D mvcCoord;
+    // For test only
+    GreenCoordinates2D greenCord2D;
 };
 
 class Object3D

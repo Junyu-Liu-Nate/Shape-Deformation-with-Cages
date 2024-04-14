@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CAGE2D_H
+#define CAGE2D_H
 
 #include "graphics/shape.h"
 #include "Eigen/StdList"
@@ -6,33 +7,29 @@
 #include <Eigen/Sparse>
 #include <QtConcurrent>
 #include "mesh_struct/halfedgemesh.h"
-#include "object3d.h"
 #include "object2d.h"
 
 class Shader;
 
-class Cage3D
+class Cage2D
 {
 private:
     Shape m_shape_cage;
     Shape m_shape_object;
 
 public:
-    Cage3D();
+    Cage2D();
 
     void init(Eigen::Vector3f &min, Eigen::Vector3f &max);
     void move(int vertex, Eigen::Vector3f pos);
 
     HalfEdgeMesh heMesh;
-    
+
     void updateCage(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition);
 
-    Object3D object3D;
-    void buildVertexList(vector<Vector3f> objectVertices);
-    void updatePosition();
-
-    bool rayIntersectsTriangle(const Eigen::Vector3f& P, const Eigen::Vector3f& D, const Face& face);
-    bool isPointOutsideMesh(const Eigen::Vector3f& point, HalfEdgeMesh& mesh);
+    //----- For test only: 2D case
+    Object2D object2D;
+    void buildVertexList2D(vector<Vector3f> objectVertices);
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 
@@ -62,3 +59,5 @@ public:
         return m_shape_cage.getAnchorPos(lastSelected, pos, ray, start);
     }
 };
+
+#endif // CAGE2D_H

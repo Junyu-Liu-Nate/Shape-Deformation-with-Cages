@@ -98,6 +98,7 @@ void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
     }
 }
 
+
 //---- Check whether a vertex is outside of the cage
 bool Cage3D::rayIntersectsTriangle(const Eigen::Vector3f& P, const Eigen::Vector3f& D, const Face& face) {
     const float EPSILON = 0.0000001f;
