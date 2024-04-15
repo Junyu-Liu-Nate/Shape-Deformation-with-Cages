@@ -27,7 +27,7 @@ public:
     vector<Vector2f> cagePoints;
     vector<std::pair<Vector2f, Vector2f>> cageEdges;
 
-    void updateCage(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition);
+    void updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition);
 
     //----- For test only: 2D case
     Object2D object2D;
@@ -42,8 +42,12 @@ public:
 
     void draw(Shader *shader, GLenum mode)
     {
-        m_shape_cage.draw(shader, mode);
-        m_shape_object.draw(shader, mode);
+        if (mode == GL_POINTS) {
+            m_shape_cage.draw(shader, mode);
+        }else {
+            m_shape_cage.draw(shader, GL_LINES);
+            m_shape_object.draw(shader, GL_TRIANGLES);
+        }
     }
 
     SelectMode select(Shader *shader, int vertex)
