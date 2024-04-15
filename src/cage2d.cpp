@@ -90,7 +90,6 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
 
     // Update cage vertex positions
     updateCage(new_vertices, vertex, targetPosition);
-//    heMesh.updateVertexPos(new_vertices);
 
     // Update object vertex positions
     object2D.updateVertices(cagePoints, cageEdges);
@@ -101,14 +100,16 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
 }
 
 // Set the cage vertex position to target position
-void Cage2D::updateCage(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition) {
+void Cage2D::updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition) {
     for (int i = 0; i < new_vertices.size(); i++) {
         if (i == vertex) {
             cagePoints.at(i) = Vector2f(targetPosition.x(), targetPosition.y());
         }
         else {
             cagePoints.at(i) = Vector2f(new_vertices.at(i).x(), new_vertices.at(i).y());
+
         }
+        new_vertices.at(i) = Vector3f(cagePoints.at(i).x(), cagePoints.at(i).y(), 0);
     }
 }
 
