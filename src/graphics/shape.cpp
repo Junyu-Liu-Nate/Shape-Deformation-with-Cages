@@ -124,6 +124,20 @@ void Shape::draw(Shader *shader, GLenum mode)
         glBindVertexArray(0);
         break;
     }
+    case GL_LINES:
+    {
+        shader->setUniform("wire", 1);
+        shader->setUniform("model", m_modelMatrix);
+        shader->setUniform("inverseTransposeModel", inverseTransposeModel);
+        shader->setUniform("red",   m_red);
+        shader->setUniform("green", m_green);
+        shader->setUniform("blue",  m_blue);
+        shader->setUniform("alpha", m_alpha);
+        glBindVertexArray(m_surfaceVao);
+        glDrawElements(mode, m_numSurfaceVertices, GL_UNSIGNED_INT, reinterpret_cast<GLvoid *>(0));
+        glBindVertexArray(0);
+        break;
+    }
     case GL_POINTS:
     {
         shader->setUniform("model", m_modelMatrix);

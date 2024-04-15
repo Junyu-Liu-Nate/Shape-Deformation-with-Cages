@@ -3,13 +3,17 @@ out vec4 fragColor;
 
 in vec3 normal_cameraSpace;
 
-uniform int   wire  = 1;
+uniform int   wire  = 0;
 uniform float red   = 1.0;
 uniform float green = 1.0;
 uniform float blue  = 1.0;
 uniform float alpha = 1.0;
 
 void main() {
+    if (wire == 1) {
+        fragColor = vec4(0.0, 0.0, 0.0, 1);
+        return;
+    }
 
     // Do lighting in camera space
     vec3 lightDir = normalize(vec3(0, 0.5, 1));
