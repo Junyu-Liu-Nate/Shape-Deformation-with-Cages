@@ -17,6 +17,8 @@ public:
     vector<float> phiCoords;
     vector<float> psiCoords;
 
+    float numericalEpsilon = 1e-8;  // A small value to prevent division by zero
+
     void constructGreenCoordinates(const Vector3f& vertexPos, HalfEdgeMesh& cage);
     void constructGreenCoordinatesExterior(const Vector3f& vertexPos, HalfEdgeMesh& cage);
 
