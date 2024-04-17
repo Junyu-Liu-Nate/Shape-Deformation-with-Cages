@@ -30,6 +30,7 @@ void Object3D::updateVertices(const HalfEdgeMesh& heMesh) {
 //    }
 
     //----- MVC Coordinates
+    #pragma omp parallel for
     for (ObjectVertex& objectVertex : vertexList) {
         Vector3f newPos = Vector3f(0,0,0);
         float wTotal = 0;

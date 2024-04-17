@@ -60,19 +60,10 @@ void MVC3D::constructMVC(const Vector3f& vertexPos, HalfEdgeMesh& cage) {
             }
             float nominator = halfEdge->vertex->mvc_theta - halfEdge->next->vertex->mvc_c * halfEdge->next->next->vertex->mvc_theta - halfEdge->next->next->vertex->mvc_c * halfEdge->next->vertex->mvc_theta;
             float denominator = halfEdge->vertex->mvc_d * sin(halfEdge->next->vertex->mvc_theta) * halfEdge->next->next->vertex->mvc_s;
-//            if (isnan(nominator)) {
-//                cout << "nominator is nan" << endl;
-//            }
-//            if (isnan(denominator)) {
-//                cout << "denominator is nan" << endl;
-//            }
             if (denominator == 0) {
                 continue;
             }
             wCoords.at(halfEdge->vertex->vertexIdx) += nominator / denominator;
-            if (isnan(wCoords.at(halfEdge->vertex->vertexIdx))) {
-                cout << "wCoords.at(halfEdge->vertex->vertexIdx) is nan: " << nominator << ", " << denominator << endl;
-            }
         }
     }
 }

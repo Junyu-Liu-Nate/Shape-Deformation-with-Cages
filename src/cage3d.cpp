@@ -17,7 +17,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3i> triangles;
 
     //----- Read in cage
-    if (MeshLoader::loadTriMesh("meshes/3d/complex/flower/flower_bounding-proxy.obj", vertices, triangles)) {
+    if (MeshLoader::loadTriMesh("meshes/3d/complex/boy/boy_bounding-proxy.obj", vertices, triangles)) {
         m_shape_cage.init(vertices, triangles);
     }
 
@@ -29,7 +29,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3f> objectVertices;
     vector<Vector3i> objectTriangles;
 
-    if (MeshLoader::loadTriMesh("meshes/3d/complex/flower/flower.obj", objectVertices, objectTriangles)) {
+    if (MeshLoader::loadTriMesh("meshes/3d/complex/boy/boy.obj", objectVertices, objectTriangles)) {
         m_shape_object.init(objectVertices, objectTriangles);
     }
 
@@ -79,6 +79,7 @@ void Cage3D::updateCage(std::vector<Eigen::Vector3f> new_vertices, int vertex, V
 //---- Build the Green Coordinates for all vertices
 void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
     object3D.vertexList.resize(objectVertices.size());
+    #pragma omp parallel for
     for (int i = 0; i < objectVertices.size(); i++) {
         ObjectVertex objectVertex;
         objectVertex.position = objectVertices.at(i);
