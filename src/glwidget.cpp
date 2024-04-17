@@ -72,7 +72,9 @@ void GLWidget::initializeGL()
     glCullFace(GL_BACK);
 
     // Initialize shaders
-    m_defaultShader = new Shader(":resources/shaders/shader.vert",      ":resources/shaders/shader.frag");
+    // m_defaultShader = new Shader(":resources/shaders/shader.vert",      ":resources/shaders/shader.frag");
+    // m_pointShader   = new Shader(":resources/shaders/anchorPoint.vert", ":resources/shaders/anchorPoint.geom", ":resources/shaders/anchorPoint.frag");
+    m_defaultShader = new Shader(":resources/shaders/texture.vert",      ":resources/shaders/texture.frag");
     m_pointShader   = new Shader(":resources/shaders/anchorPoint.vert", ":resources/shaders/anchorPoint.geom", ":resources/shaders/anchorPoint.frag");
 
     // Initialize ARAP, and get parameters needed to decide the camera position, etc
@@ -110,6 +112,8 @@ void GLWidget::initializeGL()
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glEnable(GL_DEPTH_TEST); // new
 
     m_defaultShader->bind();
     m_defaultShader->setUniform("proj", m_camera.getProjection());

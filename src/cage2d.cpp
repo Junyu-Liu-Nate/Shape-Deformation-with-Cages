@@ -57,10 +57,22 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     triangles.clear();
     triangles.push_back(Vector3i(0,1,2));
     triangles.push_back(Vector3i(2,3,0));
-    triangles.push_back(Vector3i(1,0,2));
-    triangles.push_back(Vector3i(2,0,3));
+    // triangles.push_back(Vector3i(1,0,2));
+    // triangles.push_back(Vector3i(2,0,3));
 
-    m_shape_cage.init(vertices, triangles);
+    vector<Vector2f> uvCoords = {
+        // Vector2f(1, 0),
+        // Vector2f(1, 1),
+        // Vector2f(0, 1),
+        // Vector2f(0, 0)
+        Vector2f(1, 1),
+        Vector2f(1, 0),
+        Vector2f(0, 0),
+        Vector2f(0, 1)
+    };
+
+    // m_shape_cage.init(vertices, triangles);
+    m_shape_cage.init2d(vertices, triangles, uvCoords);
 
     //----- Read in object
     vector<Vector3f> objectVertices;
@@ -95,8 +107,10 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
     object2D.updateVertices(cagePoints, cageEdges);
     std::vector<Eigen::Vector3f> new_object_vertices = object2D.getVertices();
 
-    m_shape_cage.setVertices(new_vertices);
-    m_shape_object.setVertices(new_object_vertices);
+    // m_shape_cage.setVertices(new_vertices);
+    // m_shape_object.setVertices(new_object_vertices);
+    m_shape_cage.setVertices2d(new_vertices);
+    m_shape_object.setVertices2d(new_object_vertices);
 }
 
 // Set the cage vertex position to target position
