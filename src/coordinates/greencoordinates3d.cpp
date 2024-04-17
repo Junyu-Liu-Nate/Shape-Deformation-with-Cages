@@ -48,9 +48,9 @@ void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, Ha
         }
         float I = -abs(ISum);
         psiCoords.at(j) = -I;
-        if (isinf(psiCoords.at(j))) {
-            cout << "psiCoords is inf" << endl;
-        }
+//        if (isinf(psiCoords.at(j)) || isnan(psiCoords.at(j))) {
+//            cout << "psiCoords is inf or nan" << endl;
+//        }
 
         Vector3f omega = faceNormal * I;
         for (HalfEdge* halfEdge : face.halfEdges) {
@@ -61,9 +61,9 @@ void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, Ha
             for (HalfEdge* halfEdge : face.halfEdges) {
                 int vertexIdx = halfEdge->vertex->vertexIdx;
                 phiCoords.at(vertexIdx) += (halfEdge->next->vertex->N.dot(omega)) / (halfEdge->next->vertex->N.dot(halfEdge->vertex->calculatePosition));
-                if (isinf(phiCoords.at(vertexIdx))) {
-                    cout << "phiCoords is inf" << endl;
-                }
+//                if (isinf(phiCoords.at(vertexIdx)) || isnan(phiCoords.at(vertexIdx))) {
+//                    cout << "phiCoords is inf" << endl;
+//                }
             }
         }
 
@@ -157,23 +157,28 @@ float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3
         if (isinf(term3a) || isnan(term3a)) {
             term3a = (2 * sqrt(lambda) * S * S) / ((1 - C) * (1 - C) + numericalEpsilon);
         }
-//        float term3a = (2 * sqrt(lambda) * S * S) / ((1 - C) * (1 - C) + numericalEpsilon);
         float term3b = 1 - 2*c*C / (c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S));
         if (isinf(term3b) || isnan(term3b)) {
             term3b = 1 - 2*c*C / (c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S) + numericalEpsilon);
         }
-//        float term3b = 1 - 2*c*C / (c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S + numericalEpsilon) + numericalEpsilon);
         float term3 = sqrt(lambda) * log(term3a * term3b);
         if (isinf(term3) || isnan(term3)) {
             term3 = sqrt(lambda) * log(term3a * term3b + numericalEpsilon);
+//            cout << "lambda: " << lambda << "; corrected: " << term3 << endl;
+        }
+        else {
+//            cout << "raw: " << term3 << endl;
         }
 
-        if (isinf(term3) || isnan(term3)) {
+//        if (isinf(term2) || isnan(term2)) {
 //            cout << "Invalid term3" << endl;
 //            cout << "term3a: " << term3a << endl;
 //            cout << "term3b: " << term3b << endl;
+//            cout << "C: " << C << endl;
 //            cout << "c: " << c << endl;
-        }
+//            cout << "2*c*C: " << 2*c*C << endl;
+//            cout << "(c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S)): " << (c * (1+C)) << endl;
+//        }
 
         IList.at(i) = term1 * (term2 + term3);
     }

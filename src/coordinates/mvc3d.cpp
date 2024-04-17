@@ -10,7 +10,7 @@ void MVC3D::constructMVC(const Vector3f& vertexPos, HalfEdgeMesh& cage) {
     wCoords.resize(cage.vertices.size());
     std::fill(wCoords.begin(), wCoords.end(), 0.0f);
 
-    float epsilon = 0.0f; // TODO: Check how to set this!!!!!!!!!
+    float epsilon = 1e-8; // TODO: Check how to set this!!!!!!!!!
 
     //--- Setup u for all vertices
     for (Vertex& vertex : cage.vertices) {
@@ -49,7 +49,9 @@ void MVC3D::constructMVC(const Vector3f& vertexPos, HalfEdgeMesh& cage) {
             float denominator = sin(halfEdge->next->vertex->mvc_theta) * sin(halfEdge->next->next->vertex->mvc_theta);
             halfEdge->vertex->mvc_c = nominator / denominator - 1;
 
-            halfEdge->vertex->mvc_s = copysign(1.0, uMatrix.determinant()) * sqrt(1 - pow(halfEdge->vertex->mvc_c, 2));
+            float clampedValue = max(0.0, 1 - pow(halfEdge->vertex->mvc_c, 2));
+//            halfEdge->vertex->mvc_s = copysign(1.0, uMatrix.determinant()) * sqrt(1 - pow(halfEdge->vertex->mvc_c, 2));
+            halfEdge->vertex->mvc_s = copysign(1.0, uMatrix.determinant()) * sqrt(clampedValue);
         }
 
         for (HalfEdge* halfEdge : face.halfEdges) {
@@ -58,7 +60,19 @@ void MVC3D::constructMVC(const Vector3f& vertexPos, HalfEdgeMesh& cage) {
             }
             float nominator = halfEdge->vertex->mvc_theta - halfEdge->next->vertex->mvc_c * halfEdge->next->next->vertex->mvc_theta - halfEdge->next->next->vertex->mvc_c * halfEdge->next->vertex->mvc_theta;
             float denominator = halfEdge->vertex->mvc_d * sin(halfEdge->next->vertex->mvc_theta) * halfEdge->next->next->vertex->mvc_s;
+//            if (isnan(nominator)) {
+//                cout << "nominator is nan" << endl;
+//            }
+//            if (isnan(denominator)) {
+//                cout << "denominator is nan" << endl;
+//            }
+            if (denominator == 0) {
+                continue;
+            }
             wCoords.at(halfEdge->vertex->vertexIdx) += nominator / denominator;
+            if (isnan(wCoords.at(halfEdge->vertex->vertexIdx))) {
+                cout << "wCoords.at(halfEdge->vertex->vertexIdx) is nan: " << nominator << ", " << denominator << endl;
+            }
         }
     }
 }
