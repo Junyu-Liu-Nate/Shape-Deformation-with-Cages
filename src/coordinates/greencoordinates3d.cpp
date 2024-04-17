@@ -31,39 +31,51 @@ void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, Ha
             thisVertex->q = nextVertex->calculatePosition.cross(thisVertex->calculatePosition);
             thisVertex->N = thisVertex->q / thisVertex->q.norm();
 
-            if (isinf(thisVertex->s)) {
-                cout << "s is inf" << endl;
-            }
-            if (isinf(thisVertex->I)) {
-                cout << "I is inf" << endl << endl;
-            }
-            if (isinf(thisVertex->II)) {
-                cout << "II is inf" << endl;
-            }
+//            if (isinf(thisVertex->s)) {
+//                cout << "s is inf" << endl;
+//            }
+//            if (isinf(thisVertex->I)) {
+//                cout << "I is inf" << endl << endl;
+//            }
+//            if (isinf(thisVertex->II)) {
+//                cout << "II is inf" << endl;
+//            }
         }
 
         float ISum = 0;
         for (HalfEdge* halfEdge : face.halfEdges) {
+            if (isnan(halfEdge->vertex->I) || isinf(halfEdge->vertex->I)) {
+                continue;
+            }
             ISum += halfEdge->vertex->s * halfEdge->vertex->I;
         }
         float I = -abs(ISum);
         psiCoords.at(j) = -I;
-//        if (isinf(psiCoords.at(j)) || isnan(psiCoords.at(j))) {
-//            cout << "psiCoords is inf or nan" << endl;
-//        }
+        if (isinf(psiCoords.at(j)) || isnan(psiCoords.at(j))) {
+            cout << "psiCoords is inf or nan" << endl;
+        }
 
         Vector3f omega = faceNormal * I;
         for (HalfEdge* halfEdge : face.halfEdges) {
+            if (isnan(halfEdge->vertex->II) || isinf(halfEdge->vertex->II)) {
+                continue;
+            }
             omega += halfEdge->vertex->N * halfEdge->vertex->II;
         }
-        float epsilon = 0.0; // TODO: Check how to set this
+        float epsilon = 0.0001; // TODO: Check how to set this
         if (omega.norm() > epsilon) {
             for (HalfEdge* halfEdge : face.halfEdges) {
                 int vertexIdx = halfEdge->vertex->vertexIdx;
+                if (isinf((halfEdge->next->vertex->N.dot(omega)) / (halfEdge->next->vertex->N.dot(halfEdge->vertex->calculatePosition)))) {
+                    continue;
+                }
                 phiCoords.at(vertexIdx) += (halfEdge->next->vertex->N.dot(omega)) / (halfEdge->next->vertex->N.dot(halfEdge->vertex->calculatePosition));
-//                if (isinf(phiCoords.at(vertexIdx)) || isnan(phiCoords.at(vertexIdx))) {
-//                    cout << "phiCoords is inf" << endl;
-//                }
+                if (isinf(phiCoords.at(vertexIdx))) {
+                    cout << "phiCoords is inf" << endl;
+                }
+                if (isnan(phiCoords.at(vertexIdx))) {
+                    cout << "phiCoords is nan" << endl;
+                }
             }
         }
 
@@ -123,18 +135,18 @@ float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3
     //--- Calculate alpha
     float alphaNominator = (v2 - v1).dot(p - v1);
     float alphaDenominator = (v2 - v1).norm() * (p - v1).norm();
-    float alphaInput = alphaNominator / alphaDenominator;
-    alphaInput = std::max(-1.0f, std::min(1.0f, alphaInput)); // Clamp the value to stay within [-1, 1]
-    float alpha = acos(alphaInput);
-//    float alpha = acos(alphaNominator / alphaDenominator);
+//    float alphaInput = alphaNominator / alphaDenominator;
+//    alphaInput = std::max(-1.0f, std::min(1.0f, alphaInput)); // Clamp the value to stay within [-1, 1]
+//    float alpha = acos(alphaInput);
+    float alpha = acos(alphaNominator / alphaDenominator);
 
     //--- Calculate beta
     float betaNominator = (v1 - p).dot(v2 - p);
     float betaDenominator = (v1 - p).norm() * (v2 - p).norm();
-    float betaInput = betaNominator / betaDenominator;
-    betaInput = std::max(-1.0f, std::min(1.0f, betaInput)); // Clamp the value to stay within [-1, 1]
-    float beta = acos(betaInput);
-//    float beta = acos(betaNominator / betaDenominator);
+//    float betaInput = betaNominator / betaDenominator;
+//    betaInput = std::max(-1.0f, std::min(1.0f, betaInput)); // Clamp the value to stay within [-1, 1]
+//    float beta = acos(betaInput);
+    float beta = acos(betaNominator / betaDenominator);
 
     //--- Calculate lambda
     float lambda = (p - v1).norm() * (p - v1).norm() * sin(alpha) * sin(alpha);
@@ -153,48 +165,26 @@ float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3
 
         float term1 = -copysign(1.0, S) * 0.5;
         float term2 = 2 * sqrt(c) * atan((sqrt(c) * C) / sqrt(lambda + S*S*c));
+//        if (sqrt(lambda + S*S*c) == 0) {
+//            term2 = 0;
+//        }
         float term3a = (2 * sqrt(lambda) * S * S) / ((1 - C) * (1 - C));
-        if (isinf(term3a) || isnan(term3a)) {
-            term3a = (2 * sqrt(lambda) * S * S) / ((1 - C) * (1 - C) + numericalEpsilon);
-        }
+//        if (isinf(term3a) || isnan(term3a)) {
+//            term3a = (2 * sqrt(lambda) * S * S) / ((1 - C) * (1 - C) + numericalEpsilon);
+//        }
         float term3b = 1 - 2*c*C / (c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S));
-        if (isinf(term3b) || isnan(term3b)) {
-            term3b = 1 - 2*c*C / (c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S) + numericalEpsilon);
-        }
+//        if (isinf(term3b) || isnan(term3b)) {
+//            term3b = 1 - 2*c*C / (c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S) + numericalEpsilon);
+//        }
         float term3 = sqrt(lambda) * log(term3a * term3b);
-        if (isinf(term3) || isnan(term3)) {
-            term3 = sqrt(lambda) * log(term3a * term3b + numericalEpsilon);
-//            cout << "lambda: " << lambda << "; corrected: " << term3 << endl;
-        }
-        else {
-//            cout << "raw: " << term3 << endl;
-        }
-
-//        if (isinf(term2) || isnan(term2)) {
-//            cout << "Invalid term3" << endl;
-//            cout << "term3a: " << term3a << endl;
-//            cout << "term3b: " << term3b << endl;
-//            cout << "C: " << C << endl;
-//            cout << "c: " << c << endl;
-//            cout << "2*c*C: " << 2*c*C << endl;
-//            cout << "(c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S)): " << (c * (1+C)) << endl;
+//        if (isinf(term3) || isnan(term3)) {
+//            term3 = sqrt(lambda) * log(term3a * term3b + numericalEpsilon);
 //        }
 
         IList.at(i) = term1 * (term2 + term3);
     }
 
     float result = -1 / (4*M_PI) * abs(IList.at(0) - IList.at(1) - sqrt(c) * beta);
-
-    if (isinf(result) or isnan(result)) {
-        cout << "Invalid result" << endl;
-//        cout << p.x() << "," << p.y()<< ", " << p.z() << endl;
-//        cout << v1.x() << "," << v1.y()<< ", " << v1.z() << endl;
-//        cout << v2.x() << "," << v2.y()<< ", " << v2.z() << endl;
-//        cout << "alpha: " << alpha << endl;
-//        cout << "beta: " << beta << endl;
-//        cout << "lambda: " << lambda << endl;
-//        cout << "c: " << c << endl;
-    }
 
     return result;
 }

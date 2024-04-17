@@ -17,7 +17,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3i> triangles;
 
     //----- Read in cage
-    if (MeshLoader::loadTriMesh("meshes/3d/complex/boy/boy_bounding-proxy.obj", vertices, triangles)) {
+    if (MeshLoader::loadTriMesh("meshes/3d/simple/bar/bar_cage_complex.obj", vertices, triangles)) {
         m_shape_cage.init(vertices, triangles);
     }
 
@@ -29,7 +29,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3f> objectVertices;
     vector<Vector3i> objectTriangles;
 
-    if (MeshLoader::loadTriMesh("meshes/3d/complex/boy/boy.obj", objectVertices, objectTriangles)) {
+    if (MeshLoader::loadTriMesh("meshes/3d/simple/bar/bar.obj", objectVertices, objectTriangles)) {
         m_shape_object.init(objectVertices, objectTriangles);
     }
 
@@ -85,7 +85,7 @@ void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
         objectVertex.position = objectVertices.at(i);
 
         // Build Green Coordinates
-//        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
+        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
 //        if (!isPointOutsideMesh(objectVertex.position, heMesh)) {
 //            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
 //        }
@@ -94,7 +94,7 @@ void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
 //        }
 
         // Build MVC Coordinates
-        objectVertex.mvcCoord.constructMVC(objectVertex.position, heMesh);
+//        objectVertex.mvcCoord.constructMVC(objectVertex.position, heMesh);
 
         object3D.vertexList.at(i) = objectVertex;
     }
