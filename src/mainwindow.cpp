@@ -3,7 +3,7 @@
 
 MainWindow::MainWindow()
 {
-    glWidget = new GLWidget();
+    glWidget = new GLWidget(RenderMode::Render2D);
 
     QHBoxLayout *container = new QHBoxLayout;
     container->addWidget(glWidget);

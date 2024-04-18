@@ -10,8 +10,9 @@
 using namespace std;
 using namespace Eigen;
 
-GLWidget::GLWidget(QWidget *parent) :
+GLWidget::GLWidget(RenderMode mode, QWidget *parent) :
     QOpenGLWidget(parent),
+    m_mode(mode),
     m_arap(),
     m_camera(),
     m_defaultShader(),
@@ -72,10 +73,12 @@ void GLWidget::initializeGL()
     glCullFace(GL_BACK);
 
     // Initialize shaders
-    // m_defaultShader = new Shader(":resources/shaders/shader.vert",      ":resources/shaders/shader.frag");
-    // m_pointShader   = new Shader(":resources/shaders/anchorPoint.vert", ":resources/shaders/anchorPoint.geom", ":resources/shaders/anchorPoint.frag");
-    m_defaultShader = new Shader(":resources/shaders/texture.vert",      ":resources/shaders/texture.frag");
-    m_pointShader   = new Shader(":resources/shaders/anchorPoint.vert", ":resources/shaders/anchorPoint.geom", ":resources/shaders/anchorPoint.frag");
+    if (m_mode == Render2D) {
+        m_defaultShader = new Shader(":resources/shaders/texture.vert", ":resources/shaders/texture.frag");
+    } else {
+        m_defaultShader = new Shader(":resources/shaders/shader.vert", ":resources/shaders/shader.frag");
+    }
+    m_pointShader = new Shader(":resources/shaders/anchorPoint.vert", ":resources/shaders/anchorPoint.geom", ":resources/shaders/anchorPoint.frag");
 
     // Initialize ARAP, and get parameters needed to decide the camera position, etc
     Vector3f coeffMin, coeffMax;
@@ -112,8 +115,6 @@ void GLWidget::initializeGL()
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glEnable(GL_DEPTH_TEST); // new
 
     m_defaultShader->bind();
     m_defaultShader->setUniform("proj", m_camera.getProjection());

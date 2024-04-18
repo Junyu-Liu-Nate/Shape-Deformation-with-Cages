@@ -11,7 +11,6 @@ EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix2f)
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix3f)
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix3i)
 #include "Eigen/Dense"
-#include <iostream>
 
 enum SelectMode
 {
@@ -28,7 +27,7 @@ public:
     Shape();
 
     void init(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3i> &triangles);
-    void init2d(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3i> &triangles, const std::vector<Eigen::Vector2f> &uvCoords);
+    void initWithTexture(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3i> &triangles, const std::vector<Eigen::Vector2f> &uvCoords);
     void setVertices(const std::vector<Eigen::Vector3f> &vertices);
     void setVertices2d(const std::vector<Eigen::Vector3f> &vertices);
 
@@ -56,6 +55,7 @@ private:
     float m_blue;
     float m_green;
     float m_alpha;
+    bool m_textured = false;
 
     std::vector<Eigen::Vector3i> m_faces;
     std::vector<Eigen::Vector3f> m_vertices;
@@ -74,52 +74,10 @@ private:
                            std::vector<Eigen::Vector3f>& verts,
                            std::vector<Eigen::Vector3f>& normals,
                            std::vector<Eigen::Vector3f>& colors);
-    // void updateMesh2d(const std::vector<Eigen::Vector3i> &triangles,
-    //                 const std::vector<Eigen::Vector3f> &vertices,
-    //                 std::vector<Eigen::Vector3f>& verts,
-    //                 std::vector<Eigen::Vector3f>& normals,
-    //                 std::vector<Eigen::Vector3f>& colors,
-    //                   const std::vector<Eigen::Vector2f>& uvCoords,
-    //                   std::vector<Eigen::Vector2f>& uvs);
     void updateMesh2d(const std::vector<Eigen::Vector3i> &triangles,
                       const std::vector<Eigen::Vector3f> &vertices,
                       std::vector<Eigen::Vector3f>& verts,
                       std::vector<Eigen::Vector3f>& normals,
                       std::vector<Eigen::Vector3f>& colors,
                       const std::vector<Eigen::Vector2f>& uvCoords);
-
-    void CheckGLErrors() {
-        GLenum err;
-        while ((err = glGetError()) != GL_NO_ERROR) {
-            std::string error;
-
-            switch (err) {
-            case GL_INVALID_ENUM:
-                error = "INVALID_ENUM";
-                break;
-            case GL_INVALID_VALUE:
-                error = "INVALID_VALUE";
-                break;
-            case GL_INVALID_OPERATION:
-                error = "INVALID_OPERATION";
-                break;
-            case GL_STACK_OVERFLOW:
-                error = "STACK_OVERFLOW";
-                break;
-            case GL_STACK_UNDERFLOW:
-                error = "STACK_UNDERFLOW";
-                break;
-            case GL_OUT_OF_MEMORY:
-                error = "OUT_OF_MEMORY";
-                break;
-            case GL_INVALID_FRAMEBUFFER_OPERATION:
-                error = "INVALID_FRAMEBUFFER_OPERATION";
-                break;
-            default:
-                error = "UNKNOWN_ERROR";
-                break;
-            }
-            std::cerr << "GL_" << error << std::endl;
-        }
-    }
 };

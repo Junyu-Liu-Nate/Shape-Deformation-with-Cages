@@ -13,14 +13,18 @@
 #include <QElapsedTimer>
 #include <QTimer>
 #include <memory>
-#include <iostream>
+
+enum RenderMode {
+    Render2D,
+    Render3D
+};
 
 class GLWidget : public QOpenGLWidget
 {
     Q_OBJECT
 
 public:
-    GLWidget(QWidget *parent = nullptr);
+    GLWidget(RenderMode mode, QWidget *parent = nullptr);
     ~GLWidget();
 
 private:
@@ -46,8 +50,9 @@ private slots:
     void tick();
 
 private:
+    RenderMode m_mode;
    // Cage3D    m_arap;
-    Cage2D    m_arap;
+    Cage2D  m_arap;
     Camera  m_camera;
     Shader *m_defaultShader;
     Shader *m_pointShader;

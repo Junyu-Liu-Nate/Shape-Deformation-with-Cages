@@ -11,7 +11,5 @@ out vec2 uvPos;
 
 void main() {
     uvPos = inUvPos;
-    // gl_Position = vec4(position, 1.0);
     gl_Position = proj * view * model * vec4(position, 1.0);
-    // gl_Position = view * vec4(position, 1.0);
 }
