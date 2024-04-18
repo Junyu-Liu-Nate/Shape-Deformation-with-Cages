@@ -51,8 +51,8 @@ private slots:
 
 private:
     RenderMode m_mode;
-   // Cage3D    m_arap;
-    Cage2D  m_arap;
+    Cage3D    m_arap;
+//    Cage2D  m_arap;
     Camera  m_camera;
     Shader *m_defaultShader;
     Shader *m_pointShader;
