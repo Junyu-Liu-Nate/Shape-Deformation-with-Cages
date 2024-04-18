@@ -21,7 +21,7 @@ public:
 
     vector<ObjectVertex2D> vertexList;
 
-    void updateVertices(vector<Vector2f> cagePoints, vector<std::pair<Vector2f, Vector2f>> cageEdges);
+    void updateVertices(vector<Vector2f> cagePoints, vector<std::pair<Vector2f, Vector2f>> cageEdges, vector<Vector2f> cageOriginalLengths);
     vector<Vector3f> getVertices();
 };
 

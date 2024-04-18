@@ -26,6 +26,7 @@ public:
     // Hardcoded cage points and edges
     vector<Vector2f> cagePoints;
     vector<std::pair<Vector2f, Vector2f>> cageEdges;
+    vector<Vector2f> cageOriginalLengths;
 
     void updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition);
 

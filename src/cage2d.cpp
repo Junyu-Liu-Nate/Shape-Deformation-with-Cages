@@ -48,6 +48,14 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
         cageEdges.push_back(edge);
     }
 
+    // cage lengths - in the rest position (for calculating s)
+    cageOriginalLengths.resize(4);
+    cageOriginalLengths.clear();
+    for(int i = 0; i < cageEdges.size(); ++i) {
+        Vector2f a = cageEdges.at(i).second - cageEdges.at(i).first;
+        cageOriginalLengths.push_back(a);
+    }
+
     // cage mesh - used for rendering
     vertices.clear();
     vertices.push_back(Vector3f(1, -1, 0));
@@ -92,7 +100,7 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
     updateCage(new_vertices, vertex, targetPosition);
 
     // Update object vertex positions
-    object2D.updateVertices(cagePoints, cageEdges);
+    object2D.updateVertices(cagePoints, cageEdges, cageOriginalLengths);
     std::vector<Eigen::Vector3f> new_object_vertices = object2D.getVertices();
 
     m_shape_cage.setVertices(new_vertices);
@@ -103,12 +111,12 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
 void Cage2D::updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition) {
     for (int i = 0; i < new_vertices.size(); i++) {
         if (i == vertex) {
-            cagePoints.at(i) = Vector2f(targetPosition.x(), targetPosition.y());
+            cagePoints.at(i) = Vector2f(targetPosition.x(), targetPosition.y()); 
         }
         else {
             cagePoints.at(i) = Vector2f(new_vertices.at(i).x(), new_vertices.at(i).y());
-
         }
+        cageEdges.at(i).first = cagePoints.at(i);
         new_vertices.at(i) = Vector3f(cagePoints.at(i).x(), cagePoints.at(i).y(), 0);
     }
 }
