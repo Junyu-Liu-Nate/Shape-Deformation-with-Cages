@@ -288,3 +288,17 @@ tmp/
 Eigen
 meshes/3d/.history/
 meshes/3d/.vscode/
+/.qtc_clangd
+/CMakeFiles
+/green_coordinates_autogen
+/StaticGLEW_autogen
+/Testing
+/.qt
+/.qtc
+*.cmake
+green_coordinates
+CMakeCache.txt
+CMakeCache.txt.prev
+.ninja_log
+.ninja_deps
+build.ninja

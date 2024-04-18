@@ -75,7 +75,14 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3i> objectTriangles;
 
     if (MeshLoader::loadTriMesh("meshes/2d/rectangle.obj", objectVertices, objectTriangles)) {
-        m_shape_object.init(objectVertices, objectTriangles);
+        vector<Vector2f> uvCoords = {
+            Vector2f(1, 1),
+            Vector2f(1, 0),
+            Vector2f(0, 0),
+            Vector2f(0, 1)
+        };
+
+        m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords);
     }
 
     buildVertexList2D(objectVertices);
@@ -103,8 +110,8 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
     object2D.updateVertices(cagePoints, cageEdges, cageOriginalLengths);
     std::vector<Eigen::Vector3f> new_object_vertices = object2D.getVertices();
 
-    m_shape_cage.setVertices(new_vertices);
-    m_shape_object.setVertices(new_object_vertices);
+    m_shape_cage.setVertices2d(new_vertices);
+    m_shape_object.setVertices2d(new_object_vertices);
 }
 
 // Set the cage vertex position to target position

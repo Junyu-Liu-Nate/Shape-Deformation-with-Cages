@@ -9,6 +9,7 @@ uniform float green = 1.0;
 uniform float blue  = 1.0;
 uniform float alpha = 1.0;
 
+
 void main() {
     if (wire == 1) {
         fragColor = vec4(0.0, 0.0, 0.0, 1);

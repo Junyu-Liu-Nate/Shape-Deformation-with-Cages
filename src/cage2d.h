@@ -49,6 +49,7 @@ public:
             m_shape_cage.draw(shader, GL_LINES);
             m_shape_object.draw(shader, GL_TRIANGLES);
         }
+
     }
 
     SelectMode select(Shader *shader, int vertex)

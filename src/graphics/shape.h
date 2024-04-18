@@ -27,7 +27,9 @@ public:
     Shape();
 
     void init(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3i> &triangles);
+    void initWithTexture(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3i> &triangles, const std::vector<Eigen::Vector2f> &uvCoords);
     void setVertices(const std::vector<Eigen::Vector3f> &vertices);
+    void setVertices2d(const std::vector<Eigen::Vector3f> &vertices);
 
     void setModelMatrix(const Eigen::Affine3f &model);
 
@@ -45,6 +47,7 @@ private:
     GLuint m_surfaceVao;
     GLuint m_surfaceVbo;
     GLuint m_surfaceIbo;
+    GLuint m_surfaceTexture;
 
     unsigned int m_numSurfaceVertices;
     unsigned int m_verticesSize;
@@ -52,10 +55,12 @@ private:
     float m_blue;
     float m_green;
     float m_alpha;
+    bool m_textured = false;
 
     std::vector<Eigen::Vector3i> m_faces;
     std::vector<Eigen::Vector3f> m_vertices;
     std::unordered_set<int>      m_anchors;
+    std::vector<Eigen::Vector2f> m_uvs;
 
     Eigen::Matrix4f m_modelMatrix;
     int lastSelected = -1;
@@ -69,4 +74,10 @@ private:
                            std::vector<Eigen::Vector3f>& verts,
                            std::vector<Eigen::Vector3f>& normals,
                            std::vector<Eigen::Vector3f>& colors);
+    void updateMesh2d(const std::vector<Eigen::Vector3i> &triangles,
+                      const std::vector<Eigen::Vector3f> &vertices,
+                      std::vector<Eigen::Vector3f>& verts,
+                      std::vector<Eigen::Vector3f>& normals,
+                      std::vector<Eigen::Vector3f>& colors,
+                      const std::vector<Eigen::Vector2f>& uvCoords);
 };
