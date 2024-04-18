@@ -5,7 +5,7 @@ Object2D::Object2D()
 
 }
 
-void Object2D::updateVertices(vector<Vector2f> cagePoints, vector<std::pair<Vector2f, Vector2f>> cageEdges) {
+void Object2D::updateVertices(vector<Vector2f> cagePoints, vector<std::pair<Vector2f, Vector2f>> cageEdges, vector<Vector2f> cageOriginalLengths) {
     //----- Green Coordinates 2D
     for (ObjectVertex2D& objectVertex : vertexList) {
         Vector2f newPos = Vector2f(0,0);
@@ -20,11 +20,12 @@ void Object2D::updateVertices(vector<Vector2f> cagePoints, vector<std::pair<Vect
         Vector2f term2 = Vector2f(0,0);
         for (int i = 0; i < 4; i++) {
             Vector2f a = cageEdges.at(i).second - cageEdges.at(i).first;
-            Vector2f edgeNormal = Vector2f(-a.y(), a.x());
-            term2 += objectVertex.greenCord.psiCoords.at(i) * edgeNormal * 1.0;
+            Vector2f edgeNormal = Vector2f(-a.y(), a.x()).normalized();
+            float s = a.norm() / cageOriginalLengths.at(i).norm();
+            term2 += objectVertex.greenCord.psiCoords.at(i) * -edgeNormal * s; // TODO: This fix is not consistent with the paper
         }
 
-        objectVertex.position = term1 + term2;
+        objectVertex.position = (term1 + term2);
     }
 }
 
@@ -39,4 +40,3 @@ vector<Vector3f> Object2D::getVertices() {
     return returnVertices;
 }
 
-// TODO: Add the calculation of s

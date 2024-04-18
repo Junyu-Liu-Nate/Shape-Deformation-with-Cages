@@ -44,8 +44,10 @@ public:
     {
         if (mode == GL_POINTS) {
             m_shape_cage.draw(shader, mode);
+//            m_shape_object.draw(shader, mode);
         }else {
             m_shape_cage.draw(shader, GL_LINES);
+//            m_shape_cage.draw(shader, GL_TRIANGLES);
             m_shape_object.draw(shader, GL_TRIANGLES);
         }
     }

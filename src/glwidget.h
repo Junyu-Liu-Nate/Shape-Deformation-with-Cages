@@ -4,7 +4,7 @@
 #define GL_SILENCE_DEPRECATION
 #endif
 
-//#include "cage3d.h"
+#include "cage3d.h"
 #include "cage2d.h"
 #include "graphics/camera.h"
 #include "graphics/shader.h"
@@ -14,12 +14,17 @@
 #include <QTimer>
 #include <memory>
 
+enum RenderMode {
+    Render2D,
+    Render3D
+};
+
 class GLWidget : public QOpenGLWidget
 {
     Q_OBJECT
 
 public:
-    GLWidget(QWidget *parent = nullptr);
+    GLWidget(RenderMode mode, QWidget *parent = nullptr);
     ~GLWidget();
 
 private:
@@ -45,8 +50,9 @@ private slots:
     void tick();
 
 private:
-//    Cage3D    m_arap;
-    Cage2D    m_arap;
+    RenderMode m_mode;
+   // Cage3D    m_arap;
+    Cage2D  m_arap;
     Camera  m_camera;
     Shader *m_defaultShader;
     Shader *m_pointShader;

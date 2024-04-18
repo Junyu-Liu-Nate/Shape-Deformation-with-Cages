@@ -48,6 +48,14 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
         cageEdges.push_back(edge);
     }
 
+    // cage lengths - in the rest position (for calculating s)
+    cageOriginalLengths.resize(4);
+    cageOriginalLengths.clear();
+    for(int i = 0; i < cageEdges.size(); ++i) {
+        Vector2f a = cageEdges.at(i).second - cageEdges.at(i).first;
+        cageOriginalLengths.push_back(a);
+    }
+
     // cage mesh - used for rendering
     vertices.clear();
     vertices.push_back(Vector3f(1, -1, 0));
@@ -67,7 +75,14 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3i> objectTriangles;
 
     if (MeshLoader::loadTriMesh("meshes/2d/rectangle.obj", objectVertices, objectTriangles)) {
-        m_shape_object.init(objectVertices, objectTriangles);
+        vector<Vector2f> uvCoords = {
+            Vector2f(1, 1),
+            Vector2f(1, 0),
+            Vector2f(0, 0),
+            Vector2f(0, 1)
+        };
+
+        m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords);
     }
 
     buildVertexList2D(objectVertices);
@@ -92,23 +107,23 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
     updateCage(new_vertices, vertex, targetPosition);
 
     // Update object vertex positions
-    object2D.updateVertices(cagePoints, cageEdges);
+    object2D.updateVertices(cagePoints, cageEdges, cageOriginalLengths);
     std::vector<Eigen::Vector3f> new_object_vertices = object2D.getVertices();
 
-    m_shape_cage.setVertices(new_vertices);
-    m_shape_object.setVertices(new_object_vertices);
+    m_shape_cage.setVertices2d(new_vertices);
+    m_shape_object.setVertices2d(new_object_vertices);
 }
 
 // Set the cage vertex position to target position
 void Cage2D::updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition) {
     for (int i = 0; i < new_vertices.size(); i++) {
         if (i == vertex) {
-            cagePoints.at(i) = Vector2f(targetPosition.x(), targetPosition.y());
+            cagePoints.at(i) = Vector2f(targetPosition.x(), targetPosition.y()); 
         }
         else {
             cagePoints.at(i) = Vector2f(new_vertices.at(i).x(), new_vertices.at(i).y());
-
         }
+        cageEdges.at(i).first = cagePoints.at(i);
         new_vertices.at(i) = Vector3f(cagePoints.at(i).x(), cagePoints.at(i).y(), 0);
     }
 }

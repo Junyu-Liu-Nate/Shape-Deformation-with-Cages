@@ -30,24 +30,52 @@ void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, Ha
             thisVertex->II = gcTriInt(Vector3f(0,0,0), nextVertex->calculatePosition, thisVertex->calculatePosition, Vector3f(0,0,0));
             thisVertex->q = nextVertex->calculatePosition.cross(thisVertex->calculatePosition);
             thisVertex->N = thisVertex->q / thisVertex->q.norm();
+
+//            if (isinf(thisVertex->s)) {
+//                cout << "s is inf" << endl;
+//            }
+//            if (isinf(thisVertex->I)) {
+//                cout << "I is inf" << endl << endl;
+//            }
+//            if (isinf(thisVertex->II)) {
+//                cout << "II is inf" << endl;
+//            }
         }
 
         float ISum = 0;
         for (HalfEdge* halfEdge : face.halfEdges) {
+            if (isnan(halfEdge->vertex->I) || isinf(halfEdge->vertex->I)) {
+                continue;
+            }
             ISum += halfEdge->vertex->s * halfEdge->vertex->I;
         }
         float I = -abs(ISum);
         psiCoords.at(j) = -I;
+        if (isinf(psiCoords.at(j)) || isnan(psiCoords.at(j))) {
+            cout << "psiCoords is inf or nan" << endl;
+        }
 
         Vector3f omega = faceNormal * I;
         for (HalfEdge* halfEdge : face.halfEdges) {
+            if (isnan(halfEdge->vertex->II) || isinf(halfEdge->vertex->II)) {
+                continue;
+            }
             omega += halfEdge->vertex->N * halfEdge->vertex->II;
         }
-        float epsilon = 0.00001; // TODO: Check how to set this
+        float epsilon = 0.0001; // TODO: Check how to set this
         if (omega.norm() > epsilon) {
             for (HalfEdge* halfEdge : face.halfEdges) {
                 int vertexIdx = halfEdge->vertex->vertexIdx;
+                if (isinf((halfEdge->next->vertex->N.dot(omega)) / (halfEdge->next->vertex->N.dot(halfEdge->vertex->calculatePosition)))) {
+                    continue;
+                }
                 phiCoords.at(vertexIdx) += (halfEdge->next->vertex->N.dot(omega)) / (halfEdge->next->vertex->N.dot(halfEdge->vertex->calculatePosition));
+                if (isinf(phiCoords.at(vertexIdx))) {
+                    cout << "phiCoords is inf" << endl;
+                }
+                if (isnan(phiCoords.at(vertexIdx))) {
+                    cout << "phiCoords is nan" << endl;
+                }
             }
         }
 
@@ -107,11 +135,17 @@ float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3
     //--- Calculate alpha
     float alphaNominator = (v2 - v1).dot(p - v1);
     float alphaDenominator = (v2 - v1).norm() * (p - v1).norm();
+//    float alphaInput = alphaNominator / alphaDenominator;
+//    alphaInput = std::max(-1.0f, std::min(1.0f, alphaInput)); // Clamp the value to stay within [-1, 1]
+//    float alpha = acos(alphaInput);
     float alpha = acos(alphaNominator / alphaDenominator);
 
     //--- Calculate beta
     float betaNominator = (v1 - p).dot(v2 - p);
     float betaDenominator = (v1 - p).norm() * (v2 - p).norm();
+//    float betaInput = betaNominator / betaDenominator;
+//    betaInput = std::max(-1.0f, std::min(1.0f, betaInput)); // Clamp the value to stay within [-1, 1]
+//    float beta = acos(betaInput);
     float beta = acos(betaNominator / betaDenominator);
 
     //--- Calculate lambda
@@ -131,9 +165,21 @@ float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3
 
         float term1 = -copysign(1.0, S) * 0.5;
         float term2 = 2 * sqrt(c) * atan((sqrt(c) * C) / sqrt(lambda + S*S*c));
+//        if (sqrt(lambda + S*S*c) == 0) {
+//            term2 = 0;
+//        }
         float term3a = (2 * sqrt(lambda) * S * S) / ((1 - C) * (1 - C));
+//        if (isinf(term3a) || isnan(term3a)) {
+//            term3a = (2 * sqrt(lambda) * S * S) / ((1 - C) * (1 - C) + numericalEpsilon);
+//        }
         float term3b = 1 - 2*c*C / (c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S));
+//        if (isinf(term3b) || isnan(term3b)) {
+//            term3b = 1 - 2*c*C / (c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S) + numericalEpsilon);
+//        }
         float term3 = sqrt(lambda) * log(term3a * term3b);
+//        if (isinf(term3) || isnan(term3)) {
+//            term3 = sqrt(lambda) * log(term3a * term3b + numericalEpsilon);
+//        }
 
         IList.at(i) = term1 * (term2 + term3);
     }
