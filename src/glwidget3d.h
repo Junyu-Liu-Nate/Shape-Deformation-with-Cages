@@ -14,23 +14,19 @@
 #include <QTimer>
 #include <memory>
 
-enum RenderMode {
-    Render2D,
-    Render3D
-};
-
-class GLWidget : public QOpenGLWidget
+class GLWidget3D : public QOpenGLWidget
 {
     Q_OBJECT
 
 public:
-    GLWidget(RenderMode mode, QWidget *parent = nullptr);
-    ~GLWidget();
+    GLWidget3D(QWidget *parent = nullptr);
+    ~GLWidget3D();
+
+protected:
+    Eigen::Vector3f transformToWorldRay(int x, int y);
 
 private:
     static const int FRAMES_TO_AVERAGE = 30;
-
-    Eigen::Vector3f transformToWorldRay(int x, int y);
 
     // Basic OpenGL Overrides
     void initializeGL()         override;
@@ -49,10 +45,7 @@ private slots:
     // Physics Tick
     void tick();
 
-private:
-    RenderMode m_mode;
-   // Cage3D    m_arap;
-    Cage2D  m_arap;
+protected:
     Camera  m_camera;
     Shader *m_defaultShader;
     Shader *m_pointShader;
@@ -65,11 +58,6 @@ private:
     QElapsedTimer m_deltaTimeProvider; // For measuring elapsed time
     QTimer        m_intervalTimer;     // For triggering timed events
 
-    // Movement
-    int m_forward;
-    int m_sideways;
-    int m_vertical;
-
     // Mouse handler stuff
     int m_lastX;
     int m_lastY;
@@ -77,4 +65,12 @@ private:
     bool m_rightCapture;
     SelectMode m_rightClickSelectMode;
     int m_lastSelectedVertex = -1;
+
+private:
+    Cage3D  m_arap;
+
+    // Movement
+    int m_forward;
+    int m_sideways;
+    int m_vertical;
 };
