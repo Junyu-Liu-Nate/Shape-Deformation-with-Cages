@@ -27,8 +27,13 @@ public:
     vector<Vector2f> cagePoints;
     vector<std::pair<Vector2f, Vector2f>> cageEdges;
     vector<Vector2f> cageOriginalLengths;
+    vector<pair<int, int>> marginEdges;
 
     void updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition);
+
+    void findMarginEdges(vector<Vector3i>& triangles);
+
+    void tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int finalRow, int finalCol);
 
     //----- For test only: 2D case
     Object2D object2D;
@@ -45,7 +50,7 @@ public:
     {
         if (mode == GL_POINTS) {
             m_shape_cage.draw(shader, mode);
-        }else {
+        } else {
             m_shape_cage.draw(shader, GL_LINES);
             m_shape_object.draw(shader, GL_TRIANGLES);
         }

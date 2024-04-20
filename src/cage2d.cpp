@@ -19,17 +19,23 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3f> vertices;
     vector<Vector3i> triangles;
 
-    //--- Hardcode cage
-    // cage points
-    cagePoints.resize(4);
-    cagePoints.clear();
-    cagePoints.push_back(Vector2f(1, -1));
-    cagePoints.push_back(Vector2f(1, 1));
-    cagePoints.push_back(Vector2f(-1, 1));
-    cagePoints.push_back(Vector2f(-1, -1));
+    // ------------------ REMOVED DUE TO NEW IMPLEMENTATION ------------------
+    //    //--- Hardcode cage
+    //    // cage points
+    //    cagePoints.resize(4);
+    //    cagePoints.clear();
+    //    cagePoints.push_back(Vector2f(1, -1));
+    //    cagePoints.push_back(Vector2f(1, 1));
+    //    cagePoints.push_back(Vector2f(-1, 1));
+    //    cagePoints.push_back(Vector2f(-1, -1));
+
+    // load in the cage. Later test with complex shapes
+    if (MeshLoader::loadTriMesh("meshes/2d/octagon.obj", vertices, triangles)) {
+        m_shape_cage.init(vertices, triangles);
+    }
 
     // cage edges
-    cageEdges.resize(4);
+    //    cageEdges.resize(4); // unknown edge num, no resize
     cageEdges.clear();
     for(int i = 0; i < cagePoints.size(); ++i) {
         std::pair<Vector2f, Vector2f> edge;
@@ -49,26 +55,30 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     }
 
     // cage lengths - in the rest position (for calculating s)
-    cageOriginalLengths.resize(4);
+    //    cageOriginalLengths.resize(4); // unknown edge num, no resize
     cageOriginalLengths.clear();
     for(int i = 0; i < cageEdges.size(); ++i) {
         Vector2f a = cageEdges.at(i).second - cageEdges.at(i).first;
         cageOriginalLengths.push_back(a);
     }
 
-    // cage mesh - used for rendering
-    vertices.clear();
-    vertices.push_back(Vector3f(1, -1, 0));
-    vertices.push_back(Vector3f(1, 1, 0));
-    vertices.push_back(Vector3f(-1, 1, 0));
-    vertices.push_back(Vector3f(-1, -1, 0));
-    triangles.clear();
-    triangles.push_back(Vector3i(0,1,2));
-    triangles.push_back(Vector3i(2,3,0));
-    triangles.push_back(Vector3i(1,0,2));
-    triangles.push_back(Vector3i(2,0,3));
+    findMarginEdges(triangles);
 
-    m_shape_cage.init(vertices, triangles);
+    // ------------------ NO LONGER NEEDED AS MESHLOADER IS USED ------------------
+    //    // cage mesh - used for rendering
+    //    vertices.clear();
+    //    vertices.push_back(Vector3f(1, -1, 0));
+    //    vertices.push_back(Vector3f(1, 1, 0));
+    //    vertices.push_back(Vector3f(-1, 1, 0));
+    //    vertices.push_back(Vector3f(-1, -1, 0));
+
+    //    triangles.clear();
+    //    triangles.push_back(Vector3i(0,1,2));
+    //    triangles.push_back(Vector3i(2,3,0));
+    //    triangles.push_back(Vector3i(1,0,2));
+    //    triangles.push_back(Vector3i(2,0,3));
+
+    //    m_shape_cage.init(vertices, triangles);
 
     //----- Read in object
     vector<Vector3f> objectVertices;
@@ -81,6 +91,9 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
             Vector2f(0, 0),
             Vector2f(0, 1)
         };
+
+        tessellateMesh(objectTriangles, objectVertices, 2, 2); // DOUBLE CHECK THIS
+
 
         m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords);
     }
@@ -118,7 +131,7 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
 void Cage2D::updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition) {
     for (int i = 0; i < new_vertices.size(); i++) {
         if (i == vertex) {
-            cagePoints.at(i) = Vector2f(targetPosition.x(), targetPosition.y()); 
+            cagePoints.at(i) = Vector2f(targetPosition.x(), targetPosition.y());
         }
         else {
             cagePoints.at(i) = Vector2f(new_vertices.at(i).x(), new_vertices.at(i).y());
@@ -139,5 +152,87 @@ void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices) {
         objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
 
         object2D.vertexList.at(i) = objectVertex;
+    }
+}
+
+void Cage2D::findMarginEdges(vector<Vector3i>& triangles) {
+    // Create a hash table to store the count of each edge
+    std::map<pair<int, int>, int> edgeCount;
+
+    // clear margin edges vector
+    marginEdges.clear();
+    // Iterate over each triangle and count the edges
+    for (const auto& triangle : triangles) {
+        // Iterate over each edge of the triangle
+        for (int i = 0; i < 3; ++i) {
+            // Extract the indices of the vertices forming the edge
+            int v1 = triangle[i];
+            int v2 = triangle[(i + 1) % 3];
+
+            // Ensure that v1 is smaller than v2 to avoid duplicate edges
+            if (v1 > v2) {
+                swap(v1, v2);
+            }
+
+            // Increment the count of the edge in the hash table
+            edgeCount[{v1, v2}]++;
+        }
+    }
+
+    // Find the edges with a count of 1, indicating they are on the mesh boundary
+    std::vector<std::pair<int, int>> marginEdges;
+    for (const auto& entry : edgeCount) {
+        if (entry.second == 1) {
+            marginEdges.push_back(entry.first);
+        }
+    }
+
+    // NEED TO CHECK ORDER OR NOT???
+}
+
+void Cage2D::tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int rowNum, int colNum){
+    // Initialize min and max coordinates with the first vertex to find the bounding box
+    float minX = vertices[0].x();
+    float maxX = vertices[0].x();
+    float minY = vertices[0].y();
+    float maxY = vertices[0].y();
+
+    // Iterate through all vertices to find min and max coordinates
+    for (const auto& vert : vertices) {
+        if (vert.x() < minX) minX = vert.x();
+        if (vert.x() > maxX) maxX = vert.x();
+        if (vert.y() < minY) minY = vert.y();
+        if (vert.y() > maxY) maxY = vert.y();
+    }
+
+    // compute the tessellated edge width and height
+    float stepX = (maxX - minX) / (float)colNum;
+    float stepY = (maxY - minY) / (float)rowNum;
+
+    vertices.clear();
+    // Generate vertices
+    for (int c = 0; c <= colNum; c++) {
+        for (int r = 0; r <= rowNum; r++) {
+            float x = minX + c * stepX;
+            float y = minY + r * stepY;
+            vertices.push_back(Vector3f(x, y, 0.0f));
+        }
+    }
+
+    faces.clear();
+    // Generate triangles
+    for (int r = 0; r < rowNum; r++) {
+        for (int c = 0; c < colNum; c++) {
+            int index0 = r * (colNum + 1) + c;
+            int index1 = index0 + 1;
+            int index2 = (r + 1) * (colNum + 1) + c;
+            int index3 = index2 + 1;
+
+            // First triangle
+            faces.push_back(Vector3i(index0, index2, index1));
+
+            // Second triangle
+            faces.push_back(Vector3i(index1, index2, index3));
+        }
     }
 }
