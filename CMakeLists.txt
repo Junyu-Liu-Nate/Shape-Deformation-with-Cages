@@ -58,6 +58,7 @@ add_executable(${PROJECT_NAME}
     src/object2d.h src/object2d.cpp
     src/cage2d.h src/cage2d.cpp
     src/coordinates/gchigherorder2d.h src/coordinates/gchigherorder2d.cpp
+    src/mesh_struct/margincage2d.h src/mesh_struct/margincage2d.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`

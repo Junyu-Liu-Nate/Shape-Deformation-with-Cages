@@ -4,6 +4,7 @@
 #include <Eigen/Core>
 #include <Eigen/SVD>
 #include "coordinates/greencoordinates2d.h"
+#include "mesh_struct/margincage2d.h"
 
 using namespace std;
 using namespace Eigen;
@@ -21,7 +22,8 @@ public:
 
     vector<ObjectVertex2D> vertexList;
 
-    void updateVertices(vector<Vector2f> cagePoints, vector<std::pair<Vector2f, Vector2f>> cageEdges, vector<Vector2f> cageOriginalLengths);
+//    void updateVertices(vector<Vector2f> cagePoints, vector<std::pair<Vector2f, Vector2f>> cageEdges, vector<Vector2f> cageOriginalLengths);
+     void updateVertices(vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges);
     vector<Vector3f> getVertices();
 };
 
