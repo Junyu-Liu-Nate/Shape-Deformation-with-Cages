@@ -95,7 +95,7 @@ void Cage2D::moveAllAnchors(int vertex, Vector3f pos)
     updateCage(new_vertices, vertex, pos);
 
     // Update object vertex positions
-    object2D.updateVertices(cagePoints, cageEdges, cageOriginalLengths);
+    object2D.updateVertices(cagePoints, cageEdges);
     std::vector<Eigen::Vector3f> new_object_vertices = object2D.getVertices();
 
     m_shape_cage.setVertices2d(new_vertices);
