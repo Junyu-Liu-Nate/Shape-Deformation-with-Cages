@@ -216,8 +216,11 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event)
         return;
     }
 
+    if (m_lastSelectedVertex != -1 && m_shiftFlag && m_arap.getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
+        m_arap.moveAllAnchors(m_lastSelectedVertex, pos);
+    }
     // If the selected point is an anchor point
-    if (m_lastSelectedVertex != -1 && m_arap.getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
+    else if (m_lastSelectedVertex != -1 && m_arap.getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
         // Move it
         m_arap.move(m_lastSelectedVertex, pos);
     } else {
@@ -264,7 +267,8 @@ void GLWidget3D::keyPressEvent(QKeyEvent *event)
     case Qt::Key_C: m_camera.toggleIsOrbiting(); break;
     case Qt::Key_Equal: m_vSize *= 11.0f / 10.0f; break;
     case Qt::Key_Minus: m_vSize *= 10.0f / 11.0f; break;
-    case Qt::Key_Escape: QApplication::quit();
+    case Qt::Key_Escape: QApplication::quit(); break;
+    case Qt::Key_Shift: m_shiftFlag = true; break;
     }
 }
 

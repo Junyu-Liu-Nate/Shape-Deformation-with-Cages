@@ -114,6 +114,29 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
     m_shape_object.setVertices2d(new_object_vertices);
 }
 
+void Cage2D::moveAllAnchors(int vertex, Vector3f pos)
+{
+    std::vector<Eigen::Vector3f> new_vertices = m_shape_cage.getVertices();
+    const std::unordered_set<int>& anchors = m_shape_cage.getAnchors();
+
+    Vector3f delta = pos - new_vertices[vertex];
+
+    // Apply delta to all anchors
+    for (int a : anchors) {
+        new_vertices[a] += delta;
+    }
+
+    // Update cage vertex positions
+    updateCage(new_vertices, vertex, pos);
+
+    // Update object vertex positions
+    object2D.updateVertices(cagePoints, cageEdges, cageOriginalLengths);
+    std::vector<Eigen::Vector3f> new_object_vertices = object2D.getVertices();
+
+    m_shape_cage.setVertices2d(new_vertices);
+    m_shape_object.setVertices2d(new_object_vertices);
+}
+
 // Set the cage vertex position to target position
 void Cage2D::updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition) {
     for (int i = 0; i < new_vertices.size(); i++) {

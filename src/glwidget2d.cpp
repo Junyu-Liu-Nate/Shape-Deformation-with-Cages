@@ -146,8 +146,11 @@ void GLWidget2D::mouseMoveEvent(QMouseEvent *event)
         return;
     }
 
+    if (m_lastSelectedVertex != -1 && m_shiftFlag && m_cage.getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
+        m_cage.moveAllAnchors(m_lastSelectedVertex, pos);
+    }
     // If the selected point is an anchor point
-    if (m_lastSelectedVertex != -1 && m_cage.getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
+    else if (m_lastSelectedVertex != -1 && m_cage.getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
         // Move it
         m_cage.move(m_lastSelectedVertex, pos);
     } else {

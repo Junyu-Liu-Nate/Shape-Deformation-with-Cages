@@ -65,6 +65,7 @@ protected:
     bool m_rightCapture;
     SelectMode m_rightClickSelectMode;
     int m_lastSelectedVertex = -1;
+    bool m_shiftFlag = false;
 
 private:
     Cage3D  m_arap;

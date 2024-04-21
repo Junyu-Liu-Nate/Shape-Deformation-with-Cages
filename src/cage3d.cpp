@@ -63,6 +63,30 @@ void Cage3D::move(int vertex, Vector3f targetPosition)
     m_shape_object.setVertices(new_object_vertices);
 }
 
+void Cage3D::moveAllAnchors(int vertex, Vector3f pos)
+{
+    std::vector<Eigen::Vector3f> new_vertices = m_shape_cage.getVertices();
+    const std::unordered_set<int>& anchors = m_shape_cage.getAnchors();
+
+    Vector3f delta = pos - new_vertices[vertex];
+
+    // Apply delta to all anchors
+    for (int a : anchors) {
+        new_vertices[a] += delta;
+    }
+
+    // Update cage vertex positions
+    updateCage(new_vertices, vertex, pos);
+    heMesh.updateVertexPos(new_vertices);
+
+    // Update object vertex positions
+    object3D.updateVertices(heMesh);
+    std::vector<Eigen::Vector3f> new_object_vertices = object3D.getVertices();
+
+    m_shape_cage.setVertices(new_vertices);
+    m_shape_object.setVertices(new_object_vertices);
+}
+
 // Set the cage vertex position to target position
 void Cage3D::updateCage(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition) {
     #pragma omp parallel for
