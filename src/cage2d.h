@@ -6,7 +6,7 @@
 #include "Eigen/StdVector"
 #include <Eigen/Sparse>
 #include <QtConcurrent>
-#include "mesh_struct/halfedgemesh.h"
+#include "mesh_struct/margincage2d.h"
 #include "object2d.h"
 
 class Shader;
@@ -22,13 +22,16 @@ public:
 
     void init(Eigen::Vector3f &min, Eigen::Vector3f &max);
     void move(int vertex, Eigen::Vector3f pos);
+    void moveAllAnchors(int vertex, Eigen::Vector3f pos);
 
-    // Hardcoded cage points and edges
-    vector<Vector2f> cagePoints;
-    vector<std::pair<Vector2f, Vector2f>> cageEdges;
-    vector<Vector2f> cageOriginalLengths;
+    vector<TwoDVertex> cagePoints;
+    vector<TwoDEdge> cageEdges;
 
     void updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition);
+
+    void findMarginEdges(vector<Vector3i>& triangles, vector<Vector3f>& vertices);
+
+    void tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int finalRow, int finalCol);
 
     //----- For test only: 2D case
     Object2D object2D;
@@ -45,9 +48,10 @@ public:
     {
         if (mode == GL_POINTS) {
             m_shape_cage.draw(shader, mode);
-        }else {
+        } else {
             m_shape_cage.draw(shader, GL_LINES);
             m_shape_object.draw(shader, GL_TRIANGLES);
+//            m_shape_object.draw(shader, GL_LINES);
         }
 
     }

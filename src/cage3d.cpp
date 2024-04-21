@@ -17,7 +17,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3i> triangles;
 
     //----- Read in cage
-    if (MeshLoader::loadTriMesh("meshes/3d/complex/hand_bones/hand_bones_bounding-proxy.obj", vertices, triangles)) {
+    if (MeshLoader::loadTriMesh("meshes/3d/simple/bar/bar_cage_complex.obj", vertices, triangles)) {
         m_shape_cage.init(vertices, triangles);
     }
 
@@ -29,7 +29,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3f> objectVertices;
     vector<Vector3i> objectTriangles;
 
-    if (MeshLoader::loadTriMesh("meshes/3d/complex/hand_bones/hand_bones.obj", objectVertices, objectTriangles)) {
+    if (MeshLoader::loadTriMesh("meshes/3d/simple/bar/bar.obj", objectVertices, objectTriangles)) {
         m_shape_object.init(objectVertices, objectTriangles);
     }
 
@@ -63,6 +63,30 @@ void Cage3D::move(int vertex, Vector3f targetPosition)
     m_shape_object.setVertices(new_object_vertices);
 }
 
+void Cage3D::moveAllAnchors(int vertex, Vector3f pos)
+{
+    std::vector<Eigen::Vector3f> new_vertices = m_shape_cage.getVertices();
+    const std::unordered_set<int>& anchors = m_shape_cage.getAnchors();
+
+    Vector3f delta = pos - new_vertices[vertex];
+
+    // Apply delta to all anchors
+    for (int a : anchors) {
+        new_vertices[a] += delta;
+    }
+
+    // Update cage vertex positions
+    updateCage(new_vertices, vertex, pos);
+    heMesh.updateVertexPos(new_vertices);
+
+    // Update object vertex positions
+    object3D.updateVertices(heMesh);
+    std::vector<Eigen::Vector3f> new_object_vertices = object3D.getVertices();
+
+    m_shape_cage.setVertices(new_vertices);
+    m_shape_object.setVertices(new_object_vertices);
+}
+
 // Set the cage vertex position to target position
 void Cage3D::updateCage(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition) {
     #pragma omp parallel for
@@ -85,7 +109,7 @@ void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
         objectVertex.position = objectVertices.at(i);
 
         // Build Green Coordinates
-        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
+//        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
 //        if (!isPointOutsideMesh(objectVertex.position, heMesh)) {
 //            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
 //        }
@@ -94,7 +118,7 @@ void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
 //        }
 
         // Build MVC Coordinates
-//        objectVertex.mvcCoord.constructMVC(objectVertex.position, heMesh);
+        objectVertex.mvcCoord.constructMVC(objectVertex.position, heMesh);
 
         object3D.vertexList.at(i) = objectVertex;
     }

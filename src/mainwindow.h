@@ -1,7 +1,8 @@
 #pragma once
 
 #include <QMainWindow>
-#include "glwidget.h"
+#include "glwidget3d.h"
+#include "glwidget2d.h"
 
 class MainWindow : public QWidget
 {
@@ -12,5 +13,6 @@ public:
     ~MainWindow();
 
 private:
-    GLWidget *glWidget;
+    GLWidget3D *glWidget3d;
+    GLWidget2D *glWidget2d;
 };
