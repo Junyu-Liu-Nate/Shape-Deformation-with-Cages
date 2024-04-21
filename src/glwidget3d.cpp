@@ -1,4 +1,4 @@
-#include "glwidget.h"
+#include "glwidget3d.h"
 
 #include <QApplication>
 #include <QKeyEvent>
@@ -10,9 +10,8 @@
 using namespace std;
 using namespace Eigen;
 
-GLWidget::GLWidget(RenderMode mode, QWidget *parent) :
+GLWidget3D::GLWidget3D(QWidget *parent) :
     QOpenGLWidget(parent),
-    m_mode(mode),
     m_arap(),
     m_camera(),
     m_defaultShader(),
@@ -48,7 +47,7 @@ GLWidget::GLWidget(RenderMode mode, QWidget *parent) :
     connect(&m_intervalTimer, SIGNAL(timeout()), this, SLOT(tick()));
 }
 
-GLWidget::~GLWidget()
+GLWidget3D::~GLWidget3D()
 {
     if (m_defaultShader != nullptr) delete m_defaultShader;
     if (m_pointShader   != nullptr) delete m_pointShader;
@@ -56,7 +55,7 @@ GLWidget::~GLWidget()
 
 // ================== Basic OpenGL Overrides
 
-void GLWidget::initializeGL()
+void GLWidget3D::initializeGL()
 {
     // Initialize GL extension wrangler
     glewExperimental = GL_TRUE;
@@ -73,11 +72,7 @@ void GLWidget::initializeGL()
     glCullFace(GL_BACK);
 
     // Initialize shaders
-    if (m_mode == Render2D) {
-        m_defaultShader = new Shader(":resources/shaders/texture.vert", ":resources/shaders/texture.frag");
-    } else {
-        m_defaultShader = new Shader(":resources/shaders/shader.vert", ":resources/shaders/shader.frag");
-    }
+    m_defaultShader = new Shader(":resources/shaders/shader.vert", ":resources/shaders/shader.frag");
     m_pointShader = new Shader(":resources/shaders/anchorPoint.vert", ":resources/shaders/anchorPoint.geom", ":resources/shaders/anchorPoint.frag");
 
     // Initialize ARAP, and get parameters needed to decide the camera position, etc
@@ -112,7 +107,7 @@ void GLWidget::initializeGL()
     m_intervalTimer.start(1000 / 60);
 }
 
-void GLWidget::paintGL()
+void GLWidget3D::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -134,7 +129,7 @@ void GLWidget::paintGL()
     m_pointShader->unbind();
 }
 
-void GLWidget::resizeGL(int w, int h)
+void GLWidget3D::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
     m_camera.setAspect(static_cast<float>(w) / h);
@@ -142,7 +137,7 @@ void GLWidget::resizeGL(int w, int h)
 
 // ================== Event Listeners
 
-Eigen::Vector3f GLWidget::transformToWorldRay(int x, int y)
+Eigen::Vector3f GLWidget3D::transformToWorldRay(int x, int y)
 {
     Eigen::Vector4f clipCoords = Eigen::Vector4f(
                 (float(x) / width()) * 2.f - 1.f,
@@ -157,7 +152,7 @@ Eigen::Vector3f GLWidget::transformToWorldRay(int x, int y)
     return Eigen::Vector3f(transformed_coords.x(), transformed_coords.y(), transformed_coords.z()).normalized();
 }
 
-void GLWidget::mousePressEvent(QMouseEvent *event)
+void GLWidget3D::mousePressEvent(QMouseEvent *event)
 {
     // Get current mouse coordinates
     const int currX = event->position().x();
@@ -191,7 +186,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
     m_lastY = currY;
 }
 
-void GLWidget::mouseMoveEvent(QMouseEvent *event)
+void GLWidget3D::mouseMoveEvent(QMouseEvent *event)
 {
     // Return if neither mouse button is currently held down
     if (!(m_leftCapture || m_rightCapture)) {
@@ -221,8 +216,11 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         return;
     }
 
+    if (m_lastSelectedVertex != -1 && m_shiftFlag && m_arap.getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
+        m_arap.moveAllAnchors(m_lastSelectedVertex, pos);
+    }
     // If the selected point is an anchor point
-    if (m_lastSelectedVertex != -1 && m_arap.getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
+    else if (m_lastSelectedVertex != -1 && m_arap.getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
         // Move it
         m_arap.move(m_lastSelectedVertex, pos);
     } else {
@@ -239,7 +237,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     m_lastY = currY;
 }
 
-void GLWidget::mouseReleaseEvent(QMouseEvent *event)
+void GLWidget3D::mouseReleaseEvent(QMouseEvent *event)
 {
     m_leftCapture = false;
     m_lastSelectedVertex = -1;
@@ -248,13 +246,13 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
     m_rightClickSelectMode = SelectMode::None;
 }
 
-void GLWidget::wheelEvent(QWheelEvent *event)
+void GLWidget3D::wheelEvent(QWheelEvent *event)
 {
     float zoom = 1 - event->pixelDelta().y() * 0.1f / 120.f;
     m_camera.zoom(zoom);
 }
 
-void GLWidget::keyPressEvent(QKeyEvent *event)
+void GLWidget3D::keyPressEvent(QKeyEvent *event)
 {
     if (event->isAutoRepeat()) return;
 
@@ -269,11 +267,12 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_C: m_camera.toggleIsOrbiting(); break;
     case Qt::Key_Equal: m_vSize *= 11.0f / 10.0f; break;
     case Qt::Key_Minus: m_vSize *= 10.0f / 11.0f; break;
-    case Qt::Key_Escape: QApplication::quit();
+    case Qt::Key_Escape: QApplication::quit(); break;
+    case Qt::Key_Shift: m_shiftFlag = true; break;
     }
 }
 
-void GLWidget::keyReleaseEvent(QKeyEvent *event)
+void GLWidget3D::keyReleaseEvent(QKeyEvent *event)
 {
     if (event->isAutoRepeat()) return;
 
@@ -290,7 +289,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
 
 // ================== Physics Tick
 
-void GLWidget::tick()
+void GLWidget3D::tick()
 {
     float deltaSeconds = m_deltaTimeProvider.restart() / 1000.f;
 
