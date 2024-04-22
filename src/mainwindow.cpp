@@ -8,7 +8,7 @@ MainWindow::MainWindow()
 
     QHBoxLayout *container = new QHBoxLayout;
 //    container->addWidget(glWidget3d);
-     container->addWidget(glWidget2d);
+    container->addWidget(glWidget2d);
     this->setLayout(container);
 }
 
