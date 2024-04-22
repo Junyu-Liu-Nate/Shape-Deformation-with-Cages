@@ -31,7 +31,7 @@ public:
 
     void findMarginEdges(vector<Vector3i>& triangles, vector<Vector3f>& vertices);
 
-    void tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int finalRow, int finalCol);
+    void tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int finalRow, int finalCol, vector<Vector2f> &uvCoords);
 
     //----- For test only: 2D case
     Object2D object2D;
@@ -51,9 +51,7 @@ public:
         } else {
             m_shape_cage.draw(shader, GL_LINES);
             m_shape_object.draw(shader, GL_TRIANGLES);
-//            m_shape_object.draw(shader, GL_LINES);
         }
-
     }
 
     SelectMode select(Shader *shader, int vertex)

@@ -38,15 +38,8 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3i> objectTriangles;
 
     if (MeshLoader::loadTriMesh("meshes/2d/rectangle.obj", objectVertices, objectTriangles)) {
-        vector<Vector2f> uvCoords = {
-            Vector2f(1, 1),
-            Vector2f(1, 0),
-            Vector2f(0, 0),
-            Vector2f(0, 1)
-        };
-
-        tessellateMesh(objectTriangles, objectVertices, 10, 10); // DOUBLE CHECK THIS
-
+        vector<Vector2f> uvCoords;
+        tessellateMesh(objectTriangles, objectVertices, 1, 1, uvCoords); // DOUBLE CHECK THIS
         m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords);
     }
 
@@ -184,7 +177,8 @@ void Cage2D::findMarginEdges(vector<Vector3i>& triangles, vector<Vector3f>& vert
     }
 }
 
-void Cage2D::tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int rowNum, int colNum){
+void Cage2D::tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int rowNum, int colNum, vector<Vector2f> &uvCoords)
+{
     // Initialize min and max coordinates with the first vertex to find the bounding box
     float minX = vertices[0].x();
     float maxX = vertices[0].x();
@@ -210,6 +204,7 @@ void Cage2D::tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices,
             float x = minX + c * stepX;
             float y = minY + r * stepY;
             vertices.push_back(Vector3f(x, y, 0.0f));
+            uvCoords.push_back(Vector2f(float(c) / colNum, 1 - float(r) / rowNum));
         }
     }
 
