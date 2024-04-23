@@ -11,6 +11,10 @@ class GLWidget2D : public GLWidget3D
 public:
     GLWidget2D();
 
+    void init();
+    void setTextureFilePath(const QString &path);
+    void setCageFilePath(const QString &path);
+
 private:
     void initializeGL()         override;
     void paintGL()              override;

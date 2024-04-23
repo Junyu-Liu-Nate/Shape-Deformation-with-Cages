@@ -16,6 +16,9 @@ private:
     Shape m_shape_cage;
     Shape m_shape_object;
 
+    std::string m_objectFilePath;
+    std::string m_cageFilePath;
+
 public:
     Cage3D();
 
@@ -45,10 +48,8 @@ public:
     {
         if (mode == GL_POINTS) {
             m_shape_cage.draw(shader, mode);
-//            m_shape_object.draw(shader, mode);
         }else {
             m_shape_cage.draw(shader, GL_LINES);
-//            m_shape_cage.draw(shader, GL_TRIANGLES);
             m_shape_object.draw(shader, GL_TRIANGLES);
         }
     }
@@ -67,4 +68,9 @@ public:
     {
         return m_shape_cage.getAnchorPos(lastSelected, pos, ray, start);
     }
+
+    void setObjectFilePath(const QString &path);
+    bool isObjectFilePathSet();
+    void setCageFilePath(const QString &path);
+    bool isCageFilePathSet();
 };

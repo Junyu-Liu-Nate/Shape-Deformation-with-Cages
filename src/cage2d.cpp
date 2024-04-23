@@ -20,7 +20,7 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3i> triangles;
 
     //----- load in the cage. Later test with complex shapes
-    if (MeshLoader::loadTriMesh("meshes/2d/octagon-cage.obj", vertices, triangles)) {
+    if (MeshLoader::loadTriMesh(m_cageFilePath, vertices, triangles)) {
         m_shape_cage.init(vertices, triangles);
     }
 
@@ -40,7 +40,7 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     if (MeshLoader::loadTriMesh("meshes/2d/rectangle.obj", objectVertices, objectTriangles)) {
         vector<Vector2f> uvCoords;
         tessellateMesh(objectTriangles, objectVertices, 1, 1, uvCoords); // DOUBLE CHECK THIS
-        m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords);
+        m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords, m_textureFilePath);
     }
 
     buildVertexList2D(objectVertices);
@@ -226,4 +226,30 @@ void Cage2D::tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices,
             faces.push_back(Vector3i(index2, index1, index3));
         }
     }
+}
+
+void Cage2D::setTextureFilePath(const QString &path)
+{
+    m_textureFilePath = path.toStdString();
+}
+
+bool Cage2D::isTextureFilePathSet()
+{
+    if (m_textureFilePath.empty()) {
+        return false;
+    }
+    return true;
+}
+
+void Cage2D::setCageFilePath(const QString &path)
+{
+    m_cageFilePath = path.toStdString();
+}
+
+bool Cage2D::isCageFilePathSet()
+{
+    if (m_cageFilePath.empty()) {
+        return false;
+    }
+    return true;
 }

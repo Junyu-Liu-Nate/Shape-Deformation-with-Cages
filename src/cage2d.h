@@ -17,6 +17,9 @@ private:
     Shape m_shape_cage;
     Shape m_shape_object;
 
+    std::string m_textureFilePath;
+    std::string m_cageFilePath;
+
 public:
     Cage2D();
 
@@ -36,6 +39,11 @@ public:
     //----- For test only: 2D case
     Object2D object2D;
     void buildVertexList2D(vector<Vector3f> objectVertices);
+
+    void setTextureFilePath(const QString &path);
+    bool isTextureFilePathSet();
+    void setCageFilePath(const QString &path);
+    bool isCageFilePathSet();
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 
