@@ -27,7 +27,10 @@ public:
     Shape();
 
     void init(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3i> &triangles);
-    void initWithTexture(const std::vector<Eigen::Vector3f> &vertices, const std::vector<Eigen::Vector3i> &triangles, const std::vector<Eigen::Vector2f> &uvCoords);
+    void initWithTexture(const std::vector<Eigen::Vector3f> &vertices,
+                         const std::vector<Eigen::Vector3i> &triangles,
+                         const std::vector<Eigen::Vector2f> &uvCoords,
+                         const std::string &textureFilePath);
     void setVertices(const std::vector<Eigen::Vector3f> &vertices);
     void setVertices2d(const std::vector<Eigen::Vector3f> &vertices);
 

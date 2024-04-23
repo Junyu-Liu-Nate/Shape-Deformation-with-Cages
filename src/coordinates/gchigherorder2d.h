@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 #include <iostream>
 #include <complex>
+#include "mesh_struct/margincage2d.h"
 
 using namespace std;
 using namespace Eigen;
@@ -17,8 +18,9 @@ public:
     vector<vector<float>> phiCoords;
     vector<vector<float>> psiCoords;
 
-    int degree;
+    int degree = 1;
 
+    void constructGCHigherOrder(const Vector2f& vertexPos, vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges);
     void gcHigherOrderEdge(const Vector2f& eta, const Vector2f& v0, const Vector2f& v1, vector<float>& phi, vector<float>& psi);
 };
 

@@ -20,7 +20,7 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3i> triangles;
 
     //----- load in the cage. Later test with complex shapes
-    if (MeshLoader::loadTriMesh("meshes/2d/octagon-cage.obj", vertices, triangles)) {
+    if (MeshLoader::loadTriMesh(m_cageFilePath, vertices, triangles)) {
         m_shape_cage.init(vertices, triangles);
     }
 
@@ -38,16 +38,9 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3i> objectTriangles;
 
     if (MeshLoader::loadTriMesh("meshes/2d/rectangle.obj", objectVertices, objectTriangles)) {
-        vector<Vector2f> uvCoords = {
-            Vector2f(1, 1),
-            Vector2f(1, 0),
-            Vector2f(0, 0),
-            Vector2f(0, 1)
-        };
-
-        tessellateMesh(objectTriangles, objectVertices, 10, 10); // DOUBLE CHECK THIS
-
-        m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords);
+        vector<Vector2f> uvCoords;
+        tessellateMesh(objectTriangles, objectVertices, 20, 20, uvCoords); // DOUBLE CHECK THIS
+        m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords, m_textureFilePath);
     }
 
     buildVertexList2D(objectVertices);
@@ -125,6 +118,9 @@ void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices) {
         // Build 2D Green Coordinates
         objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
 
+        // Build 2D Higher Order Green Coordinates
+        objectVertex.gcHigherOrder.constructGCHigherOrder(objectVertex.position, cagePoints, cageEdges);
+
         // Build 2D MVC Coordinates
         objectVertex.mvcCoord.constructMVC(objectVertex.position, cagePoints);
 
@@ -184,7 +180,8 @@ void Cage2D::findMarginEdges(vector<Vector3i>& triangles, vector<Vector3f>& vert
     }
 }
 
-void Cage2D::tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int rowNum, int colNum){
+void Cage2D::tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int rowNum, int colNum, vector<Vector2f> &uvCoords)
+{
     // Initialize min and max coordinates with the first vertex to find the bounding box
     float minX = vertices[0].x();
     float maxX = vertices[0].x();
@@ -210,6 +207,7 @@ void Cage2D::tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices,
             float x = minX + c * stepX;
             float y = minY + r * stepY;
             vertices.push_back(Vector3f(x, y, 0.0f));
+            uvCoords.push_back(Vector2f(1.f - float(c) / colNum, 1.f - float(r) / rowNum));
         }
     }
 
@@ -231,4 +229,30 @@ void Cage2D::tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices,
             faces.push_back(Vector3i(index2, index1, index3));
         }
     }
+}
+
+void Cage2D::setTextureFilePath(const QString &path)
+{
+    m_textureFilePath = path.toStdString();
+}
+
+bool Cage2D::isTextureFilePathSet()
+{
+    if (m_textureFilePath.empty()) {
+        return false;
+    }
+    return true;
+}
+
+void Cage2D::setCageFilePath(const QString &path)
+{
+    m_cageFilePath = path.toStdString();
+}
+
+bool Cage2D::isCageFilePathSet()
+{
+    if (m_cageFilePath.empty()) {
+        return false;
+    }
+    return true;
 }

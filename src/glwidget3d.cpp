@@ -57,6 +57,10 @@ GLWidget3D::~GLWidget3D()
 
 void GLWidget3D::initializeGL()
 {
+    if (!m_initialized) {
+        return;
+    }
+
     // Initialize GL extension wrangler
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
@@ -109,6 +113,12 @@ void GLWidget3D::initializeGL()
 
 void GLWidget3D::paintGL()
 {
+    if (!m_initialized) {
+        return;
+    }
+
+    glClearColor(1, 1, 1, 1);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_defaultShader->bind();
@@ -305,4 +315,24 @@ void GLWidget3D::tick()
 
     // Flag this view for repainting (Qt will call paintGL() soon after)
     update();
+}
+
+void GLWidget3D::setObjectFilePath(const QString &path)
+{
+    m_arap.setObjectFilePath(path);
+}
+
+void GLWidget3D::setCageFilePath(const QString &path)
+{
+    m_arap.setCageFilePath(path);
+}
+
+void GLWidget3D::init()
+{
+    if (!m_arap.isObjectFilePathSet() || !m_arap.isCageFilePathSet()) {
+        return;
+    }
+
+    m_initialized = true;
+    initializeGL();
 }
