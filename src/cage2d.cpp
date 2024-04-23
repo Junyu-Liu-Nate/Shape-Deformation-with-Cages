@@ -45,7 +45,7 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
             Vector2f(0, 1)
         };
 
-        tessellateMesh(objectTriangles, objectVertices, 10, 10); // DOUBLE CHECK THIS
+        tessellateMesh(objectTriangles, objectVertices, 1, 1); // DOUBLE CHECK THIS
 
         m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords);
     }
