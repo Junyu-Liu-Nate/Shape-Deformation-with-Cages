@@ -204,7 +204,7 @@ void Cage2D::tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices,
             float x = minX + c * stepX;
             float y = minY + r * stepY;
             vertices.push_back(Vector3f(x, y, 0.0f));
-            uvCoords.push_back(Vector2f(float(c) / colNum, 1 - float(r) / rowNum));
+            uvCoords.push_back(Vector2f(1.f - float(c) / colNum, 1.f - float(r) / rowNum));
         }
     }
 
