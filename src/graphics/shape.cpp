@@ -80,7 +80,10 @@ void Shape::init(const vector<Vector3f> &vertices, const vector<Vector3i> &trian
     m_alpha = 1.0f;
 }
 
-void Shape::initWithTexture(const vector<Vector3f> &vertices, const vector<Vector3i> &triangles, const vector<Vector2f> &uvCoords)
+void Shape::initWithTexture(const vector<Vector3f> &vertices,
+                            const vector<Vector3i> &triangles,
+                            const vector<Vector2f> &uvCoords,
+                            const string &textureFilePath)
 {
     m_textured = true;
 
@@ -139,7 +142,7 @@ void Shape::initWithTexture(const vector<Vector3f> &vertices, const vector<Vecto
     //// TEXTURE ////
 
     // Load the image for texture
-    QImage img("texture/cat.jpeg");
+    QImage img(QString::fromStdString(textureFilePath));
     img = img.convertToFormat(QImage::Format_RGBA8888);
 
     // Generate texture, choose it, and bind

@@ -10,6 +10,10 @@ GLWidget2D::GLWidget2D() {}
 
 void GLWidget2D::initializeGL()
 {
+    if (!m_initialized) {
+        return;
+    }
+
     // Initialize GL extension wrangler
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
@@ -62,6 +66,12 @@ void GLWidget2D::initializeGL()
 
 void GLWidget2D::paintGL()
 {
+    if (!m_initialized) {
+        return;
+    }
+
+    glClearColor(1, 1, 1, 1);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_defaultShader->bind();
@@ -166,3 +176,24 @@ void GLWidget2D::mouseMoveEvent(QMouseEvent *event)
     m_lastX = currX;
     m_lastY = currY;
 }
+
+void GLWidget2D::setTextureFilePath(const QString &path)
+{
+    m_cage.setTextureFilePath(path);
+}
+
+void GLWidget2D::setCageFilePath(const QString &path)
+{
+    m_cage.setCageFilePath(path);
+}
+
+void GLWidget2D::init()
+{
+    if (!m_cage.isTextureFilePathSet() || !m_cage.isCageFilePathSet()) {
+        return;
+    }
+
+    m_initialized = true;
+    initializeGL();
+}
+

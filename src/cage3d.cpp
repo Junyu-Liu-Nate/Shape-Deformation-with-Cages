@@ -17,7 +17,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3i> triangles;
 
     //----- Read in cage
-    if (MeshLoader::loadTriMesh("meshes/3d/complex/animal/animal_bounding-proxy.obj", vertices, triangles)) {
+    if (MeshLoader::loadTriMesh(m_cageFilePath, vertices, triangles)) {
         m_shape_cage.init(vertices, triangles);
     }
 
@@ -29,7 +29,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3f> objectVertices;
     vector<Vector3i> objectTriangles;
 
-    if (MeshLoader::loadTriMesh("meshes/3d/complex/animal/animal.obj", objectVertices, objectTriangles)) {
+    if (MeshLoader::loadTriMesh(m_objectFilePath, objectVertices, objectTriangles)) {
         m_shape_object.init(objectVertices, objectTriangles);
     }
 
@@ -167,4 +167,30 @@ bool Cage3D::isPointOutsideMesh(const Eigen::Vector3f& point, HalfEdgeMesh& mesh
     }
 
     return intersections % 2 == 0;
+}
+
+void Cage3D::setObjectFilePath(const QString &path)
+{
+    m_objectFilePath = path.toStdString();
+}
+
+bool Cage3D::isObjectFilePathSet()
+{
+    if (m_objectFilePath.empty()) {
+        return false;
+    }
+    return true;
+}
+
+void Cage3D::setCageFilePath(const QString &path)
+{
+    m_cageFilePath = path.toStdString();
+}
+
+bool Cage3D::isCageFilePathSet()
+{
+    if (m_cageFilePath.empty()) {
+        return false;
+    }
+    return true;
 }

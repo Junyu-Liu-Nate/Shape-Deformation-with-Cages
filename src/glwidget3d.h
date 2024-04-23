@@ -22,6 +22,10 @@ public:
     GLWidget3D(QWidget *parent = nullptr);
     ~GLWidget3D();
 
+    void init();
+    void setObjectFilePath(const QString &path);
+    void setCageFilePath(const QString &path);
+
 protected:
     Eigen::Vector3f transformToWorldRay(int x, int y);
 
@@ -66,6 +70,9 @@ protected:
     SelectMode m_rightClickSelectMode;
     int m_lastSelectedVertex = -1;
     bool m_shiftFlag = false;
+
+    // Execution flow control
+    bool m_initialized = false;
 
 private:
     Cage3D  m_arap;

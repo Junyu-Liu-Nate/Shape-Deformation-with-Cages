@@ -17,6 +17,9 @@ private:
     Shape m_shape_cage;
     Shape m_shape_object;
 
+    std::string m_textureFilePath;
+    std::string m_cageFilePath;
+
 public:
     Cage2D();
 
@@ -31,11 +34,16 @@ public:
 
     void findMarginEdges(vector<Vector3i>& triangles, vector<Vector3f>& vertices);
 
-    void tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int finalRow, int finalCol);
+    void tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int finalRow, int finalCol, vector<Vector2f> &uvCoords);
 
     //----- For test only: 2D case
     Object2D object2D;
     void buildVertexList2D(vector<Vector3f> objectVertices);
+
+    void setTextureFilePath(const QString &path);
+    bool isTextureFilePathSet();
+    void setCageFilePath(const QString &path);
+    bool isCageFilePathSet();
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 
@@ -51,10 +59,9 @@ public:
 //            m_shape_object.draw(shader, mode);
         } else {
             m_shape_cage.draw(shader, GL_LINES);
-//            m_shape_object.draw(shader, GL_TRIANGLES);
-            m_shape_object.draw(shader, GL_LINES);
+            m_shape_object.draw(shader, GL_TRIANGLES);
+//            m_shape_object.draw(shader, GL_LINES);
         }
-
     }
 
     SelectMode select(Shader *shader, int vertex)
