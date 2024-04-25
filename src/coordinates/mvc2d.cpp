@@ -6,18 +6,13 @@ MVC2D::MVC2D()
 
 }
 
-void MVC2D::constructMVC(const std::vector<Vector3f> cage, Vector3f vert){
-    int nSize = cage.size();
+void MVC2D::constructMVC(Vector2f vert, vector<TwoDVertex> cagePoints){
+    int nSize = cagePoints.size();
     float dx, dy;
     std::vector<Vector3f> s(nSize);
     for(int i = 0; i < nSize; i++) {
-<<<<<<< Updated upstream
-        dx = cage[i][0] - vert[0];
-        dy = cage[i][1] - vert[1];
-=======
         dx = cagePoints[i].position.x() - vert[0];
         dy = cagePoints[i].position.y() - vert[0];
->>>>>>> Stashed changes
         s[i][0] = dx;
         s[i][1] = dy;
         s[i][2] = 0;

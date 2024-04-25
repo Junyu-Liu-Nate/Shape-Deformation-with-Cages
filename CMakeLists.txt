@@ -31,7 +31,7 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
     src/mainwindow.cpp
     src/cage3d.cpp
-    src/glwidget.cpp
+    src/glwidget3d.cpp
     src/graphics/camera.cpp
     src/graphics/graphicsdebug.cpp
     src/graphics/meshloader.cpp
@@ -40,7 +40,7 @@ add_executable(${PROJECT_NAME}
 
     src/mainwindow.h
     src/cage3d.h
-    src/glwidget.h
+    src/glwidget3d.h
     src/graphics/camera.h
     src/graphics/graphicsdebug.h
     src/graphics/meshloader.h
@@ -57,7 +57,17 @@ add_executable(${PROJECT_NAME}
     src/coordinates/greencoordinates2d.h src/coordinates/greencoordinates2d.cpp
     src/object2d.h src/object2d.cpp
     src/cage2d.h src/cage2d.cpp
+<<<<<<< HEAD
     src/coordinates/mvc2d.h src/coordinates/mvc2d.cpp
+=======
+
+    src/coordinates/gchigherorder2d.h src/coordinates/gchigherorder2d.cpp
+    src/mesh_struct/margincage2d.h src/mesh_struct/margincage2d.cpp
+    src/coordinates/mvc2d.h src/coordinates/mvc2d.cpp
+
+    src/glwidget2d.h src/glwidget2d.cpp
+
+>>>>>>> 3D-Green-Coord
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`

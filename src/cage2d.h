@@ -6,7 +6,7 @@
 #include "Eigen/StdVector"
 #include <Eigen/Sparse>
 #include <QtConcurrent>
-#include "mesh_struct/halfedgemesh.h"
+#include "mesh_struct/margincage2d.h"
 #include "object2d.h"
 
 class Shader;
@@ -17,12 +17,17 @@ private:
     Shape m_shape_cage;
     Shape m_shape_object;
 
+    std::string m_textureFilePath;
+    std::string m_cageFilePath;
+
 public:
     Cage2D();
 
     void init(Eigen::Vector3f &min, Eigen::Vector3f &max);
     void move(int vertex, Eigen::Vector3f pos);
+    void moveAllAnchors(int vertex, Eigen::Vector3f pos);
 
+<<<<<<< HEAD
     // Hardcoded cage points and edges
     vector<Vector2f> cagePoints;
     vector<std::pair<Vector2f, Vector2f>> cageEdges;
@@ -34,10 +39,25 @@ public:
     void findMarginEdges(vector<Vector3i>& triangles);
 
     void tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int finalRow, int finalCol);
+=======
+    vector<TwoDVertex> cagePoints;
+    vector<TwoDEdge> cageEdges;
+
+    void updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition);
+
+    void findMarginEdges(vector<Vector3i>& triangles, vector<Vector3f>& vertices);
+
+    void tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int finalRow, int finalCol, vector<Vector2f> &uvCoords);
+>>>>>>> 3D-Green-Coord
 
     //----- For test only: 2D case
     Object2D object2D;
     void buildVertexList2D(vector<Vector3f> objectVertices);
+
+    void setTextureFilePath(const QString &path);
+    bool isTextureFilePathSet();
+    void setCageFilePath(const QString &path);
+    bool isCageFilePathSet();
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 
@@ -50,11 +70,15 @@ public:
     {
         if (mode == GL_POINTS) {
             m_shape_cage.draw(shader, mode);
+<<<<<<< HEAD
+=======
+//            m_shape_object.draw(shader, mode);
+>>>>>>> 3D-Green-Coord
         } else {
             m_shape_cage.draw(shader, GL_LINES);
             m_shape_object.draw(shader, GL_TRIANGLES);
+//            m_shape_object.draw(shader, GL_LINES);
         }
-
     }
 
     SelectMode select(Shader *shader, int vertex)
