@@ -119,10 +119,10 @@ void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices) {
 //        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
 
         // Build 2D Higher Order Green Coordinates
-        objectVertex.gcHigherOrder.constructGCHigherOrder(objectVertex.position, cagePoints, cageEdges);
+//        objectVertex.gcHigherOrder.constructGCHigherOrder(objectVertex.position, cagePoints, cageEdges);
 
         // Build 2D MVC Coordinates
-//        objectVertex.mvcCoord.constructMVC(objectVertex.position, cagePoints);
+        objectVertex.mvcCoord.constructMVC(objectVertex.position, cagePoints);
 
         object2D.vertexList.at(i) = objectVertex;
     }
