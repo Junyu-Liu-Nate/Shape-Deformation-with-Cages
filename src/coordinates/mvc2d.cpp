@@ -31,20 +31,20 @@ void MVC2D::constructMVC(Vector2f vert, vector<TwoDVertex> cagePoints){
         Ai = 0.5f * (s[i][0] * s[ip][1] - s[ip][0] * s[i][1]);
         Di = s[ip][0] * s[i][0] + s[ip][1] * s[i][1];
         float eps = 10.0f * std::numeric_limits<float>::min();
-        if( ri <= eps) {
+        if(ri <= eps) {
             MVCoord[i] = 1.0;
+            return;
         }
         else if(fabs(Ai) <= 0 && Di < 0.0){
             dx = cagePoints[ip].position.x() - cagePoints[i].position.x();
             dy = cagePoints[ip].position.y() - cagePoints[i].position.y();
             dl = sqrt(dx * dx + dy * dy);
-            assert(dl > eps);
             dx = vert[0] - cagePoints[i].position.x();
             dy = vert[1] - cagePoints[i].position.y();
             mu = sqrt(dx * dx + dy * dy) / dl;
-            assert(mu >= 0.0 && mu <= 1.0);
             MVCoord[i] = 1.0 - mu;
             MVCoord[ip] = mu;
+            return;
         }
     }
 
