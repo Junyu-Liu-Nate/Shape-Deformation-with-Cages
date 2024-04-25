@@ -294,6 +294,7 @@ void GLWidget3D::keyReleaseEvent(QKeyEvent *event)
     case Qt::Key_D: m_sideways -= SPEED; break;
     case Qt::Key_F: m_vertical += SPEED; break;
     case Qt::Key_R: m_vertical -= SPEED; break;
+    case Qt::Key_Shift: m_shiftFlag = false; break;
     }
 }
 
