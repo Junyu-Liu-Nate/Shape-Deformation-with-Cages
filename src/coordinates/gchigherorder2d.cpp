@@ -35,9 +35,6 @@ void GCHigherOrder2D::gcHigherOrderEdge(const Vector2f& eta, const Vector2f& v0,
     float B = 1 / (2 * M_PI * pow((v1 - v0).norm(), 2));
 
     float Dreal = 0.5 * log(1 + (1 - 2 * omega.real()) / norm(omega));
-    if (isnan(Dreal)) {
-        cout << "Dreal is nan: (1 - 2 * omega.real()) = " << (1 - 2 * omega.real()) << ",  pow(norm(omega), 2) = " <<  pow(norm(omega), 2) << endl;
-    }
     float Dimag = atan2(omega.imag(), norm(omega) - omega.real());
     complex<float> W(Dreal, Dimag);
 

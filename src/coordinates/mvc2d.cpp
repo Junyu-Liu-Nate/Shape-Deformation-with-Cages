@@ -33,6 +33,7 @@ void MVC2D::constructMVC(Vector2f vert, vector<TwoDVertex> cagePoints){
         float eps = 10.0f * std::numeric_limits<float>::min();
         if( ri <= eps) {
             MVCoord[i] = 1.0;
+            return;
         }
         else if(fabs(Ai) <= 0 && Di < 0.0){
             dx = cagePoints[ip].position.x() - cagePoints[i].position.x();
@@ -45,6 +46,7 @@ void MVC2D::constructMVC(Vector2f vert, vector<TwoDVertex> cagePoints){
             assert(mu >= 0.0 && mu <= 1.0);
             MVCoord[i] = 1.0 - mu;
             MVCoord[ip] = mu;
+            return;
         }
     }
     // --------------------------------------- END ---------------------------------------
