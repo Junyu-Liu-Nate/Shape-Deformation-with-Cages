@@ -5,7 +5,7 @@ Object2D::Object2D()
 
 }
 
-void Object2D::updateVertices(vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges) {
+void Object2D::updateVertices(vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges, unordered_map<std::tuple<int, int, int>, ControlPoint, tuple_hash> controlPoints) {
     //----- Green Coordinates 2D
 //    for (ObjectVertex2D& objectVertex : vertexList) {
 //        Vector2f newPos = Vector2f(0,0);
@@ -56,8 +56,10 @@ void Object2D::updateVertices(vector<TwoDVertex> cagePoints, vector<TwoDEdge> ca
 
             //----- Cubic case: degree = 3
             Vector2f p0 = v0;
-            Vector2f p1 = v0 + (v1 - v0) / 3;
-            Vector2f p2 = v0 + 2 * (v1 - v0) / 3;
+//            Vector2f p1 = v0 + (v1 - v0) / 3;
+//            Vector2f p2 = v0 + 2 * (v1 - v0) / 3;
+            Vector2f p1 = controlPoints[make_tuple(cageEdges.at(i).edge.first->idx, cageEdges.at(i).edge.second->idx, 1)].position;
+            Vector2f p2 = controlPoints[make_tuple(cageEdges.at(i).edge.first->idx, cageEdges.at(i).edge.second->idx, 2)].position;
             Vector2f p3 = v1;
             Vector2f c0 = p0;
             Vector2f c1 = -3 * p0 + 3 * p1;

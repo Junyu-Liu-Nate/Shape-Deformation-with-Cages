@@ -8,6 +8,7 @@
 #include <QtConcurrent>
 #include "mesh_struct/margincage2d.h"
 #include "object2d.h"
+#include "common.h"
 
 class Shader;
 
@@ -16,6 +17,7 @@ class Cage2D
 private:
     Shape m_shape_cage;
     Shape m_shape_object;
+    Shape m_shape_control_points;
 
     std::string m_textureFilePath;
     std::string m_cageFilePath;
@@ -32,11 +34,11 @@ public:
 
     void updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition);
 
-    void findMarginEdges(vector<Vector3i>& triangles, vector<Vector3f>& vertices);
+    void findMarginEdges(vector<Vector3i>& triangles, vector<Vector3f>& vertices, vector<Vector3f>& controlPts);
 
     void tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int finalRow, int finalCol, vector<Vector2f> &uvCoords);
 
-    //----- For test only: 2D case
+    //----- Linear 2D case
     Object2D object2D;
     void buildVertexList2D(vector<Vector3f> objectVertices);
 
@@ -44,6 +46,21 @@ public:
     bool isTextureFilePathSet();
     void setCageFilePath(const QString &path);
     bool isCageFilePathSet();
+
+    //----- High order 2D case
+    int degree = 3;
+
+//    struct tuple_hash {
+//        template <class T1, class T2, class T3>
+//        std::size_t operator()(const std::tuple<T1, T2, T3>& tpl) const {
+//            auto& [first, second, third] = tpl;
+//            auto hash1 = std::hash<T1>{}(first);
+//            auto hash2 = std::hash<T2>{}(second);
+//            auto hash3 = std::hash<T3>{}(third);
+//            return ((hash1 ^ (hash2 << 1)) >> 1) ^ (hash3 << 1); // Combine hashes
+//        }
+//    };
+    unordered_map<std::tuple<int, int, int>, ControlPoint, tuple_hash> controlPoints;
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 
@@ -56,11 +73,10 @@ public:
     {
         if (mode == GL_POINTS) {
             m_shape_cage.draw(shader, mode);
-//            m_shape_object.draw(shader, mode);
+//            m_shape_control_points.draw(shader, mode); // TODO: Not drawing
         } else {
             m_shape_cage.draw(shader, GL_LINES);
             m_shape_object.draw(shader, GL_TRIANGLES);
-//            m_shape_object.draw(shader, GL_LINES);
         }
     }
 
