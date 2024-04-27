@@ -50,16 +50,6 @@ public:
     //----- High order 2D case
     int degree = 3;
 
-//    struct tuple_hash {
-//        template <class T1, class T2, class T3>
-//        std::size_t operator()(const std::tuple<T1, T2, T3>& tpl) const {
-//            auto& [first, second, third] = tpl;
-//            auto hash1 = std::hash<T1>{}(first);
-//            auto hash2 = std::hash<T2>{}(second);
-//            auto hash3 = std::hash<T3>{}(third);
-//            return ((hash1 ^ (hash2 << 1)) >> 1) ^ (hash3 << 1); // Combine hashes
-//        }
-//    };
     unordered_map<std::tuple<int, int, int>, ControlPoint, tuple_hash> controlPoints;
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
@@ -73,7 +63,7 @@ public:
     {
         if (mode == GL_POINTS) {
             m_shape_cage.draw(shader, mode);
-//            m_shape_control_points.draw(shader, mode); // TODO: Not drawing
+            m_shape_control_points.draw(shader, mode); // TODO: Not drawing
         } else {
             m_shape_cage.draw(shader, GL_LINES);
             m_shape_object.draw(shader, GL_TRIANGLES);
