@@ -81,7 +81,10 @@ void Object2D::updateVertices(vector<TwoDVertex> cagePoints, vector<TwoDEdge> ca
         // Sum of weighted vertices
         Vector2f term1 = Vector2f(0,0);
         for (int i = 0; i < cagePoints.size(); i++) {
-            term1 += objectVertex.mvcCoord.MVCoord.at(i) * cagePoints.at(i).position;
+            if (cagePoints.at(i).isMargin) {
+                term1 += objectVertex.mvcCoord.MVCoord.at(i) * cagePoints.at(i).position;
+            }
+//            term1 += objectVertex.mvcCoord.MVCoord.at(i) * cagePoints.at(i).position;
         }
 
         objectVertex.position = term1;
