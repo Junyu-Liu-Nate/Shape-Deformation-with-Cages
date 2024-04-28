@@ -40,7 +40,7 @@ public:
 
     //----- Linear 2D case
     Object2D object2D;
-    void buildVertexList2D(vector<Vector3f> objectVertices);
+    void buildVertexList2D(vector<Vector3f> objectVertices, const vector<Vector3f> vertices, const vector<Vector3i> triangles);
 
     void setTextureFilePath(const QString &path);
     bool isTextureFilePathSet();
@@ -49,8 +49,11 @@ public:
 
     //----- High order 2D case
     int degree = 3;
-
     unordered_map<std::tuple<int, int, int>, ControlPoint, tuple_hash> controlPoints;
+
+    // ---Check whether an object vertex is inside the cage or not
+    bool isPointInTriangle(const Vector3f& pt, const Vector3f& v1, const Vector3f& v2, const Vector3f& v3);
+    bool isPointInsideMesh(const Vector3f& point, const vector<Vector3f>& vertices, const vector<Vector3i>& triangles);
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 

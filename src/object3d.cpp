@@ -9,13 +9,13 @@ void Object3D::updateVertices(const HalfEdgeMesh& heMesh) {
     const float LARGE_NUMBER_THRESHOLD = 5;
 
     //----- Green Coordinates
-//    #pragma omp parallel for
-//    for (ObjectVertex& objectVertex : vertexList) {
-//        Vector3f term1 = Vector3f(0,0,0);
-//        for (int i = 0; i < objectVertex.greenCord.phiCoords.size(); i++) {
-//            term1 += objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position;
-//        }
-////        cout << term1.x() << ", " << term1.y() << ", " << term1.z() << endl;
+    #pragma omp parallel for
+    for (ObjectVertex& objectVertex : vertexList) {
+        Vector3f term1 = Vector3f(0,0,0);
+        for (int i = 0; i < objectVertex.greenCord.phiCoords.size(); i++) {
+            term1 += objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position;
+        }
+//        cout << term1.x() << ", " << term1.y() << ", " << term1.z() << endl;
 //        if (term1.hasNaN() || (term1.array().isInf()).any()) {
 //            cout << "Term 1 contains NaN" << endl;
 //        }
@@ -23,15 +23,14 @@ void Object3D::updateVertices(const HalfEdgeMesh& heMesh) {
 //            std::cout << "Term 1 contains very large numbers" << std::endl;
 //        }
 
-//        Vector3f term2 = Vector3f(0,0,0);
-//        for (int i = 0; i < objectVertex.greenCord.psiCoords.size(); i++) {
-//            // TODO: s can be toggled between 1 and the calculation
-//            float s = calculateS(heMesh.faces.at(i));
-//            term2 += objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal() * s;
-//        }
-////        cout << "Max psi coord: " << *max_element(objectVertex.greenCord.psiCoords.begin(), objectVertex.greenCord.psiCoords.end());
-////        cout << "; Min psi coord: " << *min_element(objectVertex.greenCord.psiCoords.begin(), objectVertex.greenCord.psiCoords.end()) << endl;
-////        cout << term2.x() << ", " << term2.y() << ", " << term2.z() << endl;
+        Vector3f term2 = Vector3f(0,0,0);
+        for (int i = 0; i < objectVertex.greenCord.psiCoords.size(); i++) {
+            float s = calculateS(heMesh.faces.at(i));
+            term2 += objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal() * s;
+        }
+//        cout << "Max psi coord: " << *max_element(objectVertex.greenCord.psiCoords.begin(), objectVertex.greenCord.psiCoords.end());
+//        cout << "; Min psi coord: " << *min_element(objectVertex.greenCord.psiCoords.begin(), objectVertex.greenCord.psiCoords.end()) << endl;
+//        cout << term2.x() << ", " << term2.y() << ", " << term2.z() << endl;
 //        if (term2.hasNaN() || (term2.array().isInf()).any()) {
 //            cout << "Term 2 contains NaN." << endl;
 //        }
@@ -39,20 +38,20 @@ void Object3D::updateVertices(const HalfEdgeMesh& heMesh) {
 //            std::cout << "Term 2 contains very large numbers" << std::endl;
 //        }
 
-//        objectVertex.position = term1 + term2;
-//    }
+        objectVertex.position = term1 + term2;
+    }
 
     //----- MVC Coordinates
-    #pragma omp parallel for
-    for (ObjectVertex& objectVertex : vertexList) {
-        Vector3f newPos = Vector3f(0,0,0);
-        float wTotal = 0;
-        for (int i = 0; i < objectVertex.mvcCoord.wCoords.size(); i++) {
-            newPos += objectVertex.mvcCoord.wCoords.at(i) * heMesh.vertices.at(i).position;
-            wTotal += objectVertex.mvcCoord.wCoords.at(i);
-        }
-        objectVertex.position = newPos / wTotal;
-    }
+//    #pragma omp parallel for
+//    for (ObjectVertex& objectVertex : vertexList) {
+//        Vector3f newPos = Vector3f(0,0,0);
+//        float wTotal = 0;
+//        for (int i = 0; i < objectVertex.mvcCoord.wCoords.size(); i++) {
+//            newPos += objectVertex.mvcCoord.wCoords.at(i) * heMesh.vertices.at(i).position;
+//            wTotal += objectVertex.mvcCoord.wCoords.at(i);
+//        }
+//        objectVertex.position = newPos / wTotal;
+//    }
 }
 
 vector<Vector3f> Object3D::getVertices() {

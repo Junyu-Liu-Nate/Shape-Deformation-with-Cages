@@ -62,7 +62,7 @@ void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, Ha
             }
             omega += halfEdge->vertex->N * halfEdge->vertex->II;
         }
-        float epsilon = 0.0001; // TODO: Check how to set this
+        float epsilon = 0.0; // TODO: Check how to set this
         if (omega.norm() > epsilon) {
             for (HalfEdge* halfEdge : face.halfEdges) {
                 int vertexIdx = halfEdge->vertex->vertexIdx;
@@ -106,25 +106,19 @@ void GreenCoordinates3D::constructGreenCoordinatesExterior(const Vector3f& verte
         Vector3f faceNormal = face.calculateNormal();
 
         MatrixXf A(4, 4);
-//        cout << vList.at(0) << endl;
         A << vList.at(0), vList.at(1), vList.at(2), faceNormal,
             1, 1, 1, 0;
-//        cout << A << endl;
         Vector4f b;
         b << vertexPos, 1;
-//        cout << b << endl << endl;
 
         Vector4f solution = A.colPivHouseholderQr().solve(b);
-//        cout << solution << endl;
 
         for (int i = 0; i < 3; i++) {
             int vertexIdx = face.halfEdges[i]->vertex->vertexIdx;
             phiCoords.at(vertexIdx) += solution[i];
-//            cout << phiCoords.at(vertexIdx) << endl;
         }
 
         psiCoords.at(j) += solution[3];
-//        cout << psiCoords.at(j) << endl << endl;
 
         j++;
         break;

@@ -17,8 +17,8 @@ public:
     vector<float> phiCoords;
     vector<float> psiCoords;
 
-//    void constructGreenCoordinates(const Vector2f& vertexPos, vector<Vector2f> cagePoints, vector<std::pair<Vector2f, Vector2f>> cageEdges);
     void constructGreenCoordinates(const Vector2f& vertexPos, vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges);
+    void constructGreenCoordinatesExterior(const Vector2f& vertexPos, vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges);
 };
 
 #endif // GREENCOORDINATES2D_H

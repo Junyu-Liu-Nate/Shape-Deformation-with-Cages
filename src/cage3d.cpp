@@ -109,7 +109,7 @@ void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
         objectVertex.position = objectVertices.at(i);
 
         // Build Green Coordinates
-//        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
+        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
 //        if (!isPointOutsideMesh(objectVertex.position, heMesh)) {
 //            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, heMesh);
 //        }

@@ -40,11 +40,11 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 
     if (MeshLoader::loadTriMesh("meshes/2d/square.obj", objectVertices, objectTriangles)) {
         vector<Vector2f> uvCoords;
-        tessellateMesh(objectTriangles, objectVertices, 20, 20, uvCoords); // DOUBLE CHECK THIS
+        tessellateMesh(objectTriangles, objectVertices, 1, 1, uvCoords); // DOUBLE CHECK THIS
         m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords, m_textureFilePath);
     }
 
-    buildVertexList2D(objectVertices);
+    buildVertexList2D(objectVertices, vertices, triangles);
 
     m_shape_control_points.init(controlPts, vector<Vector3i>()); // Setup rendering for control points
     // TODO: How to draw and control these vertices
@@ -119,14 +119,21 @@ void Cage2D::updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, 
 }
 
 //---------- Build coordinates for all vertices ----------//
-void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices) {
+void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices, const vector<Vector3f> vertices, const vector<Vector3i> triangles) {
     object2D.vertexList.resize(objectVertices.size());
     for (int i = 0; i < objectVertices.size(); i++) {
         ObjectVertex2D objectVertex;
         objectVertex.position = Vector2f(objectVertices.at(i).x(), objectVertices.at(i).y());
 
         // Build 2D Green Coordinates
-        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
+        if (isPointInsideMesh(objectVertices.at(i), vertices, triangles)) {
+            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
+        }
+        else {
+//            cout << objectVertex.position.x() << ", "<< objectVertex.position.y() << endl;
+            objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, cagePoints, cageEdges);
+        }
+//        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
 
         // Build 2D Higher Order Green Coordinates
         objectVertex.gcHigherOrder.constructGCHigherOrder(objectVertex.position, cagePoints, cageEdges);
@@ -199,6 +206,42 @@ void Cage2D::findMarginEdges(vector<Vector3i>& triangles, vector<Vector3f>& vert
 
         }
     }
+}
+
+//---------- Check whether an object vertex is inside the cage or not ----------//
+bool Cage2D::isPointInTriangle(const Vector3f& pt, const Vector3f& v1, const Vector3f& v2, const Vector3f& v3) {
+    Vector3f v2_v1 = v2 - v1;
+    Vector3f v3_v2 = v3 - v2;
+    Vector3f v1_v3 = v1 - v3;
+
+    // Vector from vertices to point
+    Vector3f v1_pt = pt - v1;
+    Vector3f v2_pt = pt - v2;
+    Vector3f v3_pt = pt - v3;
+
+    // Cross product to get the area of parallelogram (2*area of triangle)
+    float area_orig = (v2_v1.cross(v3_v2)).norm();
+    float area1 = (v2_v1.cross(v1_pt)).norm();
+    float area2 = (v3_v2.cross(v2_pt)).norm();
+    float area3 = (v1_v3.cross(v3_pt)).norm();
+
+    // Check if point is inside the triangle
+    return fabs(area1 + area2 + area3 - area_orig) < 1e-5; // Tolerance for floating point arithmetic
+}
+
+bool Cage2D::isPointInsideMesh(const Vector3f& point, const vector<Vector3f>& vertices, const vector<Vector3i>& triangles) {
+    bool inside = false;
+    for (const auto& tri : triangles) {
+        const Vector3f& v1 = vertices[tri[0]];
+        const Vector3f& v2 = vertices[tri[1]];
+        const Vector3f& v3 = vertices[tri[2]];
+
+        if (isPointInTriangle(point, v1, v2, v3)) {
+            inside = true;
+            break;
+        }
+    }
+    return inside;
 }
 
 //---------- Tessellate object mesh ----------//
