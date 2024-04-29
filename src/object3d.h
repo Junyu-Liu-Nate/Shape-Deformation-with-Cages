@@ -17,7 +17,7 @@ struct ObjectVertex {
     GreenCoordinates3D greenCord;
     MVC3D mvcCoord;
     // For test only
-    GreenCoordinates2D greenCord2D;
+//    GreenCoordinates2D greenCord2D;
 };
 
 class Object3D
@@ -30,7 +30,8 @@ public:
     void updateVertices(const HalfEdgeMesh& heMesh);
     vector<Vector3f> getVertices();
 
-    float calculateS(const Face face);
+//    float calculateS(const Face face);
+    double calculateS(const Face face);
 };
 
 #endif // OBJECT3D_H
