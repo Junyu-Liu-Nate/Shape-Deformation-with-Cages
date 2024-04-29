@@ -18,7 +18,7 @@ public:
     vector<vector<float>> phiCoords;
     vector<vector<float>> psiCoords;
 
-    int degree = 1;
+    int degree = 3;
 
     void constructGCHigherOrder(const Vector2f& vertexPos, vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges);
     void gcHigherOrderEdge(const Vector2f& eta, const Vector2f& v0, const Vector2f& v1, vector<float>& phi, vector<float>& psi);

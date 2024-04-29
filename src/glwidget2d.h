@@ -5,6 +5,7 @@
 #endif
 
 #include <glwidget3d.h>
+#include "cage2d.h"
 
 class GLWidget2D : public GLWidget3D
 {

@@ -4,7 +4,7 @@ HalfEdgeMesh::HalfEdgeMesh() {
 
 }
 
-void HalfEdgeMesh::buildHalfEdgeStructure(const std::vector<Eigen::Vector3f>& _vertices,
+void HalfEdgeMesh::buildHalfEdgeStructure(const std::vector<Eigen::Vector3d>& _vertices,
                                           const std::vector<Eigen::Vector3i>& _faces) {
     // Create vertices and store the index within them
     vertices.clear();
@@ -78,7 +78,8 @@ void HalfEdgeMesh::buildHalfEdgeStructure(const std::vector<Eigen::Vector3f>& _v
 
 void HalfEdgeMesh::updateVertexPos(std::vector<Eigen::Vector3f>& outVertices) {
     for (Vertex& vertex : vertices) {
-        outVertices[vertex.vertexIdx] = vertex.position;
+//        outVertices[vertex.vertexIdx] = vertex.position;
+        outVertices[vertex.vertexIdx] = vertex.position.cast<float>();
     }
 }
 

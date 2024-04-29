@@ -8,6 +8,7 @@
 #include <QtConcurrent>
 #include "mesh_struct/margincage2d.h"
 #include "object2d.h"
+#include "common.h"
 
 class Shader;
 
@@ -16,6 +17,7 @@ class Cage2D
 private:
     Shape m_shape_cage;
     Shape m_shape_object;
+    Shape m_shape_control_points;
 
     std::string m_textureFilePath;
     std::string m_cageFilePath;
@@ -32,18 +34,26 @@ public:
 
     void updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition);
 
-    void findMarginEdges(vector<Vector3i>& triangles, vector<Vector3f>& vertices);
+    void findMarginEdges(vector<Vector3i>& triangles, vector<Vector3f>& vertices, vector<Vector3f>& controlPts);
 
     void tessellateMesh(vector<Vector3i>& faces, vector<Vector3f>& vertices, int finalRow, int finalCol, vector<Vector2f> &uvCoords);
 
-    //----- For test only: 2D case
+    //----- Linear 2D case
     Object2D object2D;
-    void buildVertexList2D(vector<Vector3f> objectVertices);
+    void buildVertexList2D(vector<Vector3f> objectVertices, const vector<Vector3f> vertices, const vector<Vector3i> triangles);
 
     void setTextureFilePath(const QString &path);
     bool isTextureFilePathSet();
     void setCageFilePath(const QString &path);
     bool isCageFilePathSet();
+
+    //----- High order 2D case
+    int degree = 3;
+    unordered_map<std::tuple<int, int, int>, ControlPoint, tuple_hash> controlPoints;
+
+    // ---Check whether an object vertex is inside the cage or not
+    bool isPointInTriangle(const Vector3f& pt, const Vector3f& v1, const Vector3f& v2, const Vector3f& v3);
+    bool isPointInsideMesh(const Vector3f& point, const vector<Vector3f>& vertices, const vector<Vector3i>& triangles);
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 
@@ -56,11 +66,10 @@ public:
     {
         if (mode == GL_POINTS) {
             m_shape_cage.draw(shader, mode);
-//            m_shape_object.draw(shader, mode);
+            m_shape_control_points.draw(shader, mode); // TODO: Not drawing
         } else {
             m_shape_cage.draw(shader, GL_LINES);
             m_shape_object.draw(shader, GL_TRIANGLES);
-//            m_shape_object.draw(shader, GL_LINES);
         }
     }
 
