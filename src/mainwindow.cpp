@@ -8,13 +8,15 @@ MainWindow::MainWindow()
 {
     glWidget2d = new GLWidget2D();
     glWidget2d->setMinimumSize(600, 600);
+    glWidget2d->hide();
+
     glWidget3d = new GLWidget3D();
     glWidget3d->setMinimumSize(600, 600);
     glWidget3d->hide();
 
     QPushButton *button1 = new QPushButton("Load 2D Image File");
     QObject::connect(button1, &QPushButton::clicked, [&]() {
-        QString filePath = QFileDialog::getOpenFileName(this, "Select File", "", "All Files (*.*)");
+        QString filePath = QFileDialog::getOpenFileName(this, "Select File", "texture", "Images (*.png *.jpg *.jpeg)");
         if (!filePath.isEmpty()) {
             glWidget2d->setTextureFilePath(filePath);
         }
@@ -22,7 +24,7 @@ MainWindow::MainWindow()
 
     QPushButton *button2 = new QPushButton("Load 2D Cage File");
     QObject::connect(button2, &QPushButton::clicked, [&]() {
-        QString filePath = QFileDialog::getOpenFileName(this, "Select File", "", "All Files (*.*)");
+        QString filePath = QFileDialog::getOpenFileName(this, "Select File", "meshes/2d", "Meshes (*.obj)");
         if (!filePath.isEmpty()) {
             glWidget2d->setCageFilePath(filePath);
         }
@@ -33,14 +35,14 @@ MainWindow::MainWindow()
         glWidget2d->init();
 
         if (glWidget3d->isVisible()) {
-            glWidget3d->setVisible(false);
+            glWidget3d->hide();
         }
-        glWidget2d->setVisible(true);
+        glWidget2d->show();
     });
 
     QPushButton *button4 = new QPushButton("Load 3D Cage File");
     QObject::connect(button4, &QPushButton::clicked, [&]() {
-        QString filePath = QFileDialog::getOpenFileName(this, "Select File", "", "All Files (*.*)");
+        QString filePath = QFileDialog::getOpenFileName(this, "Select File", "meshes/3d", "Meshes (*.obj)");
         if (!filePath.isEmpty()) {
             glWidget3d->setCageFilePath(filePath);
         }
@@ -48,7 +50,7 @@ MainWindow::MainWindow()
 
     QPushButton *button5 = new QPushButton("Load 3D Object File");
     QObject::connect(button5, &QPushButton::clicked, [&]() {
-        QString filePath = QFileDialog::getOpenFileName(this, "Select File", "", "All Files (*.*)");
+        QString filePath = QFileDialog::getOpenFileName(this, "Select File", "meshes/3d", "Meshes (*.obj)");
         if (!filePath.isEmpty()) {
             glWidget3d->setObjectFilePath(filePath);
         }
@@ -59,9 +61,9 @@ MainWindow::MainWindow()
         glWidget3d->init();
 
         if (glWidget2d->isVisible()) {
-            glWidget2d->setVisible(false);
+            glWidget2d->hide();
         }
-        glWidget3d->setVisible(true);
+        glWidget3d->show();
     });
 
     QVBoxLayout *menu = new QVBoxLayout;
