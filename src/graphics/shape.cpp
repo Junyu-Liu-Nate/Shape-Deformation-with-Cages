@@ -160,6 +160,26 @@ void Shape::initWithTexture(const vector<Vector3f> &vertices,
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void Shape::initPoints(const vector<Vector3f> &vertices)
+{
+    m_vertices.clear();
+    copy(vertices.begin(), vertices.end(), back_inserter(m_vertices));
+
+    glGenBuffers(1, &m_surfaceVbo);
+    glGenVertexArrays(1, &m_surfaceVao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size() * 3, vertices.data(), GL_DYNAMIC_DRAW);
+
+    glBindVertexArray(m_surfaceVao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVbo);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, static_cast<GLvoid *>(0));
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void Shape::setVertices(const vector<Vector3f> &vertices)
 {
     m_vertices.clear();
@@ -261,6 +281,18 @@ void Shape::draw(Shader *shader, GLenum mode)
         break;
     }
     }
+}
+
+void Shape::drawPoints(Shader *shader)
+{
+    Eigen::Matrix3f m3 = m_modelMatrix.topLeftCorner(3, 3);
+    Eigen::Matrix3f inverseTransposeModel = m3.inverse().transpose();
+
+    shader->setUniform("model", m_modelMatrix);
+    shader->setUniform("inverseTransposeModel", inverseTransposeModel);
+    glBindVertexArray(m_surfaceVao);
+    glDrawArrays(GL_POINTS, 0, 3);
+    glBindVertexArray(0);
 }
 
 SelectMode Shape::select(Shader *shader, int closest_vertex)

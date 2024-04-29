@@ -31,12 +31,14 @@ public:
                          const std::vector<Eigen::Vector3i> &triangles,
                          const std::vector<Eigen::Vector2f> &uvCoords,
                          const std::string &textureFilePath);
+    void initPoints(const std::vector<Eigen::Vector3f> &vertices);
     void setVertices(const std::vector<Eigen::Vector3f> &vertices);
     void setVertices2d(const std::vector<Eigen::Vector3f> &vertices);
 
     void setModelMatrix(const Eigen::Affine3f &model);
 
     void draw(Shader *shader, GLenum mode);
+    void drawPoints(Shader *shader);
     SelectMode select(Shader *shader, int vertex);
     bool selectWithSpecifiedMode(Shader *shader, int vertex, SelectMode mode);
     int  getClosestVertex(Eigen::Vector3f start, Eigen::Vector3f ray, float threshold);
