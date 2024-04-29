@@ -13,14 +13,14 @@ void Object3D::updateVertices(const HalfEdgeMesh& heMesh) {
     for (ObjectVertex& objectVertex : vertexList) {
         Vector3f term1 = Vector3f(0,0,0);
         for (int i = 0; i < objectVertex.greenCord.phiCoords.size(); i++) {
-            term1 += 0.5 * objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position.cast<float>();
+            term1 += objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position.cast<float>();
         }
 
         Vector3f term2 = Vector3f(0,0,0);
         for (int i = 0; i < objectVertex.greenCord.psiCoords.size(); i++) {
             // TODO: s can be toggled between 1 and the calculation
             float s = calculateS(heMesh.faces.at(i));
-            term2 += 0.5 * objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal().cast<float>() * s;
+            term2 += objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal().cast<float>() * s;
         }
 
         objectVertex.position = term1 + term2;
