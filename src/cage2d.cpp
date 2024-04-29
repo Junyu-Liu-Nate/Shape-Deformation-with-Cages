@@ -40,15 +40,15 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 
     if (MeshLoader::loadTriMesh("meshes/2d/square.obj", objectVertices, objectTriangles)) {
         vector<Vector2f> uvCoords;
-        tessellateMesh(objectTriangles, objectVertices, 1, 1, uvCoords); // DOUBLE CHECK THIS
+        tessellateMesh(objectTriangles, objectVertices, 1, 1, uvCoords);
         m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords, m_textureFilePath);
     }
 
     cout << "init for 2D is called!!!" << endl;
     buildVertexList2D(objectVertices, vertices, triangles);
 
-    m_shape_control_points.init(controlPts, vector<Vector3i>()); // Setup rendering for control points
-    // TODO: How to draw and control these vertices
+    // Initialize additional control points on edges
+    m_shape_control_points.initPoints(controlPts);
 
     //----- Students, please don't touch this code: get min and max for viewport stuff
     MatrixX3f all_vertices = MatrixX3f(vertices.size(), 3);
@@ -76,6 +76,7 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
 
     m_shape_cage.setVertices2d(new_vertices);
     m_shape_object.setVertices2d(new_object_vertices);
+    m_shape_control_points.setCtrlPtsVertices(m_shape_control_points.getVertices());
 
     // TODO: Add updates for Bezier curve control points
 }

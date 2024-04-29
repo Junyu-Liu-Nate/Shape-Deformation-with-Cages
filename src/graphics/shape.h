@@ -34,11 +34,11 @@ public:
     void initPoints(const std::vector<Eigen::Vector3f> &vertices);
     void setVertices(const std::vector<Eigen::Vector3f> &vertices);
     void setVertices2d(const std::vector<Eigen::Vector3f> &vertices);
+    void setCtrlPtsVertices(const std::vector<Eigen::Vector3f> &vertices);
 
     void setModelMatrix(const Eigen::Affine3f &model);
 
     void draw(Shader *shader, GLenum mode);
-    void drawPoints(Shader *shader);
     SelectMode select(Shader *shader, int vertex);
     bool selectWithSpecifiedMode(Shader *shader, int vertex, SelectMode mode);
     int  getClosestVertex(Eigen::Vector3f start, Eigen::Vector3f ray, float threshold);
@@ -60,7 +60,7 @@ private:
     float m_blue;
     float m_green;
     float m_alpha;
-    bool m_textured = false;
+    bool m_isTextured = false;
 
     std::vector<Eigen::Vector3i> m_faces;
     std::vector<Eigen::Vector3f> m_vertices;
@@ -85,4 +85,5 @@ private:
                       std::vector<Eigen::Vector3f>& normals,
                       std::vector<Eigen::Vector3f>& colors,
                       const std::vector<Eigen::Vector2f>& uvCoords);
+    void updatePointColor(std::vector<Eigen::Vector3f>& colors);
 };
