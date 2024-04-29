@@ -29,6 +29,11 @@ struct TwoDEdge {
     }
 };
 
+struct ControlPoint {
+    int idx; // id for storing in the rendering list
+    Vector2f position;
+};
+
 class MarginCage2D
 {
 public:

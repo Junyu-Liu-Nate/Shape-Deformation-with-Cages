@@ -5,7 +5,7 @@
 #endif
 
 #include "cage3d.h"
-#include "cage2d.h"
+//#include "cage2d.h"
 #include "graphics/camera.h"
 #include "graphics/shader.h"
 

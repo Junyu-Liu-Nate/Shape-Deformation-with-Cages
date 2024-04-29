@@ -194,6 +194,5 @@ void GLWidget2D::init()
     }
 
     m_initialized = true;
-    initializeGL();
 }
 

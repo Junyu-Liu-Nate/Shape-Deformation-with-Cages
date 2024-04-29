@@ -4,6 +4,7 @@
 
 #include <Eigen/Dense>
 #include "mesh_struct/margincage2d.h"
+#include <iostream>
 
 using namespace Eigen;
 class MVC2D

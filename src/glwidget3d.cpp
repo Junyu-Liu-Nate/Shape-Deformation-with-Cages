@@ -335,5 +335,4 @@ void GLWidget3D::init()
     }
 
     m_initialized = true;
-    initializeGL();
 }

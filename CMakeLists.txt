@@ -63,6 +63,7 @@ add_executable(${PROJECT_NAME}
     src/coordinates/mvc2d.h src/coordinates/mvc2d.cpp
 
     src/glwidget2d.h src/glwidget2d.cpp
+    src/common.h src/common.cpp
 
 )
 
