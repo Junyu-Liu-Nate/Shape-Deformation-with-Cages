@@ -33,6 +33,7 @@ void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
         m_shape_object.init(objectVertices, objectTriangles);
     }
 
+//    cout << "init for 3D is called!!!" << endl;
     buildVertexList(objectVertices);
 
     //----- Students, please don't touch this code: get min and max for viewport stuff
@@ -102,7 +103,7 @@ void Cage3D::updateCage(std::vector<Eigen::Vector3f> new_vertices, int vertex, V
 
 //---- Build the Green Coordinates for all vertices
 void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
-    cout << "Check buildVertexList" << endl;
+//    cout << "buildVertexList for 3D is called!!!" << endl;
     object3D.vertexList.resize(objectVertices.size());
     #pragma omp parallel for
     for (int i = 0; i < objectVertices.size(); i++) {

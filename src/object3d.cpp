@@ -13,7 +13,8 @@ void Object3D::updateVertices(const HalfEdgeMesh& heMesh) {
     for (ObjectVertex& objectVertex : vertexList) {
         Vector3f term1 = Vector3f(0,0,0);
         for (int i = 0; i < objectVertex.greenCord.phiCoords.size(); i++) {
-            term1 += objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position;
+//            term1 += objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position;
+            term1 += 0.5 * objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position;
         }
 //        cout << term1.x() << ", " << term1.y() << ", " << term1.z() << endl;
 //        if (term1.hasNaN() || (term1.array().isInf()).any()) {
@@ -27,7 +28,7 @@ void Object3D::updateVertices(const HalfEdgeMesh& heMesh) {
         for (int i = 0; i < objectVertex.greenCord.psiCoords.size(); i++) {
             // TODO: s can be toggled between 1 and the calculation
             float s = calculateS(heMesh.faces.at(i));
-            term2 += objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal() * s;
+            term2 += 0.5 * objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal() * s;
         }
 //        cout << "Max psi coord: " << *max_element(objectVertex.greenCord.psiCoords.begin(), objectVertex.greenCord.psiCoords.end());
 //        cout << "; Min psi coord: " << *min_element(objectVertex.greenCord.psiCoords.begin(), objectVertex.greenCord.psiCoords.end()) << endl;
