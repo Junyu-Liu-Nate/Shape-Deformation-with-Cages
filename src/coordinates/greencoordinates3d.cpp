@@ -31,15 +31,15 @@ void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, Ha
             thisVertex->q = nextVertex->calculatePosition.cross(thisVertex->calculatePosition);
             thisVertex->N = thisVertex->q / thisVertex->q.norm();
 
-//            if (isinf(thisVertex->s)) {
-//                cout << "s is inf" << endl;
-//            }
-//            if (isinf(thisVertex->I)) {
-//                cout << "I is inf" << endl << endl;
-//            }
-//            if (isinf(thisVertex->II)) {
-//                cout << "II is inf" << endl;
-//            }
+            //            if (isinf(thisVertex->s)) {
+            //                cout << "s is inf" << endl;
+            //            }
+            //            if (isinf(thisVertex->I)) {
+            //                cout << "I is inf" << endl << endl;
+            //            }
+            //            if (isinf(thisVertex->II)) {
+            //                cout << "II is inf" << endl;
+            //            }
         }
 
         float ISum = 0;
@@ -62,7 +62,7 @@ void GreenCoordinates3D::constructGreenCoordinates(const Vector3f& vertexPos, Ha
             }
             omega += halfEdge->vertex->N * halfEdge->vertex->II;
         }
-        float epsilon = 0.0; // TODO: Check how to set this
+        float epsilon = 0.0001; // TODO: Check how to set this
         if (omega.norm() > epsilon) {
             for (HalfEdge* halfEdge : face.halfEdges) {
                 int vertexIdx = halfEdge->vertex->vertexIdx;
@@ -106,19 +106,25 @@ void GreenCoordinates3D::constructGreenCoordinatesExterior(const Vector3f& verte
         Vector3f faceNormal = face.calculateNormal();
 
         MatrixXf A(4, 4);
+        //        cout << vList.at(0) << endl;
         A << vList.at(0), vList.at(1), vList.at(2), faceNormal,
             1, 1, 1, 0;
+        //        cout << A << endl;
         Vector4f b;
         b << vertexPos, 1;
+        //        cout << b << endl << endl;
 
         Vector4f solution = A.colPivHouseholderQr().solve(b);
+        //        cout << solution << endl;
 
         for (int i = 0; i < 3; i++) {
             int vertexIdx = face.halfEdges[i]->vertex->vertexIdx;
             phiCoords.at(vertexIdx) += solution[i];
+            //            cout << phiCoords.at(vertexIdx) << endl;
         }
 
         psiCoords.at(j) += solution[3];
+        //        cout << psiCoords.at(j) << endl << endl;
 
         j++;
         break;
@@ -129,17 +135,17 @@ float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3
     //--- Calculate alpha
     float alphaNominator = (v2 - v1).dot(p - v1);
     float alphaDenominator = (v2 - v1).norm() * (p - v1).norm();
-//    float alphaInput = alphaNominator / alphaDenominator;
-//    alphaInput = std::max(-1.0f, std::min(1.0f, alphaInput)); // Clamp the value to stay within [-1, 1]
-//    float alpha = acos(alphaInput);
+    //    float alphaInput = alphaNominator / alphaDenominator;
+    //    alphaInput = std::max(-1.0f, std::min(1.0f, alphaInput)); // Clamp the value to stay within [-1, 1]
+    //    float alpha = acos(alphaInput);
     float alpha = acos(alphaNominator / alphaDenominator);
 
     //--- Calculate beta
     float betaNominator = (v1 - p).dot(v2 - p);
     float betaDenominator = (v1 - p).norm() * (v2 - p).norm();
-//    float betaInput = betaNominator / betaDenominator;
-//    betaInput = std::max(-1.0f, std::min(1.0f, betaInput)); // Clamp the value to stay within [-1, 1]
-//    float beta = acos(betaInput);
+    //    float betaInput = betaNominator / betaDenominator;
+    //    betaInput = std::max(-1.0f, std::min(1.0f, betaInput)); // Clamp the value to stay within [-1, 1]
+    //    float beta = acos(betaInput);
     float beta = acos(betaNominator / betaDenominator);
 
     //--- Calculate lambda
@@ -159,21 +165,21 @@ float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3
 
         float term1 = -copysign(1.0, S) * 0.5;
         float term2 = 2 * sqrt(c) * atan((sqrt(c) * C) / sqrt(lambda + S*S*c));
-//        if (sqrt(lambda + S*S*c) == 0) {
-//            term2 = 0;
-//        }
+        //        if (sqrt(lambda + S*S*c) == 0) {
+        //            term2 = 0;
+        //        }
         float term3a = (2 * sqrt(lambda) * S * S) / ((1 - C) * (1 - C));
-//        if (isinf(term3a) || isnan(term3a)) {
-//            term3a = (2 * sqrt(lambda) * S * S) / ((1 - C) * (1 - C) + numericalEpsilon);
-//        }
+        //        if (isinf(term3a) || isnan(term3a)) {
+        //            term3a = (2 * sqrt(lambda) * S * S) / ((1 - C) * (1 - C) + numericalEpsilon);
+        //        }
         float term3b = 1 - 2*c*C / (c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S));
-//        if (isinf(term3b) || isnan(term3b)) {
-//            term3b = 1 - 2*c*C / (c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S) + numericalEpsilon);
-//        }
+        //        if (isinf(term3b) || isnan(term3b)) {
+        //            term3b = 1 - 2*c*C / (c * (1+C) + lambda + sqrt(lambda*lambda + lambda*c*S*S) + numericalEpsilon);
+        //        }
         float term3 = sqrt(lambda) * log(term3a * term3b);
-//        if (isinf(term3) || isnan(term3)) {
-//            term3 = sqrt(lambda) * log(term3a * term3b + numericalEpsilon);
-//        }
+        //        if (isinf(term3) || isnan(term3)) {
+        //            term3 = sqrt(lambda) * log(term3a * term3b + numericalEpsilon);
+        //        }
 
         IList.at(i) = term1 * (term2 + term3);
     }
@@ -182,4 +188,3 @@ float GreenCoordinates3D::gcTriInt(Vector3f p, Vector3f v1, Vector3f v2, Vector3
 
     return result;
 }
-

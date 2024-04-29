@@ -25,6 +25,7 @@ void Object3D::updateVertices(const HalfEdgeMesh& heMesh) {
 
         Vector3f term2 = Vector3f(0,0,0);
         for (int i = 0; i < objectVertex.greenCord.psiCoords.size(); i++) {
+            // TODO: s can be toggled between 1 and the calculation
             float s = calculateS(heMesh.faces.at(i));
             term2 += objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal() * s;
         }

@@ -102,6 +102,7 @@ void Cage3D::updateCage(std::vector<Eigen::Vector3f> new_vertices, int vertex, V
 
 //---- Build the Green Coordinates for all vertices
 void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
+    cout << "Check buildVertexList" << endl;
     object3D.vertexList.resize(objectVertices.size());
     #pragma omp parallel for
     for (int i = 0; i < objectVertices.size(); i++) {
