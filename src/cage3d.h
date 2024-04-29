@@ -34,8 +34,6 @@ public:
     void buildVertexList(vector<Vector3f> objectVertices);
     void updatePosition();
 
-//    bool rayIntersectsTriangle(const Eigen::Vector3f& P, const Eigen::Vector3f& D, const Face& face);
-//    bool isPointOutsideMesh(const Eigen::Vector3f& point, HalfEdgeMesh& mesh);
     bool rayIntersectsTriangle(const Eigen::Vector3d& P, const Eigen::Vector3d& D, const Face& face);
     bool isPointOutsideMesh(const Eigen::Vector3d& point, HalfEdgeMesh& mesh);
 
