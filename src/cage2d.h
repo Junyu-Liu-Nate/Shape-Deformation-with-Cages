@@ -70,6 +70,7 @@ public:
         } else {
             m_shape_cage.draw(shader, GL_LINES);
             m_shape_object.draw(shader, GL_TRIANGLES);
+//            m_shape_object.draw(shader, GL_LINES);
         }
     }
 

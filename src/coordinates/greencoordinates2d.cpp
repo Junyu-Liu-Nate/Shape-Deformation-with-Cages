@@ -73,7 +73,7 @@ void GreenCoordinates2D::constructGreenCoordinatesExterior(const Vector2f& verte
 
         phiCoords.at(currEdge.edge.first->idx) += solution[0];
         phiCoords.at(currEdge.edge.second->idx) += solution[1];
-        psiCoords.at(r) += solution[2];
+        psiCoords.at(r) -= solution[2];
 
 //        break;
     }
