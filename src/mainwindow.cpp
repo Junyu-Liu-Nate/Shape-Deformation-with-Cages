@@ -8,6 +8,8 @@ MainWindow::MainWindow()
 {
     glWidget2d = new GLWidget2D();
     glWidget2d->setMinimumSize(600, 600);
+    glWidget2d->hide();
+
     glWidget3d = new GLWidget3D();
     glWidget3d->setMinimumSize(600, 600);
     glWidget3d->hide();
@@ -33,9 +35,9 @@ MainWindow::MainWindow()
         glWidget2d->init();
 
         if (glWidget3d->isVisible()) {
-            glWidget3d->setVisible(false);
+            glWidget3d->hide();
         }
-        glWidget2d->setVisible(true);
+        glWidget2d->show();
     });
 
     QPushButton *button4 = new QPushButton("Load 3D Cage File");
@@ -59,9 +61,9 @@ MainWindow::MainWindow()
         glWidget3d->init();
 
         if (glWidget2d->isVisible()) {
-            glWidget2d->setVisible(false);
+            glWidget2d->hide();
         }
-        glWidget3d->setVisible(true);
+        glWidget3d->show();
     });
 
     QVBoxLayout *menu = new QVBoxLayout;
