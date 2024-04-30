@@ -38,7 +38,7 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     vector<Vector3f> objectVertices;
     vector<Vector3i> objectTriangles;
 
-    if (MeshLoader::loadTriMesh("meshes/2d/square.obj", objectVertices, objectTriangles)) {
+    if (MeshLoader::loadTriMesh("meshes/2d/rectangle.obj", objectVertices, objectTriangles)) {
         vector<Vector2f> uvCoords;
         tessellateMesh(objectTriangles, objectVertices, 11, 11, uvCoords); // DOUBLE CHECK THIS
         m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords, m_textureFilePath);
@@ -75,13 +75,25 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
 
     m_shape_cage.setVertices2d(new_vertices);
     m_shape_object.setVertices2d(new_object_vertices);
-
-    // TODO: Add updates for Bezier curve control points
 }
 
 void Cage2D::moveCtrlPt(int vertex, Vector3f targetPosition)
 {
     m_shape_control_points.setCtrlPtsVertices(vertex, targetPosition);
+
+    // TODO: Add updates for Bezier curve control points
+    // Update control point vertices
+    for (auto& controlPoint : controlPoints) {
+        if (controlPoint.second.idx == vertex) {
+            controlPoint.second.position = Vector2f(targetPosition.x(), targetPosition.y());
+        }
+    }
+
+    // Update object vertex positions
+    object2D.updateVertices(cagePoints, cageEdges, controlPoints);
+    std::vector<Eigen::Vector3f> new_object_vertices = object2D.getVertices();
+
+     m_shape_object.setVertices2d(new_object_vertices);
 }
 
 void Cage2D::moveAllAnchors(int vertex, Vector3f pos)
@@ -106,8 +118,6 @@ void Cage2D::moveAllAnchors(int vertex, Vector3f pos)
 
     m_shape_cage.setVertices2d(new_vertices);
     m_shape_object.setVertices2d(new_object_vertices);
-
-    // TODO: Add updates for Bezier curve control points
 }
 
 // Set the cage vertex position to target position
@@ -135,10 +145,8 @@ void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices, const vector<Vec
             objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
         }
         else {
-//            cout << objectVertex.position.x() << ", "<< objectVertex.position.y() << endl;
             objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, cagePoints, cageEdges);
         }
-//        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
 
         // Build 2D Higher Order Green Coordinates
         objectVertex.gcHigherOrder.constructGCHigherOrder(objectVertex.position, cagePoints, cageEdges);
