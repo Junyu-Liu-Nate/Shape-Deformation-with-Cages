@@ -12,7 +12,6 @@ void MVC2D::constructMVC(Vector2f vert, vector<TwoDVertex> cagePoints){
     int nSize = cagePoints.size();
     float dx, dy;
     std::vector<Vector3f> s(nSize);
-//    std::vector<Vector2f> s(nSize);
     for(int i = 0; i < nSize; i++) {
         dx = cagePoints.at(i).position[0] - vert[0];
         dy = cagePoints.at(i).position[1] - vert[1];
@@ -26,7 +25,6 @@ void MVC2D::constructMVC(Vector2f vert, vector<TwoDVertex> cagePoints){
     int ip, im; // i+ and i-
     float ri, rp, Ai, Di, dl, mu;  // Distance
 
-    // --------------------------------------- NEW ---------------------------------------
     vector<float> AList;
     vector<float> rList;
     vector<float> DList;
@@ -55,7 +53,7 @@ void MVC2D::constructMVC(Vector2f vert, vector<TwoDVertex> cagePoints){
             specialCaseIndices.push_back(i);
         }
     }
-    // --------------------------------------- END ---------------------------------------
+
     float wsum = 0;
     for (int i = 0; i < nSize; i++) {
         if (find(specialCaseIndices.begin(), specialCaseIndices.end(), i) != specialCaseIndices.end()) {
@@ -82,6 +80,4 @@ void MVC2D::constructMVC(Vector2f vert, vector<TwoDVertex> cagePoints){
             MVCoord[i] /= wsum;
         }
     }
-
-    //-------------
 }
