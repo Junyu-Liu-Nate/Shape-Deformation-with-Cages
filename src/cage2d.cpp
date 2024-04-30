@@ -76,9 +76,13 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
 
     m_shape_cage.setVertices2d(new_vertices);
     m_shape_object.setVertices2d(new_object_vertices);
-    m_shape_control_points.setCtrlPtsVertices(m_shape_control_points.getVertices());
 
     // TODO: Add updates for Bezier curve control points
+}
+
+void Cage2D::moveCtrlPt(int vertex, Vector3f targetPosition)
+{
+    m_shape_control_points.setCtrlPtsVertices(vertex, targetPosition);
 }
 
 void Cage2D::moveAllAnchors(int vertex, Vector3f pos)

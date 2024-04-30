@@ -67,8 +67,6 @@ protected:
     int m_lastY;
     bool m_leftCapture;
     bool m_rightCapture;
-    SelectMode m_rightClickSelectMode;
-    int m_lastSelectedVertex = -1;
     bool m_shiftFlag = false;
 
     // Execution flow control
@@ -81,4 +79,8 @@ private:
     int m_forward;
     int m_sideways;
     int m_vertical;
+
+    // Mouse handler stuff
+    int m_lastSelectedVertex = -1;
+    SelectMode m_rightClickSelectMode;
 };

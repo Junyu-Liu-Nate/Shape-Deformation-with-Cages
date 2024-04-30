@@ -28,6 +28,7 @@ public:
     void init(Eigen::Vector3f &min, Eigen::Vector3f &max);
     void move(int vertex, Eigen::Vector3f pos);
     void moveAllAnchors(int vertex, Eigen::Vector3f pos);
+    void moveCtrlPt(int vertex, Vector3f targetPosition);
 
     vector<TwoDVertex> cagePoints;
     vector<TwoDEdge> cageEdges;
@@ -57,9 +58,14 @@ public:
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 
-    int getClosestVertex(Eigen::Vector3f start, Eigen::Vector3f ray, float threshold)
+    int getClosestVertexOnCage(Eigen::Vector3f start, Eigen::Vector3f ray, float threshold)
     {
         return m_shape_cage.getClosestVertex(start, ray, threshold);
+    }
+
+    int getClosestVertexOnCtrlPt(Eigen::Vector3f start, Eigen::Vector3f ray, float threshold)
+    {
+        return m_shape_control_points.getClosestVertex(start, ray, threshold);
     }
 
     void draw(Shader *shader, GLenum mode)
@@ -73,19 +79,34 @@ public:
         }
     }
 
-    SelectMode select(Shader *shader, int vertex)
+    SelectMode selectOnCage(Shader *shader, int vertex)
     {
         return m_shape_cage.select(shader, vertex);
     }
 
-    bool selectWithSpecifiedMode(Shader *shader, int vertex, SelectMode mode)
+    SelectMode selectOnCtrlPt(Shader *shader, int vertex)
+    {
+        return m_shape_control_points.select(shader, vertex);
+    }
+
+    bool selectWithSpecifiedModeOnCage(Shader *shader, int vertex, SelectMode mode)
     {
         return m_shape_cage.selectWithSpecifiedMode(shader, vertex, mode);
     }
 
-    bool getAnchorPos(int lastSelected, Eigen::Vector3f& pos, Eigen::Vector3f ray, Eigen::Vector3f start)
+    bool selectWithSpecifiedModeOnCtrlPt(Shader *shader, int vertex, SelectMode mode)
+    {
+        return m_shape_control_points.selectWithSpecifiedMode(shader, vertex, mode);
+    }
+
+    bool getAnchorPosOnCage(int lastSelected, Eigen::Vector3f& pos, Eigen::Vector3f ray, Eigen::Vector3f start)
     {
         return m_shape_cage.getAnchorPos(lastSelected, pos, ray, start);
+    }
+
+    bool getAnchorPosOnCtrlPt(int lastSelected, Eigen::Vector3f& pos, Eigen::Vector3f ray, Eigen::Vector3f start)
+    {
+        return m_shape_control_points.getAnchorPos(lastSelected, pos, ray, start);
     }
 };
 

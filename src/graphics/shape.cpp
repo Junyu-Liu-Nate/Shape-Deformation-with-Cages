@@ -162,6 +162,8 @@ void Shape::initWithTexture(const vector<Vector3f> &vertices,
 
 void Shape::initPoints(const vector<Vector3f> &vertices)
 {
+    m_isPoints = true;
+
     m_vertices.clear();
     copy(vertices.begin(), vertices.end(), back_inserter(m_vertices));
 
@@ -169,7 +171,7 @@ void Shape::initPoints(const vector<Vector3f> &vertices)
     m_numSurfaceVertices = vertices.size();
 
     vector<Vector3f> colors;
-    updatePointColor(colors);
+    updateCtrlPtColor(colors);
 
     std::vector<GLuint> indices(vertices.size());
     std::iota(indices.begin(), indices.end(), 0); // Fill with 0, 1, 2, ..., n-1
@@ -219,18 +221,17 @@ void Shape::setVertices(const vector<Vector3f> &vertices)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Shape::setCtrlPtsVertices(const vector<Vector3f> &vertices)
+void Shape::setCtrlPtsVertices(int vertex, const Vector3f &targetPosition)
 {
-    m_vertices.clear();
-    copy(vertices.begin(), vertices.end(), back_inserter(m_vertices));
+    m_vertices.at(vertex) = targetPosition;
 
     vector<Vector3f> colors;
-    updatePointColor(colors);
+    updateCtrlPtColor(colors);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (vertices.size() * 3 + colors.size() * 3), nullptr, GL_DYNAMIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * vertices.size() * 3, static_cast<const void *>(vertices.data()));
-    glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size() * 3, sizeof(float) * colors.size() * 3, static_cast<const void *>(colors.data()));
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (m_vertices.size() * 3 + colors.size() * 3), nullptr, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * m_vertices.size() * 3, static_cast<const void *>(m_vertices.data()));
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * m_vertices.size() * 3, sizeof(float) * colors.size() * 3, static_cast<const void *>(colors.data()));
 }
 
 void Shape::setVertices2d(const vector<Vector3f> &vertices)
@@ -329,7 +330,11 @@ SelectMode Shape::select(Shader *shader, int closest_vertex)
         m_anchors.erase(closest_vertex);
     }
 
-    selectHelper();
+    if (!m_isPoints) {
+        selectHelper();
+    } else {
+        selectHelperForCtrlPt();
+    }
 
     return vertexIsNowSelected ? SelectMode::Anchor : SelectMode::Unanchor;
 }
@@ -352,7 +357,11 @@ bool Shape::selectWithSpecifiedMode(Shader *shader, int closest_vertex, SelectMo
     }
     }
 
-    selectHelper();
+    if (!m_isPoints) {
+        selectHelper();
+    } else {
+        selectHelperForCtrlPt();
+    }
 
     return true;
 }
@@ -412,6 +421,18 @@ void Shape::selectHelper()
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * verts.size() * 3, static_cast<const void *>(verts.data()));
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * verts.size() * 3, sizeof(float) * normals.size() * 3, static_cast<const void *>(normals.data()));
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (normals.size() * 3)), sizeof(float) * colors.size() * 3, static_cast<const void *>(colors.data()));
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Shape::selectHelperForCtrlPt()
+{
+    vector<Vector3f> colors;
+    updateCtrlPtColor(colors);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (m_vertices.size() * 3 + colors.size() * 3), nullptr, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * m_vertices.size() * 3, static_cast<const void *>(m_vertices.data()));
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * m_vertices.size() * 3, sizeof(float) * colors.size() * 3, static_cast<const void *>(colors.data()));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -478,7 +499,7 @@ void Shape::updateMesh2d(const std::vector<Eigen::Vector3i> &faces,
     }
 }
 
-void Shape::updatePointColor(std::vector<Eigen::Vector3f>& colors)
+void Shape::updateCtrlPtColor(std::vector<Eigen::Vector3f>& colors)
 {
     for (int v = 0; v < m_verticesSize; v++) {
         if (m_anchors.find(v) == m_anchors.end()) {
