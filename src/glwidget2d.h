@@ -21,7 +21,13 @@ private:
     void paintGL()              override;
     void mousePressEvent  (QMouseEvent *event) override;
     void mouseMoveEvent   (QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
     Cage2D  m_cage;
+    SelectMode m_rightClickSelectModeOnCage;
+    SelectMode m_rightClickSelectModeOnCtrlPt;
+
+    int m_lastSelectedVertexOnCage = -1;
+    int m_lastSelectedVertexOnCtrlPt = -1;
 };
 

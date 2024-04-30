@@ -46,8 +46,8 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 
     buildVertexList2D(objectVertices, vertices, triangles);
 
-    m_shape_control_points.init(controlPts, vector<Vector3i>()); // Setup rendering for control points
-    // TODO: How to draw and control these vertices
+    // Initialize additional control points on edges
+    m_shape_control_points.initPoints(controlPts);
 
     //----- Students, please don't touch this code: get min and max for viewport stuff
     MatrixX3f all_vertices = MatrixX3f(vertices.size(), 3);
@@ -77,6 +77,11 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
     m_shape_object.setVertices2d(new_object_vertices);
 
     // TODO: Add updates for Bezier curve control points
+}
+
+void Cage2D::moveCtrlPt(int vertex, Vector3f targetPosition)
+{
+    m_shape_control_points.setCtrlPtsVertices(vertex, targetPosition);
 }
 
 void Cage2D::moveAllAnchors(int vertex, Vector3f pos)
