@@ -39,6 +39,7 @@ void GreenCoordinates2D::constructGreenCoordinates(const Vector2f& vertexPos, ve
 
 }
 
+//------ Attempts to deal with the edge case
 //void GreenCoordinates2D::constructGreenCoordinates(const Vector2f& vertexPos, vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges) {
 //    phiCoords.resize(cagePoints.size(), 0.0f);
 //    psiCoords.resize(cageEdges.size(), 0.0f);

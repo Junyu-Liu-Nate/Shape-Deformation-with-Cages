@@ -116,7 +116,8 @@ void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
         ObjectVertex objectVertex;
         objectVertex.position = objectVertices.at(i);
 
-        // Build Green Coordinates
+        //----- Build Green Coordinates
+        // If not consider boundary cases
 //        if (!isPointOutsideMesh(objectVertex.position.cast<double>(), heMesh)) {
 //            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position.cast<double>(), heMesh);
 //        }
@@ -124,6 +125,7 @@ void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
 //            objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position.cast<double>(), heMesh);
 //        }
 
+        // If consider boundary cases
         if (isPointOnBoundary(objectVertex.position.cast<double>(), heMesh)) {
             objectVertex.greenCord.constructGreenCoordinatesBoundary(objectVertex.position.cast<double>(), heMesh);
         }
@@ -136,7 +138,7 @@ void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
             }
         }
 
-        // Build MVC Coordinates
+        //----- Build MVC Coordinates
         objectVertex.mvcCoord.constructMVC(objectVertex.position.cast<double>(), heMesh);
 
         object3D.vertexList.at(i) = objectVertex;

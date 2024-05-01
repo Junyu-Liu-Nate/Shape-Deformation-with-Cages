@@ -141,7 +141,8 @@ void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices, const vector<Vec
         ObjectVertex2D objectVertex;
         objectVertex.position = Vector2f(objectVertices.at(i).x(), objectVertices.at(i).y());
 
-        // Build 2D Green Coordinates
+        //----- Build 2D Green Coordinates
+        // If not consider boundary cases
 //        if (isPointInsideMesh(objectVertices.at(i), vertices, triangles)) {
 //            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
 //        }
@@ -149,6 +150,7 @@ void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices, const vector<Vec
 //            objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, cagePoints, cageEdges);
 //        }
 
+        // If consider boundary cases
         if (isPointOnBoundary(objectVertices.at(i))) {
             objectVertex.greenCord.constructGreenCoordinatesBoundary(objectVertex.position, cagePoints, cageEdges);
         }
@@ -161,10 +163,10 @@ void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices, const vector<Vec
             }
         }
 
-        // Build 2D Higher Order Green Coordinates
+        //----- Build 2D Higher Order Green Coordinates
         objectVertex.gcHigherOrder.constructGCHigherOrder(objectVertex.position, cagePoints, cageEdges);
 
-        // Build 2D MVC Coordinates
+        //----- Build 2D MVC Coordinates
         objectVertex.mvcCoord.constructMVC(objectVertex.position, cagePoints);
 
         object2D.vertexList.at(i) = objectVertex;
@@ -298,14 +300,10 @@ bool Cage2D::isPointOnBoundary(const Vector3f& point) {
     for (TwoDEdge cageEdge : cageEdges) {
         Vector3f v1 = Vector3f(cageEdge.edge.first->position.x(), cageEdge.edge.first->position.y(), 0);
         Vector3f v2 = Vector3f(cageEdge.edge.second->position.x(), cageEdge.edge.second->position.y(), 0);
-//        cout << "Point: " << point.x() << ", " << point.y() << ", " << point.z() << endl;
-//        cout << "v1: " << v1.x() << ", " << v1.y() << ", " << v1.z() << endl;
-//        cout << "v2: " << v2.x() << ", " << v2.y() << ", " << v2.z() << endl;
         if (isPointOnEdge(point, v1, v2)) {
             return true;
         }
     }
-//    cout << endl;
     return false;
 }
 

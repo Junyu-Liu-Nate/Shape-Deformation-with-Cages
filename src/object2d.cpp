@@ -26,7 +26,6 @@ void Object2D::updateVertices(vector<TwoDVertex> cagePoints, vector<TwoDEdge> ca
         }
 
         objectVertex.position = (term1 + term2);
-//        cout << objectVertex.position << endl;
     }
 
     //----- Green Coordinates Higher Order 2D
