@@ -40,7 +40,8 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 
     if (MeshLoader::loadTriMesh("meshes/2d/square.obj", objectVertices, objectTriangles)) {
         vector<Vector2f> uvCoords;
-        tessellateMesh(objectTriangles, objectVertices, 3, 3, uvCoords); // DOUBLE CHECK THIS
+        //---- Currently need to ensure that no points are on the boundary of partial cages
+        tessellateMesh(objectTriangles, objectVertices, 21, 21, uvCoords); // DOUBLE CHECK THIS
         m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords, m_textureFilePath);
     }
 
@@ -147,6 +148,18 @@ void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices, const vector<Vec
         else {
             objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, cagePoints, cageEdges);
         }
+
+//        if (isPointOnBoundary(objectVertices.at(i))) {
+//            objectVertex.greenCord.constructGreenCoordinatesBoundary(objectVertex.position, cagePoints, cageEdges);
+//        }
+//        else {
+//            if (isPointInsideMesh(objectVertices.at(i), vertices, triangles)) {
+//                objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
+//            }
+//            else {
+//                objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, cagePoints, cageEdges);
+//            }
+//        }
 
         // Build 2D Higher Order Green Coordinates
         objectVertex.gcHigherOrder.constructGCHigherOrder(objectVertex.position, cagePoints, cageEdges);
@@ -255,6 +268,45 @@ bool Cage2D::isPointInsideMesh(const Vector3f& point, const vector<Vector3f>& ve
         }
     }
     return inside;
+}
+
+bool Cage2D::isPointOnEdge(const Eigen::Vector3f& point, const Eigen::Vector3f& edgeStart, const Eigen::Vector3f& edgeEnd) {
+    // Vector from start to end of the edge
+    Eigen::Vector3f edgeVector = edgeEnd - edgeStart;
+    // Vector from start to the point
+    Eigen::Vector3f pointVector = point - edgeStart;
+
+    // Cross product to check if the point is in the line formed by the edge
+    Eigen::Vector3f crossProduct = edgeVector.cross(pointVector);
+
+    // If the cross product is not zero, the point is not on the line
+    if (!crossProduct.isZero(1e-6)) {
+        return false;
+    }
+
+    // Check if the point is between the start and end points using dot product
+    float dotProduct = edgeVector.dot(pointVector);
+    // Ensure the point is between the start and the end (0 <= t <= 1)
+    if (dotProduct < 0 || dotProduct > edgeVector.squaredNorm()) {
+        return false;
+    }
+
+    return true;
+}
+
+bool Cage2D::isPointOnBoundary(const Vector3f& point) {
+    for (TwoDEdge cageEdge : cageEdges) {
+        Vector3f v1 = Vector3f(cageEdge.edge.first->position.x(), cageEdge.edge.first->position.y(), 0);
+        Vector3f v2 = Vector3f(cageEdge.edge.second->position.x(), cageEdge.edge.second->position.y(), 0);
+//        cout << "Point: " << point.x() << ", " << point.y() << ", " << point.z() << endl;
+//        cout << "v1: " << v1.x() << ", " << v1.y() << ", " << v1.z() << endl;
+//        cout << "v2: " << v2.x() << ", " << v2.y() << ", " << v2.z() << endl;
+        if (isPointOnEdge(point, v1, v2)) {
+            return true;
+        }
+    }
+//    cout << endl;
+    return false;
 }
 
 //---------- Tessellate object mesh ----------//

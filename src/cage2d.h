@@ -55,6 +55,8 @@ public:
     // ---Check whether an object vertex is inside the cage or not
     bool isPointInTriangle(const Vector3f& pt, const Vector3f& v1, const Vector3f& v2, const Vector3f& v3);
     bool isPointInsideMesh(const Vector3f& point, const vector<Vector3f>& vertices, const vector<Vector3i>& triangles);
+    bool isPointOnEdge(const Eigen::Vector3f& point, const Eigen::Vector3f& edgeStart, const Eigen::Vector3f& edgeEnd);
+    bool isPointOnBoundary(const Vector3f& point);
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 

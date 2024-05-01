@@ -7,6 +7,7 @@
 #include <QtConcurrent>
 #include "mesh_struct/halfedgemesh.h"
 #include "object3d.h"
+#include <float.h> // For DBL_MAX
 
 class Shader;
 
@@ -36,6 +37,7 @@ public:
 
     bool rayIntersectsTriangle(const Eigen::Vector3d& P, const Eigen::Vector3d& D, const Face& face);
     bool isPointOutsideMesh(const Eigen::Vector3d& point, HalfEdgeMesh& mesh);
+    bool isPointOnBoundary(const Eigen::Vector3d& point, HalfEdgeMesh& mesh);
 
     // ================== Students, If You Choose To Modify The Code Below, It's On You
 
