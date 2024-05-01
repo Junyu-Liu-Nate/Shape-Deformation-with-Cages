@@ -6,8 +6,6 @@ Object3D::Object3D()
 }
 
 void Object3D::updateVertices(const HalfEdgeMesh& heMesh) {
-    const float LARGE_NUMBER_THRESHOLD = 5;
-
     //----- Green Coordinates
     #pragma omp parallel for
     for (ObjectVertex& objectVertex : vertexList) {

@@ -75,6 +75,7 @@ void Object2D::updateVertices(vector<TwoDVertex> cagePoints, vector<TwoDEdge> ca
 //    }
 
     //----- MVC 2D
+//    int printCounter = 0;
 //    for (ObjectVertex2D& objectVertex : vertexList) {
 //        Vector2f newPos = Vector2f(0,0);
 
@@ -84,10 +85,10 @@ void Object2D::updateVertices(vector<TwoDVertex> cagePoints, vector<TwoDEdge> ca
 //            if (cagePoints.at(i).isMargin) {
 //                term1 += objectVertex.mvcCoord.MVCoord.at(i) * cagePoints.at(i).position;
 //            }
-////            term1 += objectVertex.mvcCoord.MVCoord.at(i) * cagePoints.at(i).position;
 //        }
 
 //        objectVertex.position = term1;
+//        printCounter ++;
 //    }
 }
 

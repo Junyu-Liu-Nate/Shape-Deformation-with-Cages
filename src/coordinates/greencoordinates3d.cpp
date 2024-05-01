@@ -115,6 +115,48 @@ void GreenCoordinates3D::constructGreenCoordinatesExterior(const Vector3d& verte
     }
 }
 
+void GreenCoordinates3D::constructGreenCoordinatesBoundary(const Vector3d& vertexPos, HalfEdgeMesh& cage) {
+    //--- Construct the coordinates the same as internal at first
+    constructGreenCoordinates(vertexPos, cage);
+
+    //--- Add alphas and betas
+    int j = 0;
+    for (Face& face : cage.faces) {
+        // TODO: Need to figure out a way to define the EXIT FACE !!!!!!
+        if (face.calculateNormal() != Vector3d(0,-1,0)) {
+            j++;
+            continue;
+        }
+
+        vector<Vector3d> vList(3);
+        std::fill(vList.begin(), vList.end(), Vector3d(0,0,0));
+
+        for (int i = 0; i < 3; i++) {
+            vList.at(i) = face.halfEdges[i]->vertex->position;
+        }
+
+        Vector3d faceNormal = face.calculateNormal();
+
+        MatrixXd A(4, 4);
+        A << vList.at(0), vList.at(1), vList.at(2), faceNormal,
+            1, 1, 1, 0;
+        Vector4d b;
+        b << 0.5 * vertexPos, 0.5;
+
+        Vector4d solution = A.colPivHouseholderQr().solve(b);
+
+        for (int i = 0; i < 3; i++) {
+            int vertexIdx = face.halfEdges[i]->vertex->vertexIdx;
+            phiCoords.at(vertexIdx) += solution[i];
+        }
+
+        psiCoords.at(j) += solution[3];
+
+        j++;
+        break;
+    }
+}
+
 double GreenCoordinates3D::gcTriInt(Vector3d p, Vector3d v1, Vector3d v2, Vector3d eta) {
     //--- Calculate alpha
     double alphaNominator = (v2 - v1).dot(p - v1);

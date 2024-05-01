@@ -31,8 +31,10 @@ public:
                          const std::vector<Eigen::Vector3i> &triangles,
                          const std::vector<Eigen::Vector2f> &uvCoords,
                          const std::string &textureFilePath);
+    void initPoints(const std::vector<Eigen::Vector3f> &vertices);
     void setVertices(const std::vector<Eigen::Vector3f> &vertices);
     void setVertices2d(const std::vector<Eigen::Vector3f> &vertices);
+    void setCtrlPtsVertices(int vertex, const Eigen::Vector3f &targetPosition);
 
     void setModelMatrix(const Eigen::Affine3f &model);
 
@@ -58,7 +60,8 @@ private:
     float m_blue;
     float m_green;
     float m_alpha;
-    bool m_textured = false;
+    bool m_isTextured = false;
+    bool m_isPoints = false;
 
     std::vector<Eigen::Vector3i> m_faces;
     std::vector<Eigen::Vector3f> m_vertices;
@@ -71,6 +74,7 @@ private:
     // Helpers
 
     void selectHelper();
+    void selectHelperForCtrlPt();
     Eigen::Vector3f getNormal(const Eigen::Vector3i& face);
     void updateMesh(const std::vector<Eigen::Vector3i> &triangles,
                     const std::vector<Eigen::Vector3f> &vertices,
@@ -83,4 +87,5 @@ private:
                       std::vector<Eigen::Vector3f>& normals,
                       std::vector<Eigen::Vector3f>& colors,
                       const std::vector<Eigen::Vector2f>& uvCoords);
+    void updateCtrlPtColor(std::vector<Eigen::Vector3f>& colors);
 };

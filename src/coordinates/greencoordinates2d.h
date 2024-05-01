@@ -19,6 +19,7 @@ public:
 
     void constructGreenCoordinates(const Vector2f& vertexPos, vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges);
     void constructGreenCoordinatesExterior(const Vector2f& vertexPos, vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges);
+    void constructGreenCoordinatesBoundary(const Vector2f& vertexPos, vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges);
 };
 
 #endif // GREENCOORDINATES2D_H

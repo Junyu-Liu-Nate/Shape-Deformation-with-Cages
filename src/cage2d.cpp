@@ -40,15 +40,15 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 
     if (MeshLoader::loadTriMesh("meshes/2d/square.obj", objectVertices, objectTriangles)) {
         vector<Vector2f> uvCoords;
-        tessellateMesh(objectTriangles, objectVertices, 1, 1, uvCoords); // DOUBLE CHECK THIS
+        //---- Currently need to ensure that no points are on the boundary of partial cages
+        tessellateMesh(objectTriangles, objectVertices, 3, 3, uvCoords); // DOUBLE CHECK THIS
         m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords, m_textureFilePath);
     }
 
-    cout << "init for 2D is called!!!" << endl;
     buildVertexList2D(objectVertices, vertices, triangles);
 
-    m_shape_control_points.init(controlPts, vector<Vector3i>()); // Setup rendering for control points
-    // TODO: How to draw and control these vertices
+    // Initialize additional control points on edges
+    m_shape_control_points.initPoints(controlPts);
 
     //----- Students, please don't touch this code: get min and max for viewport stuff
     MatrixX3f all_vertices = MatrixX3f(vertices.size(), 3);
@@ -76,8 +76,25 @@ void Cage2D::move(int vertex, Vector3f targetPosition)
 
     m_shape_cage.setVertices2d(new_vertices);
     m_shape_object.setVertices2d(new_object_vertices);
+}
+
+void Cage2D::moveCtrlPt(int vertex, Vector3f targetPosition)
+{
+    m_shape_control_points.setCtrlPtsVertices(vertex, targetPosition);
 
     // TODO: Add updates for Bezier curve control points
+    // Update control point vertices
+    for (auto& controlPoint : controlPoints) {
+        if (controlPoint.second.idx == vertex) {
+            controlPoint.second.position = Vector2f(targetPosition.x(), targetPosition.y());
+        }
+    }
+
+    // Update object vertex positions
+    object2D.updateVertices(cagePoints, cageEdges, controlPoints);
+    std::vector<Eigen::Vector3f> new_object_vertices = object2D.getVertices();
+
+     m_shape_object.setVertices2d(new_object_vertices);
 }
 
 void Cage2D::moveAllAnchors(int vertex, Vector3f pos)
@@ -102,8 +119,6 @@ void Cage2D::moveAllAnchors(int vertex, Vector3f pos)
 
     m_shape_cage.setVertices2d(new_vertices);
     m_shape_object.setVertices2d(new_object_vertices);
-
-    // TODO: Add updates for Bezier curve control points
 }
 
 // Set the cage vertex position to target position
@@ -126,20 +141,32 @@ void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices, const vector<Vec
         ObjectVertex2D objectVertex;
         objectVertex.position = Vector2f(objectVertices.at(i).x(), objectVertices.at(i).y());
 
-        // Build 2D Green Coordinates
-        if (isPointInsideMesh(objectVertices.at(i), vertices, triangles)) {
-            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
+        //----- Build 2D Green Coordinates
+        // If not consider boundary cases
+//        if (isPointInsideMesh(objectVertices.at(i), vertices, triangles)) {
+//            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
+//        }
+//        else {
+//            objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, cagePoints, cageEdges);
+//        }
+
+        // If consider boundary cases
+        if (isPointOnBoundary(objectVertices.at(i))) {
+            objectVertex.greenCord.constructGreenCoordinatesBoundary(objectVertex.position, cagePoints, cageEdges);
         }
         else {
-//            cout << objectVertex.position.x() << ", "<< objectVertex.position.y() << endl;
-            objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, cagePoints, cageEdges);
+            if (isPointInsideMesh(objectVertices.at(i), vertices, triangles)) {
+                objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
+            }
+            else {
+                objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, cagePoints, cageEdges);
+            }
         }
-//        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
 
-        // Build 2D Higher Order Green Coordinates
+        //----- Build 2D Higher Order Green Coordinates
         objectVertex.gcHigherOrder.constructGCHigherOrder(objectVertex.position, cagePoints, cageEdges);
 
-        // Build 2D MVC Coordinates
+        //----- Build 2D MVC Coordinates
         objectVertex.mvcCoord.constructMVC(objectVertex.position, cagePoints);
 
         object2D.vertexList.at(i) = objectVertex;
@@ -243,6 +270,41 @@ bool Cage2D::isPointInsideMesh(const Vector3f& point, const vector<Vector3f>& ve
         }
     }
     return inside;
+}
+
+bool Cage2D::isPointOnEdge(const Eigen::Vector3f& point, const Eigen::Vector3f& edgeStart, const Eigen::Vector3f& edgeEnd) {
+    // Vector from start to end of the edge
+    Eigen::Vector3f edgeVector = edgeEnd - edgeStart;
+    // Vector from start to the point
+    Eigen::Vector3f pointVector = point - edgeStart;
+
+    // Cross product to check if the point is in the line formed by the edge
+    Eigen::Vector3f crossProduct = edgeVector.cross(pointVector);
+
+    // If the cross product is not zero, the point is not on the line
+    if (!crossProduct.isZero(1e-6)) {
+        return false;
+    }
+
+    // Check if the point is between the start and end points using dot product
+    float dotProduct = edgeVector.dot(pointVector);
+    // Ensure the point is between the start and the end (0 <= t <= 1)
+    if (dotProduct < 0 || dotProduct > edgeVector.squaredNorm()) {
+        return false;
+    }
+
+    return true;
+}
+
+bool Cage2D::isPointOnBoundary(const Vector3f& point) {
+    for (TwoDEdge cageEdge : cageEdges) {
+        Vector3f v1 = Vector3f(cageEdge.edge.first->position.x(), cageEdge.edge.first->position.y(), 0);
+        Vector3f v2 = Vector3f(cageEdge.edge.second->position.x(), cageEdge.edge.second->position.y(), 0);
+        if (isPointOnEdge(point, v1, v2)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 //---------- Tessellate object mesh ----------//

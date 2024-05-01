@@ -39,6 +39,50 @@ void GreenCoordinates2D::constructGreenCoordinates(const Vector2f& vertexPos, ve
 
 }
 
+//------ Attempts to deal with the edge case
+//void GreenCoordinates2D::constructGreenCoordinates(const Vector2f& vertexPos, vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges) {
+//    phiCoords.resize(cagePoints.size(), 0.0f);
+//    psiCoords.resize(cageEdges.size(), 0.0f);
+
+//    for(int r = 0; r < cageEdges.size(); r++) {
+//        auto currEdge = cageEdges[r];
+//        Vector2f a = currEdge.edge.second->position - currEdge.edge.first->position;
+//        Vector2f b = currEdge.edge.first->position - vertexPos;
+//        float Q = a.dot(a);
+//        float S = b.dot(b);
+//        float R = (2 * a).dot(b);
+//        float BA = b.dot(a.norm() * currEdge.calculateNormal());
+
+//        if (Q == 0) continue; // Skip if Q is zero to avoid division by zero
+
+//        float discriminant = 4 * S * Q - R * R;
+//        if (discriminant < 0) continue; // Skip if the discriminant is negative, sqrt of negative number
+
+//        float SRT = std::sqrt(discriminant);
+//        if (SRT == 0) continue; // Skip if SRT is zero to avoid division by zero
+
+//        if (S <= 0) {
+//            continue;
+//        }
+//        float L0 = S > 0 ? std::log(S) : 0; // Use log(S) if S is positive
+//        if ((S + Q + R) <= 0) {
+//            continue;
+//        }
+//        float L1 = (S + Q + R) > 0 ? std::log(S + Q + R) : 0; // Use log(S + Q + R) if positive
+
+//        float A0 = atan2(R, SRT) / SRT;
+//        float A1 = atan2((2 * Q + R), SRT) / SRT;
+//        float A10 = A1 - A0;
+//        float L10 = L1 - L0;
+
+//        psiCoords.at(r) = -((a.norm()) / (4 * M_PI)) * ((4 * S - (R * R) / Q) * A10 + (R / (2 * Q)) * L10 + L1 - 2);
+
+//        phiCoords.at(currEdge.edge.second->idx) -= (BA / (2 * M_PI)) * ((L10 / (2 * Q)) - A10 * R / Q);
+//        phiCoords.at(currEdge.edge.first->idx) += (BA / (2 * M_PI)) * ((L10 / (2 * Q)) - A10 * (2 + R / Q));
+//    }
+//}
+
+
 void GreenCoordinates2D::constructGreenCoordinatesExterior(const Vector2f& vertexPos, vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges) {
     //--- Construct the coordinates the same as internal at first
     constructGreenCoordinates(vertexPos, cagePoints, cageEdges);
@@ -46,11 +90,10 @@ void GreenCoordinates2D::constructGreenCoordinatesExterior(const Vector2f& verte
     //--- Add alpha and betas
     for (int r = 0; r < cageEdges.size(); r++) {
         auto currEdge = cageEdges[r];
-//        cout << r << ": " << currEdge.edge.first->position << ", " << currEdge.edge.second->position << endl;
 
         // TODO: Need to figure out a way to define the EXIT EDGE !!!!!!
         // Currently hardcoded edge idx 1 as the exit edge
-        if (r != 1) {
+        if (r != 0) {
             continue;
         }
 
@@ -69,12 +112,45 @@ void GreenCoordinates2D::constructGreenCoordinatesExterior(const Vector2f& verte
         b << vertexPos.x(), vertexPos.y(), 1;
 
         Vector3f solution = A.colPivHouseholderQr().solve(b);
-//        cout << solution[0] << ", " << solution[1] << ", " << solution[2] << endl;
 
         phiCoords.at(currEdge.edge.first->idx) += solution[0];
         phiCoords.at(currEdge.edge.second->idx) += solution[1];
-        psiCoords.at(r) += solution[2];
+        psiCoords.at(r) -= solution[2];
+    }
+}
 
-//        break;
+void GreenCoordinates2D::constructGreenCoordinatesBoundary(const Vector2f& vertexPos, vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges) {
+    //--- Construct the coordinates the same as internal at first
+    constructGreenCoordinates(vertexPos, cagePoints, cageEdges);
+
+    //--- Add alpha and betas
+    for (int r = 0; r < cageEdges.size(); r++) {
+        auto currEdge = cageEdges[r];
+
+        // TODO: Need to figure out a way to define the EXIT EDGE !!!!!!
+        // Currently hardcoded edge idx 1 as the exit edge
+        if (r != 0) {
+            continue;
+        }
+
+        vector<Vector2f> vList(2);
+        std::fill(vList.begin(), vList.end(), Vector2f(0,0));
+        vList.at(0) = currEdge.edge.first->position;
+        vList.at(1) = currEdge.edge.second->position;
+
+        Vector2f edgeNormal = currEdge.calculateNormal();
+
+        MatrixXf A(3, 3);
+        A << vList.at(0).x(), vList.at(1).x(), edgeNormal.x(),
+            vList.at(0).y(), vList.at(1).y(), edgeNormal.y(),
+            1,               1,               0;
+        Vector3f b;
+        b << 0.5 * vertexPos.x(), 0.5 * vertexPos.y(), 0.5;
+
+        Vector3f solution = A.colPivHouseholderQr().solve(b);
+
+        phiCoords.at(currEdge.edge.first->idx) += solution[0];
+        phiCoords.at(currEdge.edge.second->idx) += solution[1];
+        psiCoords.at(r) -= solution[2];
     }
 }

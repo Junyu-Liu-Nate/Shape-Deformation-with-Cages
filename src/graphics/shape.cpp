@@ -64,7 +64,7 @@ void Shape::init(const vector<Vector3f> &vertices, const vector<Vector3i> &trian
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLvoid *>(sizeof(float) * verts.size() * 3));
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLvoid *>(sizeof(float) * (verts.size() * 3 + colors.size() * 3)));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLvoid *>(sizeof(float) * (verts.size() * 3 + normals.size() * 3)));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_surfaceIbo);
     glBindVertexArray(0);
@@ -85,7 +85,7 @@ void Shape::initWithTexture(const vector<Vector3f> &vertices,
                             const vector<Vector2f> &uvCoords,
                             const string &textureFilePath)
 {
-    m_textured = true;
+    m_isTextured = true;
 
     m_vertices.clear();
     copy(vertices.begin(), vertices.end(), back_inserter(m_vertices));
@@ -160,6 +160,48 @@ void Shape::initWithTexture(const vector<Vector3f> &vertices,
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void Shape::initPoints(const vector<Vector3f> &vertices)
+{
+    m_isPoints = true;
+
+    m_vertices.clear();
+    copy(vertices.begin(), vertices.end(), back_inserter(m_vertices));
+
+    m_verticesSize = vertices.size();
+    m_numSurfaceVertices = vertices.size();
+
+    vector<Vector3f> colors;
+    updateCtrlPtColor(colors);
+
+    std::vector<GLuint> indices(vertices.size());
+    std::iota(indices.begin(), indices.end(), 0); // Fill with 0, 1, 2, ..., n-1
+
+    glGenBuffers(1, &m_surfaceVbo);
+    glGenBuffers(1, &m_surfaceIbo);
+    glGenVertexArrays(1, &m_surfaceVao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (vertices.size() * 3 + colors.size() * 3), nullptr, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * vertices.size() * 3, static_cast<const void *>(vertices.data()));
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size() * 3, sizeof(float) * colors.size() * 3, static_cast<const void *>(colors.data()));
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_surfaceIbo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), static_cast<const void *>(indices.data()), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    glBindVertexArray(m_surfaceVao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVbo);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, static_cast<GLvoid *>(0));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLvoid *>(sizeof(float) * vertices.size() * 3));
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_surfaceIbo);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
 void Shape::setVertices(const vector<Vector3f> &vertices)
 {
     m_vertices.clear();
@@ -177,6 +219,19 @@ void Shape::setVertices(const vector<Vector3f> &vertices)
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * verts.size() * 3, sizeof(float) * normals.size() * 3, static_cast<const void *>(normals.data()));
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * ((verts.size() * 3) + (normals.size() * 3)), sizeof(float) * colors.size() * 3, static_cast<const void *>(colors.data()));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Shape::setCtrlPtsVertices(int vertex, const Vector3f &targetPosition)
+{
+    m_vertices.at(vertex) = targetPosition;
+
+    vector<Vector3f> colors;
+    updateCtrlPtColor(colors);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (m_vertices.size() * 3 + colors.size() * 3), nullptr, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * m_vertices.size() * 3, static_cast<const void *>(m_vertices.data()));
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * m_vertices.size() * 3, sizeof(float) * colors.size() * 3, static_cast<const void *>(colors.data()));
 }
 
 void Shape::setVertices2d(const vector<Vector3f> &vertices)
@@ -221,7 +276,7 @@ void Shape::draw(Shader *shader, GLenum mode)
         shader->setUniform("blue",  m_blue);
         shader->setUniform("alpha", m_alpha);
 
-        if (m_textured) {
+        if (m_isTextured) {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, m_surfaceTexture);
             shader->setUniform("textureSampler", 0);
@@ -275,7 +330,11 @@ SelectMode Shape::select(Shader *shader, int closest_vertex)
         m_anchors.erase(closest_vertex);
     }
 
-    selectHelper();
+    if (!m_isPoints) {
+        selectHelper();
+    } else {
+        selectHelperForCtrlPt();
+    }
 
     return vertexIsNowSelected ? SelectMode::Anchor : SelectMode::Unanchor;
 }
@@ -298,7 +357,11 @@ bool Shape::selectWithSpecifiedMode(Shader *shader, int closest_vertex, SelectMo
     }
     }
 
-    selectHelper();
+    if (!m_isPoints) {
+        selectHelper();
+    } else {
+        selectHelperForCtrlPt();
+    }
 
     return true;
 }
@@ -361,6 +424,18 @@ void Shape::selectHelper()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void Shape::selectHelperForCtrlPt()
+{
+    vector<Vector3f> colors;
+    updateCtrlPtColor(colors);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * (m_vertices.size() * 3 + colors.size() * 3), nullptr, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * m_vertices.size() * 3, static_cast<const void *>(m_vertices.data()));
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * m_vertices.size() * 3, sizeof(float) * colors.size() * 3, static_cast<const void *>(colors.data()));
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 Vector3f Shape::getNormal(const Vector3i& face)
 {
     Vector3f& v1 = m_vertices[face[0]];
@@ -420,6 +495,17 @@ void Shape::updateMesh2d(const std::vector<Eigen::Vector3i> &faces,
             } else {
                 colors.push_back(Vector3f(0, 1 - m_green, 1 - m_blue));
             }
+        }
+    }
+}
+
+void Shape::updateCtrlPtColor(std::vector<Eigen::Vector3f>& colors)
+{
+    for (int v = 0; v < m_verticesSize; v++) {
+        if (m_anchors.find(v) == m_anchors.end()) {
+            colors.push_back(Vector3f(1,0,0));
+        } else {
+            colors.push_back(Vector3f(0, 1 - m_green, 1 - m_blue));
         }
     }
 }

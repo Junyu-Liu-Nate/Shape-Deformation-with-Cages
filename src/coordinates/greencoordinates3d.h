@@ -21,6 +21,7 @@ public:
 
     void constructGreenCoordinates(const Vector3d& vertexPos, HalfEdgeMesh& cage);
     void constructGreenCoordinatesExterior(const Vector3d& vertexPos, HalfEdgeMesh& cage);
+    void constructGreenCoordinatesBoundary(const Vector3d& vertexPos, HalfEdgeMesh& cage);
 
 private:
     double gcTriInt(Vector3d p, Vector3d v1, Vector3d v2, Vector3d eta);  // All Vector3f changed to Vector3d and float to double

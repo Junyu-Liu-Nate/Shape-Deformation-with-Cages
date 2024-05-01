@@ -116,16 +116,29 @@ void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
         ObjectVertex objectVertex;
         objectVertex.position = objectVertices.at(i);
 
-        // Build Green Coordinates
-//        objectVertex.greenCord.constructGreenCoordinates(objectVertex.position.cast<double>(), heMesh);
-        if (!isPointOutsideMesh(objectVertex.position.cast<double>(), heMesh)) {
-            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position.cast<double>(), heMesh);
+        //----- Build Green Coordinates
+        // If not consider boundary cases
+//        if (!isPointOutsideMesh(objectVertex.position.cast<double>(), heMesh)) {
+//            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position.cast<double>(), heMesh);
+//        }
+//        else {
+//            objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position.cast<double>(), heMesh);
+//        }
+
+        // If consider boundary cases
+        if (isPointOnBoundary(objectVertex.position.cast<double>(), heMesh)) {
+            objectVertex.greenCord.constructGreenCoordinatesBoundary(objectVertex.position.cast<double>(), heMesh);
         }
         else {
-            objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position.cast<double>(), heMesh);
+            if (!isPointOutsideMesh(objectVertex.position.cast<double>(), heMesh)) {
+                objectVertex.greenCord.constructGreenCoordinates(objectVertex.position.cast<double>(), heMesh);
+            }
+            else {
+                objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position.cast<double>(), heMesh);
+            }
         }
 
-        // Build MVC Coordinates
+        //----- Build MVC Coordinates
         objectVertex.mvcCoord.constructMVC(objectVertex.position.cast<double>(), heMesh);
 
         object3D.vertexList.at(i) = objectVertex;
@@ -175,6 +188,36 @@ bool Cage3D::isPointOutsideMesh(const Eigen::Vector3d& point, HalfEdgeMesh& mesh
     }
 
     return intersections % 2 == 0;
+}
+
+bool Cage3D::isPointOnBoundary(const Eigen::Vector3d& point, HalfEdgeMesh& mesh) {
+    double minDistance = DBL_MAX;
+    Vertex* closestVertex = nullptr;
+
+    // Step 1: Find the closest vertex
+    for (auto& vertex : mesh.vertices) {
+        double dist = (vertex.position - point).squaredNorm();
+        if (dist < minDistance) {
+            minDistance = dist;
+            closestVertex = &vertex;
+        }
+    }
+
+    // Step 2: Check if the closest vertex is on a boundary
+    if (closestVertex) {
+        HalfEdge* startEdge = closestVertex->halfEdge;
+        HalfEdge* edge = startEdge;
+
+        do {
+            if (!edge->twin) {
+                // If twin is nullptr, then it's a boundary edge
+                return true;
+            }
+            edge = edge->twin->next;
+        } while (edge != startEdge);
+    }
+
+    return false;
 }
 
 void Cage3D::setObjectFilePath(const QString &path)
