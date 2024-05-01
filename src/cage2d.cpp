@@ -41,7 +41,7 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     if (MeshLoader::loadTriMesh("meshes/2d/square.obj", objectVertices, objectTriangles)) {
         vector<Vector2f> uvCoords;
         //---- Currently need to ensure that no points are on the boundary of partial cages
-        tessellateMesh(objectTriangles, objectVertices, 21, 21, uvCoords); // DOUBLE CHECK THIS
+        tessellateMesh(objectTriangles, objectVertices, 3, 3, uvCoords); // DOUBLE CHECK THIS
         m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords, m_textureFilePath);
     }
 
@@ -142,24 +142,24 @@ void Cage2D::buildVertexList2D(vector<Vector3f> objectVertices, const vector<Vec
         objectVertex.position = Vector2f(objectVertices.at(i).x(), objectVertices.at(i).y());
 
         // Build 2D Green Coordinates
-        if (isPointInsideMesh(objectVertices.at(i), vertices, triangles)) {
-            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
-        }
-        else {
-            objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, cagePoints, cageEdges);
-        }
-
-//        if (isPointOnBoundary(objectVertices.at(i))) {
-//            objectVertex.greenCord.constructGreenCoordinatesBoundary(objectVertex.position, cagePoints, cageEdges);
+//        if (isPointInsideMesh(objectVertices.at(i), vertices, triangles)) {
+//            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
 //        }
 //        else {
-//            if (isPointInsideMesh(objectVertices.at(i), vertices, triangles)) {
-//                objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
-//            }
-//            else {
-//                objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, cagePoints, cageEdges);
-//            }
+//            objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, cagePoints, cageEdges);
 //        }
+
+        if (isPointOnBoundary(objectVertices.at(i))) {
+            objectVertex.greenCord.constructGreenCoordinatesBoundary(objectVertex.position, cagePoints, cageEdges);
+        }
+        else {
+            if (isPointInsideMesh(objectVertices.at(i), vertices, triangles)) {
+                objectVertex.greenCord.constructGreenCoordinates(objectVertex.position, cagePoints, cageEdges);
+            }
+            else {
+                objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position, cagePoints, cageEdges);
+            }
+        }
 
         // Build 2D Higher Order Green Coordinates
         objectVertex.gcHigherOrder.constructGCHigherOrder(objectVertex.position, cagePoints, cageEdges);
