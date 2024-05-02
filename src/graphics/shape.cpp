@@ -97,7 +97,7 @@ void Shape::initWithTexture(const vector<Vector3f> &vertices,
     faces.reserve(triangles.size());
 
     for (int s = 0; s < triangles.size() * 3; s+=3) faces.push_back(Vector3i(s, s + 1, s + 2));
-    updateMesh2d(triangles, vertices, verts, normals, colors, uvCoords);
+    updateTexturedMesh(triangles, vertices, verts, normals, colors, uvCoords);
 
     glGenBuffers(1, &m_surfaceVbo);
     glGenBuffers(1, &m_surfaceIbo);
@@ -292,17 +292,14 @@ void Shape::draw(Shader *shader, GLenum mode)
         }
         break;
     }
-    case GL_LINES:
+    case GL_LINE_LOOP:
     {
-        shader->setUniform("wire", 1);
         shader->setUniform("model", m_modelMatrix);
         shader->setUniform("inverseTransposeModel", inverseTransposeModel);
-        shader->setUniform("red",   m_red);
-        shader->setUniform("green", m_green);
-        shader->setUniform("blue",  m_blue);
-        shader->setUniform("alpha", m_alpha);
         glBindVertexArray(m_surfaceVao);
-        glDrawElements(mode, m_numSurfaceVertices, GL_UNSIGNED_INT, reinterpret_cast<GLvoid *>(0));
+        for (int i = 0; i < m_faces.size(); i++) {
+            glDrawElements(GL_LINE_LOOP, 3, GL_UNSIGNED_INT, (void*)(i * sizeof(GLuint) * 3));
+        }
         glBindVertexArray(0);
         break;
     }
@@ -472,12 +469,12 @@ void Shape::updateMesh(const std::vector<Eigen::Vector3i> &faces,
     }
 }
 
-void Shape::updateMesh2d(const std::vector<Eigen::Vector3i> &faces,
-                         const std::vector<Eigen::Vector3f> &vertices,
-                         std::vector<Eigen::Vector3f>& verts,
-                         std::vector<Eigen::Vector3f>& normals,
-                         std::vector<Eigen::Vector3f>& colors,
-                         const std::vector<Eigen::Vector2f>& uvCoords)
+void Shape::updateTexturedMesh(const std::vector<Eigen::Vector3i> &faces,
+                               const std::vector<Eigen::Vector3f> &vertices,
+                               std::vector<Eigen::Vector3f>& verts,
+                               std::vector<Eigen::Vector3f>& normals,
+                               std::vector<Eigen::Vector3f>& colors,
+                               const std::vector<Eigen::Vector2f>& uvCoords)
 {
     verts.reserve(faces.size() * 3);
     normals.reserve(faces.size() * 3);
