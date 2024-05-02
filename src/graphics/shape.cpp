@@ -294,6 +294,7 @@ void Shape::draw(Shader *shader, GLenum mode)
     }
     case GL_LINE_LOOP:
     {
+        shader->setUniform("wire", 1);
         shader->setUniform("model", m_modelMatrix);
         shader->setUniform("inverseTransposeModel", inverseTransposeModel);
         glBindVertexArray(m_surfaceVao);
