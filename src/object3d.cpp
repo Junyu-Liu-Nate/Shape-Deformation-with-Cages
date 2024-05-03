@@ -7,34 +7,34 @@ Object3D::Object3D()
 
 void Object3D::updateVertices(const HalfEdgeMesh& heMesh) {
     //----- Green Coordinates
-//    #pragma omp parallel for
-//    for (ObjectVertex& objectVertex : vertexList) {
-//        Vector3f term1 = Vector3f(0,0,0);
-//        for (int i = 0; i < objectVertex.greenCord.phiCoords.size(); i++) {
-//            term1 += objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position.cast<float>();
-//        }
-
-//        Vector3f term2 = Vector3f(0,0,0);
-//        for (int i = 0; i < objectVertex.greenCord.psiCoords.size(); i++) {
-//            // TODO: s can be toggled between 1 and the calculation
-//            float s = calculateS(heMesh.faces.at(i));
-//            term2 += objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal().cast<float>() * s;
-//        }
-
-//        objectVertex.position = term1 + term2;
-//    }
-
-    //----- MVC Coordinates
     #pragma omp parallel for
     for (ObjectVertex& objectVertex : vertexList) {
-        Vector3f newPos = Vector3f(0,0,0);
-        float wTotal = 0;
-        for (int i = 0; i < objectVertex.mvcCoord.wCoords.size(); i++) {
-            newPos += objectVertex.mvcCoord.wCoords.at(i) * heMesh.vertices.at(i).position.cast<float>();
-            wTotal += objectVertex.mvcCoord.wCoords.at(i);
+        Vector3f term1 = Vector3f(0,0,0);
+        for (int i = 0; i < objectVertex.greenCord.phiCoords.size(); i++) {
+            term1 += objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position.cast<float>();
         }
-        objectVertex.position = newPos / wTotal;
+
+        Vector3f term2 = Vector3f(0,0,0);
+        for (int i = 0; i < objectVertex.greenCord.psiCoords.size(); i++) {
+            // TODO: s can be toggled between 1 and the calculation
+            float s = calculateS(heMesh.faces.at(i));
+            term2 += objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal().cast<float>() * s;
+        }
+
+        objectVertex.position = term1 + term2;
     }
+
+    //----- MVC Coordinates
+//    #pragma omp parallel for
+//    for (ObjectVertex& objectVertex : vertexList) {
+//        Vector3f newPos = Vector3f(0,0,0);
+//        float wTotal = 0;
+//        for (int i = 0; i < objectVertex.mvcCoord.wCoords.size(); i++) {
+//            newPos += objectVertex.mvcCoord.wCoords.at(i) * heMesh.vertices.at(i).position.cast<float>();
+//            wTotal += objectVertex.mvcCoord.wCoords.at(i);
+//        }
+//        objectVertex.position = newPos / wTotal;
+//    }
 }
 
 vector<Vector3f> Object3D::getVertices() {

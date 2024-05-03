@@ -41,7 +41,7 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
     if (MeshLoader::loadTriMesh("meshes/2d/rectangle.obj", objectVertices, objectTriangles)) {
         vector<Vector2f> uvCoords;
         //---- Currently need to ensure that no points are on the boundary of partial cages
-        tessellateMesh(objectTriangles, objectVertices, 11, 11, uvCoords); // DOUBLE CHECK THIS
+        tessellateMesh(objectTriangles, objectVertices, 21, 21, uvCoords); // DOUBLE CHECK THIS
         m_shape_object.initWithTexture(objectVertices, objectTriangles, uvCoords, m_textureFilePath);
     }
 
