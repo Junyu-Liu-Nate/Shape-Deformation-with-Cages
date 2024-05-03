@@ -8,6 +8,7 @@
 #include "mesh_struct/halfedgemesh.h"
 #include "object3d.h"
 #include <float.h> // For DBL_MAX
+#include <QtConcurrent/QtConcurrentMap>
 
 class Shader;
 
