@@ -81,7 +81,7 @@ private:
                            std::vector<Eigen::Vector3f>& verts,
                            std::vector<Eigen::Vector3f>& normals,
                            std::vector<Eigen::Vector3f>& colors);
-    void updateMesh2d(const std::vector<Eigen::Vector3i> &triangles,
+    void updateTexturedMesh(const std::vector<Eigen::Vector3i> &triangles,
                       const std::vector<Eigen::Vector3f> &vertices,
                       std::vector<Eigen::Vector3f>& verts,
                       std::vector<Eigen::Vector3f>& normals,

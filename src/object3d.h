@@ -7,6 +7,7 @@
 #include "coordinates/mvc3d.h"
 #include "coordinates/greencoordinates2d.h"
 #include "mesh_struct/halfedgemesh.h"
+#include <QtConcurrent/QtConcurrentMap>
 
 using namespace std;
 using namespace Eigen;
