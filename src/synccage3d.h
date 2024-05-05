@@ -8,6 +8,7 @@ public:
     void linkCage(SyncCage3D *other);
     void move(int vertex, Eigen::Vector3f pos) override;
     void moveAllAnchors(int vertex, Eigen::Vector3f pos) override;
+    void moveAllAnchors(int vertex, Vector3f pos, const std::unordered_set<int>& anchors);
 
     bool test;
 
