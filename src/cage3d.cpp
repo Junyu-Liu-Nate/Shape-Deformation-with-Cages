@@ -9,7 +9,11 @@
 using namespace std;
 using namespace Eigen;
 
-Cage3D::Cage3D() {}
+Cage3D::Cage3D(bool useGreen) :
+    object3D(useGreen)
+{
+    m_useGreen = useGreen;
+}
 
 void Cage3D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 {
@@ -116,30 +120,30 @@ void Cage3D::buildVertexList(vector<Vector3f> objectVertices) {
         ObjectVertex objectVertex;
         objectVertex.position = objectVertices.at(i);
 
-        //----- Build Green Coordinates
-        // If not consider boundary cases
-//        if (!isPointOutsideMesh(objectVertex.position.cast<double>(), heMesh)) {
-//            objectVertex.greenCord.constructGreenCoordinates(objectVertex.position.cast<double>(), heMesh);
-//        }
-//        else {
-//            objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position.cast<double>(), heMesh);
-//        }
-
-        // If consider boundary cases
-        if (isPointOnBoundary(objectVertex.position.cast<double>(), heMesh)) {
-            objectVertex.greenCord.constructGreenCoordinatesBoundary(objectVertex.position.cast<double>(), heMesh);
-        }
-        else {
+        if (m_useGreen) {
+            // If not consider boundary cases
+            // Build Green Coordinates
             if (!isPointOutsideMesh(objectVertex.position.cast<double>(), heMesh)) {
                 objectVertex.greenCord.constructGreenCoordinates(objectVertex.position.cast<double>(), heMesh);
-            }
-            else {
+            } else {
                 objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position.cast<double>(), heMesh);
             }
+        } else {
+            // If consider boundary cases
+            if (isPointOnBoundary(objectVertex.position.cast<double>(), heMesh)) {
+                objectVertex.greenCord.constructGreenCoordinatesBoundary(objectVertex.position.cast<double>(), heMesh);
+            }
+            else {
+                if (!isPointOutsideMesh(objectVertex.position.cast<double>(), heMesh)) {
+                    objectVertex.greenCord.constructGreenCoordinates(objectVertex.position.cast<double>(), heMesh);
+                }
+                else {
+                    objectVertex.greenCord.constructGreenCoordinatesExterior(objectVertex.position.cast<double>(), heMesh);
+                }
+            }
+            // Build MVC Coordinates
+            objectVertex.mvcCoord.constructMVC(objectVertex.position.cast<double>(), heMesh);
         }
-
-        //----- Build MVC Coordinates
-        objectVertex.mvcCoord.constructMVC(objectVertex.position.cast<double>(), heMesh);
 
         object3D.vertexList.at(i) = objectVertex;
     }

@@ -10,9 +10,22 @@ MainWindow::MainWindow()
     glWidget2d->setMinimumSize(600, 600);
     glWidget2d->hide();
 
-    glWidget3d = new GLWidget3D();
-    glWidget3d->setMinimumSize(600, 600);
-    glWidget3d->hide();
+    cageMVC = new SyncCage3D(false);
+    cageGreen = new SyncCage3D(true);
+    cageMVC->linkCage(cageGreen);
+    cageGreen->linkCage(cageMVC);
+
+    glWidget3dMVC = new StaticGLWidget3D(nullptr, cageMVC);
+    glWidget3dMVC->setMinimumSize(600, 600);
+    glWidget3dMVC->hide();
+
+    glWidget3dGreen = new StaticGLWidget3D(nullptr, cageGreen);
+    glWidget3dGreen->setMinimumSize(600, 600);
+    glWidget3dGreen->hide();
+
+    QHBoxLayout *hBoxLayout3d = new QHBoxLayout();
+    hBoxLayout3d->addWidget(glWidget3dMVC);
+    hBoxLayout3d->addWidget(glWidget3dGreen);
 
     QPushButton *button1 = new QPushButton("Load 2D Image File");
     QObject::connect(button1, &QPushButton::clicked, [&]() {
@@ -34,8 +47,8 @@ MainWindow::MainWindow()
     QObject::connect(button3, &QPushButton::clicked, [&]() {
         glWidget2d->init();
 
-        if (glWidget3d->isVisible()) {
-            glWidget3d->hide();
+        if (glWidget3dMVC->isVisible()) {
+            glWidget3dMVC->hide();
         }
         glWidget2d->show();
     });
@@ -44,7 +57,8 @@ MainWindow::MainWindow()
     QObject::connect(button4, &QPushButton::clicked, [&]() {
         QString filePath = QFileDialog::getOpenFileName(this, "Select File", "meshes/3d", "Meshes (*.obj)");
         if (!filePath.isEmpty()) {
-            glWidget3d->setCageFilePath(filePath);
+            glWidget3dMVC->setCageFilePath(filePath);
+            glWidget3dGreen->setCageFilePath(filePath);
         }
     });
 
@@ -52,18 +66,21 @@ MainWindow::MainWindow()
     QObject::connect(button5, &QPushButton::clicked, [&]() {
         QString filePath = QFileDialog::getOpenFileName(this, "Select File", "meshes/3d", "Meshes (*.obj)");
         if (!filePath.isEmpty()) {
-            glWidget3d->setObjectFilePath(filePath);
+            glWidget3dMVC->setObjectFilePath(filePath);
+            glWidget3dGreen->setObjectFilePath(filePath);
         }
     });
 
     QPushButton *button6 = new QPushButton("Render 3D");
     QObject::connect(button6, &QPushButton::clicked, [&]() {
-        glWidget3d->init();
+        glWidget3dMVC->init();
+        glWidget3dGreen->init();
 
         if (glWidget2d->isVisible()) {
             glWidget2d->hide();
         }
-        glWidget3d->show();
+        glWidget3dMVC->show();
+        glWidget3dGreen->show();
     });
 
     QVBoxLayout *menu = new QVBoxLayout;
@@ -82,7 +99,7 @@ MainWindow::MainWindow()
 
     container->addWidget(menuWidget);
     container->addWidget(glWidget2d);
-    container->addWidget(glWidget3d);
+    container->addLayout(hBoxLayout3d);
 
     this->setLayout(container);
 }
@@ -91,5 +108,5 @@ MainWindow::MainWindow()
 MainWindow::~MainWindow()
 {
     delete glWidget2d;
-    delete glWidget3d;
+    delete glWidget3dMVC;
 }

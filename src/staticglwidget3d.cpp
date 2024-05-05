@@ -1,4 +1,4 @@
-#include "glwidget3d.h"
+#include "StaticGLWidget3D.h"
 
 #include <QApplication>
 #include <QKeyEvent>
@@ -10,29 +10,36 @@
 using namespace std;
 using namespace Eigen;
 
-GLWidget3D::GLWidget3D(QWidget *parent) :
+
+Camera StaticGLWidget3D::m_camera = Camera();
+
+float StaticGLWidget3D::m_movementScaling = 0.f;
+float StaticGLWidget3D::m_vertexSelectionThreshold = 0.f;
+float StaticGLWidget3D::m_vSize = 0.f;
+
+int StaticGLWidget3D::m_lastX = 0;
+int StaticGLWidget3D::m_lastY = 0;
+bool StaticGLWidget3D::m_leftCapture = false;
+bool StaticGLWidget3D::m_rightCapture = false;
+bool StaticGLWidget3D::m_shiftFlag = false;
+
+bool StaticGLWidget3D::m_initialized = false;
+
+int StaticGLWidget3D::m_forward = 0;
+int StaticGLWidget3D::m_sideways = 0;
+int StaticGLWidget3D::m_vertical = 0;
+
+int StaticGLWidget3D::m_lastSelectedVertex = -1;
+SelectMode StaticGLWidget3D::m_rightClickSelectMode = SelectMode::None;
+
+StaticGLWidget3D::StaticGLWidget3D(QWidget *parent, SyncCage3D *syncCage) :
     QOpenGLWidget(parent),
-    m_arap(true),
-    m_camera(),
+    m_syncCage(syncCage),
     m_defaultShader(),
     m_pointShader(),
-    m_vSize(),
-    m_movementScaling(),
-    m_vertexSelectionThreshold(),
     // Movement
     m_deltaTimeProvider(),
-    m_intervalTimer(),
-    // Timing
-    m_forward(),
-    m_sideways(),
-    m_vertical(),
-    // Mouse handler stuff
-    m_lastX(),
-    m_lastY(),
-    m_leftCapture(false),
-    m_rightCapture(false),
-    m_rightClickSelectMode(SelectMode::None),
-    m_lastSelectedVertex(-1)
+    m_intervalTimer()
 {
     // GLWidget needs all mouse move events, not just mouse drag events
     setMouseTracking(true);
@@ -47,7 +54,7 @@ GLWidget3D::GLWidget3D(QWidget *parent) :
     connect(&m_intervalTimer, SIGNAL(timeout()), this, SLOT(tick()));
 }
 
-GLWidget3D::~GLWidget3D()
+StaticGLWidget3D::~StaticGLWidget3D()
 {
     if (m_defaultShader != nullptr) delete m_defaultShader;
     if (m_pointShader   != nullptr) delete m_pointShader;
@@ -55,7 +62,7 @@ GLWidget3D::~GLWidget3D()
 
 // ================== Basic OpenGL Overrides
 
-void GLWidget3D::initializeGL()
+void StaticGLWidget3D::initializeGL()
 {
     if (!m_initialized) {
         return;
@@ -81,7 +88,7 @@ void GLWidget3D::initializeGL()
 
     // Initialize ARAP, and get parameters needed to decide the camera position, etc
     Vector3f coeffMin, coeffMax;
-    m_arap.init(coeffMin, coeffMax);
+    m_syncCage->init(coeffMin, coeffMax);
 
     Vector3f center = (coeffMax + coeffMin) / 2.0f;
     float extentLength  = (coeffMax - coeffMin).norm();
@@ -111,7 +118,7 @@ void GLWidget3D::initializeGL()
     m_intervalTimer.start(1000 / 60);
 }
 
-void GLWidget3D::paintGL()
+void StaticGLWidget3D::paintGL()
 {
     if (!m_initialized) {
         return;
@@ -124,7 +131,7 @@ void GLWidget3D::paintGL()
     m_defaultShader->bind();
     m_defaultShader->setUniform("proj", m_camera.getProjection());
     m_defaultShader->setUniform("view", m_camera.getView());
-    m_arap.draw(m_defaultShader, GL_TRIANGLES);
+    m_syncCage->draw(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();
 
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -135,11 +142,11 @@ void GLWidget3D::paintGL()
     m_pointShader->setUniform("vSize",  m_vSize);
     m_pointShader->setUniform("width",  width());
     m_pointShader->setUniform("height", height());
-    m_arap.draw(m_pointShader, GL_POINTS);
+    m_syncCage->draw(m_pointShader, GL_POINTS);
     m_pointShader->unbind();
 }
 
-void GLWidget3D::resizeGL(int w, int h)
+void StaticGLWidget3D::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
     m_camera.setAspect(static_cast<float>(w) / h);
@@ -147,13 +154,13 @@ void GLWidget3D::resizeGL(int w, int h)
 
 // ================== Event Listeners
 
-Eigen::Vector3f GLWidget3D::transformToWorldRay(int x, int y)
+Eigen::Vector3f StaticGLWidget3D::transformToWorldRay(int x, int y)
 {
     Eigen::Vector4f clipCoords = Eigen::Vector4f(
-                (float(x) / width()) * 2.f - 1.f,
-                1.f - (float(y) / height()) * 2.f,
-                -1.f,
-                1.f);
+        (float(x) / width()) * 2.f - 1.f,
+        1.f - (float(y) / height()) * 2.f,
+        -1.f,
+        1.f);
 
     Eigen::Vector4f transformed_coords = m_camera.getProjection().inverse() * clipCoords;
     transformed_coords = Eigen::Vector4f(transformed_coords.x(), transformed_coords.y(), -1.f, 0.f);
@@ -162,7 +169,7 @@ Eigen::Vector3f GLWidget3D::transformToWorldRay(int x, int y)
     return Eigen::Vector3f(transformed_coords.x(), transformed_coords.y(), transformed_coords.z()).normalized();
 }
 
-void GLWidget3D::mousePressEvent(QMouseEvent *event)
+void StaticGLWidget3D::mousePressEvent(QMouseEvent *event)
 {
     // Get current mouse coordinates
     const int currX = event->position().x();
@@ -170,7 +177,7 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event)
 
     // Get closest vertex to ray
     const Vector3f ray = transformToWorldRay(currX, currY);
-    const int closest_vertex = m_arap.getClosestVertex(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
+    const int closest_vertex = m_syncCage->getClosestVertex(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
 
     // Switch on button
     switch (event->button()) {
@@ -178,7 +185,7 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event)
         // Capture
         m_rightCapture = true;
         // Anchor/un-anchor the vertex
-        m_rightClickSelectMode = m_arap.select(m_pointShader, closest_vertex);
+        m_rightClickSelectMode = m_syncCage->select(m_pointShader, closest_vertex);
         break;
     }
     case Qt::MouseButton::LeftButton: {
@@ -196,7 +203,7 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event)
     m_lastY = currY;
 }
 
-void GLWidget3D::mouseMoveEvent(QMouseEvent *event)
+void StaticGLWidget3D::mouseMoveEvent(QMouseEvent *event)
 {
     // Return if neither mouse button is currently held down
     if (!(m_leftCapture || m_rightCapture)) {
@@ -214,25 +221,25 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event)
     // If right is held down
     if (m_rightCapture) {
         // Get closest vertex to ray
-        const int closest_vertex = m_arap.getClosestVertex(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
+        const int closest_vertex = m_syncCage->getClosestVertex(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
 
         // Anchor/un-anchor the vertex
         if (m_rightClickSelectMode == SelectMode::None) {
-            m_rightClickSelectMode = m_arap.select(m_pointShader, closest_vertex);
+            m_rightClickSelectMode = m_syncCage->select(m_pointShader, closest_vertex);
         } else {
-            m_arap.selectWithSpecifiedMode(m_pointShader, closest_vertex, m_rightClickSelectMode);
+            m_syncCage->selectWithSpecifiedMode(m_pointShader, closest_vertex, m_rightClickSelectMode);
         }
 
         return;
     }
 
-    if (m_lastSelectedVertex != -1 && m_shiftFlag && m_arap.getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
-        m_arap.moveAllAnchors(m_lastSelectedVertex, pos);
+    if (m_lastSelectedVertex != -1 && m_shiftFlag && m_syncCage->getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
+        m_syncCage->moveAllAnchors(m_lastSelectedVertex, pos);
     }
     // If the selected point is an anchor point
-    else if (m_lastSelectedVertex != -1 && m_arap.getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
+    else if (m_lastSelectedVertex != -1 && m_syncCage->getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
         // Move it
-        m_arap.move(m_lastSelectedVertex, pos);
+        m_syncCage->move(m_lastSelectedVertex, pos);
     } else {
         // Rotate the camera
         const int deltaX = currX - m_lastX;
@@ -247,7 +254,7 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event)
     m_lastY = currY;
 }
 
-void GLWidget3D::mouseReleaseEvent(QMouseEvent *event)
+void StaticGLWidget3D::mouseReleaseEvent(QMouseEvent *event)
 {
     m_leftCapture = false;
     m_lastSelectedVertex = -1;
@@ -256,13 +263,13 @@ void GLWidget3D::mouseReleaseEvent(QMouseEvent *event)
     m_rightClickSelectMode = SelectMode::None;
 }
 
-void GLWidget3D::wheelEvent(QWheelEvent *event)
+void StaticGLWidget3D::wheelEvent(QWheelEvent *event)
 {
     float zoom = 1 - event->pixelDelta().y() * 0.1f / 120.f;
     m_camera.zoom(zoom);
 }
 
-void GLWidget3D::keyPressEvent(QKeyEvent *event)
+void StaticGLWidget3D::keyPressEvent(QKeyEvent *event)
 {
     if (event->isAutoRepeat()) return;
 
@@ -282,7 +289,7 @@ void GLWidget3D::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void GLWidget3D::keyReleaseEvent(QKeyEvent *event)
+void StaticGLWidget3D::keyReleaseEvent(QKeyEvent *event)
 {
     if (event->isAutoRepeat()) return;
 
@@ -300,7 +307,7 @@ void GLWidget3D::keyReleaseEvent(QKeyEvent *event)
 
 // ================== Physics Tick
 
-void GLWidget3D::tick()
+void StaticGLWidget3D::tick()
 {
     float deltaSeconds = m_deltaTimeProvider.restart() / 1000.f;
 
@@ -318,19 +325,19 @@ void GLWidget3D::tick()
     update();
 }
 
-void GLWidget3D::setObjectFilePath(const QString &path)
+void StaticGLWidget3D::setObjectFilePath(const QString &path)
 {
-    m_arap.setObjectFilePath(path);
+    m_syncCage->setObjectFilePath(path);
 }
 
-void GLWidget3D::setCageFilePath(const QString &path)
+void StaticGLWidget3D::setCageFilePath(const QString &path)
 {
-    m_arap.setCageFilePath(path);
+    m_syncCage->setCageFilePath(path);
 }
 
-void GLWidget3D::init()
+void StaticGLWidget3D::init()
 {
-    if (!m_arap.isObjectFilePathSet() || !m_arap.isCageFilePathSet()) {
+    if (!m_syncCage->isObjectFilePathSet() || !m_syncCage->isCageFilePathSet()) {
         return;
     }
 

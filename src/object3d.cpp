@@ -1,69 +1,42 @@
 #include "object3d.h"
 
-Object3D::Object3D()
+Object3D::Object3D(bool useGreen) :
+    m_useGreen(useGreen)
 {
 
 }
 
 void Object3D::updateVertices(const HalfEdgeMesh& heMesh) {
-    //----- Green Coordinates
-//    #pragma omp parallel for
-//    for (ObjectVertex& objectVertex : vertexList) {
-//        Vector3f term1 = Vector3f(0,0,0);
-//        for (int i = 0; i < objectVertex.greenCord.phiCoords.size(); i++) {
-//            term1 += objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position.cast<float>();
-//        }
+    if (m_useGreen) {
+        QtConcurrent::blockingMap(vertexList, [this, &heMesh](ObjectVertex& objectVertex) {
+            Eigen::Vector3f term1 = Eigen::Vector3f(0,0,0);
+            for (int i = 0; i < objectVertex.greenCord.phiCoords.size(); i++) {
+                term1 += objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position.cast<float>();
+            }
 
-//        Vector3f term2 = Vector3f(0,0,0);
-//        for (int i = 0; i < objectVertex.greenCord.psiCoords.size(); i++) {
-//            // TODO: s can be toggled between 1 and the calculation
-//            float s = calculateS(heMesh.faces.at(i));
-//            term2 += objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal().cast<float>() * s;
-//        }
+            Eigen::Vector3f term2 = Eigen::Vector3f(0,0,0);
+            for (int i = 0; i < objectVertex.greenCord.psiCoords.size(); i++) {
+                float s = calculateS(heMesh.faces.at(i));  // Assuming calculateS() and calculateNormal() are thread-safe
+                term2 += objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal().cast<float>() * s;
+            }
 
-//        objectVertex.position = term1 + term2;
-//    }
-
-//    QtConcurrent::blockingMap(vertexList, [this, &heMesh](ObjectVertex& objectVertex) {
-//        Eigen::Vector3f term1 = Eigen::Vector3f(0,0,0);
-//        for (int i = 0; i < objectVertex.greenCord.phiCoords.size(); i++) {
-//            term1 += objectVertex.greenCord.phiCoords.at(i) * heMesh.vertices.at(i).position.cast<float>();
-//        }
-
-//        Eigen::Vector3f term2 = Eigen::Vector3f(0,0,0);
-//        for (int i = 0; i < objectVertex.greenCord.psiCoords.size(); i++) {
-//            float s = calculateS(heMesh.faces.at(i));  // Assuming calculateS() and calculateNormal() are thread-safe
-//            term2 += objectVertex.greenCord.psiCoords.at(i) * heMesh.faces.at(i).calculateNormal().cast<float>() * s;
-//        }
-
-//        objectVertex.position = term1 + term2;
-//    });
-
-    //----- MVC Coordinates
-//    #pragma omp parallel for
-//    for (ObjectVertex& objectVertex : vertexList) {
-//        Vector3f newPos = Vector3f(0,0,0);
-//        float wTotal = 0;
-//        for (int i = 0; i < objectVertex.mvcCoord.wCoords.size(); i++) {
-//            newPos += objectVertex.mvcCoord.wCoords.at(i) * heMesh.vertices.at(i).position.cast<float>();
-//            wTotal += objectVertex.mvcCoord.wCoords.at(i);
-//        }
-//        objectVertex.position = newPos / wTotal;
-//    }
-
-    QtConcurrent::blockingMap(vertexList, [this, &heMesh](ObjectVertex& objectVertex) {
-        Eigen::Vector3f newPos = Eigen::Vector3f(0,0,0);
-        float wTotal = 0;
-        for (int i = 0; i < objectVertex.mvcCoord.wCoords.size(); i++) {
-            newPos += objectVertex.mvcCoord.wCoords.at(i) * heMesh.vertices.at(i).position.cast<float>();
-            wTotal += objectVertex.mvcCoord.wCoords.at(i);
-        }
-        if (wTotal != 0) {  // Safeguard against division by zero
-            objectVertex.position = newPos / wTotal;
-        } else {
-            objectVertex.position = newPos;  // Handle potential division by zero if necessary
-        }
-    });
+            objectVertex.position = term1 + term2;
+        });
+    } else {
+           QtConcurrent::blockingMap(vertexList, [this, &heMesh](ObjectVertex& objectVertex) {
+               Eigen::Vector3f newPos = Eigen::Vector3f(0,0,0);
+               float wTotal = 0;
+               for (int i = 0; i < objectVertex.mvcCoord.wCoords.size(); i++) {
+                   newPos += objectVertex.mvcCoord.wCoords.at(i) * heMesh.vertices.at(i).position.cast<float>();
+                   wTotal += objectVertex.mvcCoord.wCoords.at(i);
+               }
+               if (wTotal != 0) {  // Safeguard against division by zero
+                   objectVertex.position = newPos / wTotal;
+               } else {
+                   objectVertex.position = newPos;  // Handle potential division by zero if necessary
+               }
+           });
+    }
 }
 
 vector<Vector3f> Object3D::getVertices() {
