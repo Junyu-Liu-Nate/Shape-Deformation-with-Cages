@@ -9,8 +9,14 @@ MainWindow::MainWindow()
     // 2D cages
     cage2dMVC = new SyncCage2D(Mode2D::MVC);
     cage2dGreen = new SyncCage2D(Mode2D::Green);
-    cage2dMVC->linkCage(cage2dGreen);
-    cage2dGreen->linkCage(cage2dMVC);
+    cage2dHigherOrderGreen = new SyncCage2D(Mode2D::HigherOrderGreen);
+
+    cage2dMVC->linkCage1(cage2dGreen);
+    cage2dMVC->linkCage2(cage2dHigherOrderGreen);
+    cage2dGreen->linkCage1(cage2dMVC);
+    cage2dGreen->linkCage2(cage2dHigherOrderGreen);
+    cage2dHigherOrderGreen->linkCage1(cage2dMVC);
+    cage2dHigherOrderGreen->linkCage2(cage2dGreen);
 
     // 2D side-by-side
     glWidget2dMVC = new StaticGLWidget2D(cage2dMVC);
@@ -21,9 +27,14 @@ MainWindow::MainWindow()
     glWidget2dGreen->setMinimumSize(600, 600);
     glWidget2dGreen->hide();
 
+    glWidget2dGreenHigherOrder = new StaticGLWidget2D(cage2dHigherOrderGreen);
+    glWidget2dGreenHigherOrder->setMinimumSize(600, 600);
+    glWidget2dGreenHigherOrder->hide();
+
     QHBoxLayout *hBoxLayout2d = new QHBoxLayout();
     hBoxLayout2d->addWidget(glWidget2dMVC);
     hBoxLayout2d->addWidget(glWidget2dGreen);
+    hBoxLayout2d->addWidget(glWidget2dGreenHigherOrder);
 
     // 3D cages
     cage3dMVC = new SyncCage3D(false);
@@ -50,6 +61,7 @@ MainWindow::MainWindow()
         if (!filePath.isEmpty()) {
             glWidget2dMVC->setTextureFilePath(filePath);
             glWidget2dGreen->setTextureFilePath(filePath);
+            glWidget2dGreenHigherOrder->setTextureFilePath(filePath);
         }
     });
 
@@ -59,6 +71,7 @@ MainWindow::MainWindow()
         if (!filePath.isEmpty()) {
             glWidget2dMVC->setCageFilePath(filePath);
             glWidget2dGreen->setCageFilePath(filePath);
+            glWidget2dGreenHigherOrder->setCageFilePath(filePath);
         }
     });
 
@@ -66,13 +79,16 @@ MainWindow::MainWindow()
     QObject::connect(button3, &QPushButton::clicked, [&]() {
         glWidget2dMVC->init();
         glWidget2dGreen->init();
+        glWidget2dGreenHigherOrder->init();
 
         if (glWidget3dMVC->isVisible()) {
             glWidget3dMVC->hide();
             glWidget3dGreen->hide();
+            glWidget2dGreenHigherOrder->hide();
         }
         glWidget2dMVC->show();
         glWidget2dGreen->show();
+        glWidget2dGreenHigherOrder->show();
     });
 
     QPushButton *button4 = new QPushButton("Load 3D Cage File");
@@ -101,6 +117,7 @@ MainWindow::MainWindow()
         if (glWidget2dMVC->isVisible()) {
             glWidget2dMVC->hide();
             glWidget2dGreen->hide();
+            glWidget2dGreenHigherOrder->hide();
         }
         glWidget3dMVC->show();
         glWidget3dGreen->show();

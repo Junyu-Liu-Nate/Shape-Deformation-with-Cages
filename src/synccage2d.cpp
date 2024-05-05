@@ -2,9 +2,14 @@
 
 SyncCage2D::SyncCage2D(Mode2D mode) : Cage2D(mode) {}
 
-void SyncCage2D::linkCage(SyncCage2D *other)
+void SyncCage2D::linkCage1(SyncCage2D *other)
 {
-    m_linkedCage = other;
+    m_linkedCage1 = other;
+}
+
+void SyncCage2D::linkCage2(SyncCage2D *other)
+{
+    m_linkedCage2 = other;
 }
 
 // Move an anchored vertex, defined by its index, to targetPosition
@@ -29,8 +34,11 @@ void SyncCage2D::move(int vertex, Vector3f targetPosition)
     m_shape_object.setVertices2d(new_object_vertices);
 
     m_isSynced = true;
-    if (!m_linkedCage->isSynced()) {
-        m_linkedCage->move(vertex, targetPosition);
+    if (!m_linkedCage1->isSynced()) {
+        m_linkedCage1->move(vertex, targetPosition);
+    }
+    if (!m_linkedCage2->isSynced()) {
+        m_linkedCage2->move(vertex, targetPosition);
     }
     m_isSynced = false;
 }
@@ -63,8 +71,11 @@ void SyncCage2D::moveAllAnchors(int vertex, Vector3f pos)
     m_shape_object.setVertices2d(new_object_vertices);
 
     m_isSynced = true;
-    if (!m_linkedCage->isSynced()) {
-        m_linkedCage->moveAllAnchors(vertex, pos, anchors);
+    if (!m_linkedCage1->isSynced()) {
+        m_linkedCage1->moveAllAnchors(vertex, pos, anchors);
+    }
+    if (!m_linkedCage2->isSynced()) {
+        m_linkedCage2->moveAllAnchors(vertex, pos, anchors);
     }
     m_isSynced = false;
 }

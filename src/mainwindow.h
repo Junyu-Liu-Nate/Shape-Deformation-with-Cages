@@ -20,6 +20,8 @@ private:
 
     SyncCage2D *cage2dMVC;
     SyncCage2D *cage2dGreen;
+    SyncCage2D *cage2dHigherOrderGreen;
     StaticGLWidget2D *glWidget2dMVC;
     StaticGLWidget2D *glWidget2dGreen;
+    StaticGLWidget2D *glWidget2dGreenHigherOrder;
 };
