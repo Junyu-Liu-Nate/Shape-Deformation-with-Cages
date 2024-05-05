@@ -12,6 +12,12 @@
 using namespace std;
 using namespace Eigen;
 
+enum class Mode2D {
+    MVC,
+    Green,
+    HigherOrderGreen
+};
+
 struct ObjectVertex2D {
     Vector2f position;
 
@@ -23,7 +29,7 @@ struct ObjectVertex2D {
 class Object2D
 {
 public:
-    Object2D();
+    Object2D(Mode2D mode);
 
     vector<ObjectVertex2D> vertexList;
 
@@ -42,6 +48,9 @@ public:
     void updateVertices(vector<TwoDVertex> cagePoints, vector<TwoDEdge> cageEdges, unordered_map<std::tuple<int, int, int>, ControlPoint, tuple_hash> controlPoints);
 
     vector<Vector3f> getVertices();
+
+private:
+    Mode2D m_mode;
 };
 
 #endif // OBJECT2D_H

@@ -15,18 +15,23 @@ class Shader;
 class Cage3D
 {
 private:
-    Shape m_shape_cage;
-    Shape m_shape_object;
-
     std::string m_objectFilePath;
     std::string m_cageFilePath;
 
+protected:
+    Shape m_shape_cage;
+    Shape m_shape_object;
+
+    // false for MVC, true for Green Coordinate
+    bool m_useGreen = false;
+
 public:
-    Cage3D();
+
+    Cage3D(bool useGreen);
 
     void init(Eigen::Vector3f &min, Eigen::Vector3f &max);
-    void move(int vertex, Eigen::Vector3f pos);
-    void moveAllAnchors(int vertex, Eigen::Vector3f pos);
+    virtual void move(int vertex, Eigen::Vector3f pos);
+    virtual void moveAllAnchors(int vertex, Eigen::Vector3f pos);
 
     HalfEdgeMesh heMesh;
     

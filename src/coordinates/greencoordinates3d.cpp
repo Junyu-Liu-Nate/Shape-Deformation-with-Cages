@@ -81,10 +81,10 @@ void GreenCoordinates3D::constructGreenCoordinatesExterior(const Vector3d& verte
     int j = 0;
     for (Face& face : cage.faces) {
         // TODO: Need to figure out a way to define the EXIT FACE !!!!!!
-//        if (face.calculateNormal() != Vector3d(0,-1,0)) {
-//            j++;
-//            continue;
-//        }
+        if (face.calculateNormal() != Vector3d(0,-1,0)) {
+            j++;
+            continue;
+        }
 
         vector<Vector3d> vList(3);
         std::fill(vList.begin(), vList.end(), Vector3d(0,0,0));

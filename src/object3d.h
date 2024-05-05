@@ -22,7 +22,7 @@ struct ObjectVertex {
 class Object3D
 {
 public:
-    Object3D();
+    Object3D(bool useGreen);
 
     vector<ObjectVertex> vertexList;
 
@@ -30,6 +30,9 @@ public:
     vector<Vector3f> getVertices();
 
     double calculateS(const Face face);
+
+private:
+    bool m_useGreen = false;
 };
 
 #endif // OBJECT3D_H

@@ -64,7 +64,10 @@ add_executable(${PROJECT_NAME}
 
     src/glwidget2d.h src/glwidget2d.cpp
     src/common.h src/common.cpp
-
+    src/staticglwidget3d.h src/staticglwidget3d.cpp
+    src/synccage3d.h src/synccage3d.cpp
+    src/staticglwidget2d.h src/staticglwidget2d.cpp
+    src/synccage2d.h src/synccage2d.cpp
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
