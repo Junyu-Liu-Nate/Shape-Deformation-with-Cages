@@ -2,7 +2,8 @@
 
 SyncCage3D::SyncCage3D(bool useGreen) : Cage3D(useGreen) {}
 
-void SyncCage3D::linkCage(SyncCage3D *other) {
+void SyncCage3D::linkCage(SyncCage3D *other)
+{
     m_linkedCage = other;
 }
 

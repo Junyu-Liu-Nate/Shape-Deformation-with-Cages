@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
-#include "glwidget2d.h"
+#include "staticglwidget2d.h"
 #include "staticglwidget3d.h"
 
 class MainWindow : public QWidget
@@ -13,9 +13,15 @@ public:
     ~MainWindow();
 
 private:
-    SyncCage3D *cageMVC;
-    SyncCage3D *cageGreen;
+    SyncCage3D *cage3dMVC;
+    SyncCage3D *cage3dGreen;
     StaticGLWidget3D *glWidget3dMVC;
     StaticGLWidget3D *glWidget3dGreen;
-    GLWidget2D *glWidget2d;
+
+    SyncCage2D *cage2dMVC;
+    SyncCage2D *cage2dGreen;
+    SyncCage2D *cage2dHigherOrderGreen;
+    StaticGLWidget2D *glWidget2dMVC;
+    StaticGLWidget2D *glWidget2dGreen;
+    StaticGLWidget2D *glWidget2dGreenHigherOrder;
 };

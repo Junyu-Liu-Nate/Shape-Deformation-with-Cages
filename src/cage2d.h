@@ -15,19 +15,23 @@ class Shader;
 class Cage2D
 {
 private:
-    Shape m_shape_cage;
-    Shape m_shape_object;
     Shape m_shape_control_points;
 
     std::string m_textureFilePath;
     std::string m_cageFilePath;
 
+    Mode2D m_mode;
+
+protected:
+    Shape m_shape_cage;
+    Shape m_shape_object;
+
 public:
-    Cage2D();
+    Cage2D(Mode2D mode);
 
     void init(Eigen::Vector3f &min, Eigen::Vector3f &max);
-    void move(int vertex, Eigen::Vector3f pos);
-    void moveAllAnchors(int vertex, Eigen::Vector3f pos);
+    virtual void move(int vertex, Eigen::Vector3f pos);
+    virtual void moveAllAnchors(int vertex, Eigen::Vector3f pos);
     void moveCtrlPt(int vertex, Vector3f targetPosition);
 
     vector<TwoDVertex> cagePoints;
@@ -74,7 +78,7 @@ public:
     {
         if (mode == GL_POINTS) {
             m_shape_cage.draw(shader, mode);
-//            m_shape_control_points.draw(shader, mode);
+            m_shape_control_points.draw(shader, mode);
         } else {
             m_shape_cage.draw(shader, GL_LINE_LOOP);
             m_shape_object.draw(shader, GL_TRIANGLES);

@@ -22,12 +22,10 @@ protected:
     Shape m_shape_cage;
     Shape m_shape_object;
 
-    // // false for MVC, true for Green Coordinate
-    // bool m_useGreen = false;
-
-public:
     // false for MVC, true for Green Coordinate
     bool m_useGreen = false;
+
+public:
 
     Cage3D(bool useGreen);
 
