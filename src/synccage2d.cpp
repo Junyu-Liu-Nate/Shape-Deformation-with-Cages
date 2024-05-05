@@ -1,13 +1,14 @@
-#include "SyncCage3D.h"
+#include "synccage2d.h"
 
-SyncCage3D::SyncCage3D(bool useGreen) : Cage3D(useGreen) {}
+SyncCage2D::SyncCage2D(Mode2D mode) : Cage2D(mode) {}
 
-void SyncCage3D::linkCage(SyncCage3D *other)
+void SyncCage2D::linkCage(SyncCage2D *other)
 {
     m_linkedCage = other;
 }
 
-void SyncCage3D::move(int vertex, Vector3f targetPosition)
+// Move an anchored vertex, defined by its index, to targetPosition
+void SyncCage2D::move(int vertex, Vector3f targetPosition)
 {
     if (m_isSynced) {
         return;
@@ -18,14 +19,14 @@ void SyncCage3D::move(int vertex, Vector3f targetPosition)
 
     // Update cage vertex positions
     updateCage(new_vertices, vertex, targetPosition);
-    heMesh.updateVertexPos(new_vertices);
 
     // Update object vertex positions
-    object3D.updateVertices(heMesh);
-    std::vector<Eigen::Vector3f> new_object_vertices = object3D.getVertices();
+    //    object2D.updateVertices(cagePoints, cageEdges);
+    object2D.updateVertices(cagePoints, cageEdges, controlPoints);
+    std::vector<Eigen::Vector3f> new_object_vertices = object2D.getVertices();
 
-    m_shape_cage.setVertices(new_vertices);
-    m_shape_object.setVertices(new_object_vertices);
+    m_shape_cage.setVertices2d(new_vertices);
+    m_shape_object.setVertices2d(new_object_vertices);
 
     m_isSynced = true;
     if (!m_linkedCage->isSynced()) {
@@ -34,7 +35,7 @@ void SyncCage3D::move(int vertex, Vector3f targetPosition)
     m_isSynced = false;
 }
 
-void SyncCage3D::moveAllAnchors(int vertex, Vector3f pos)
+void SyncCage2D::moveAllAnchors(int vertex, Vector3f pos)
 {
     if (m_isSynced) {
         return;
@@ -52,14 +53,14 @@ void SyncCage3D::moveAllAnchors(int vertex, Vector3f pos)
 
     // Update cage vertex positions
     updateCage(new_vertices, vertex, pos);
-    heMesh.updateVertexPos(new_vertices);
 
     // Update object vertex positions
-    object3D.updateVertices(heMesh);
-    std::vector<Eigen::Vector3f> new_object_vertices = object3D.getVertices();
+    //    object2D.updateVertices(cagePoints, cageEdges);
+    object2D.updateVertices(cagePoints, cageEdges, controlPoints);
+    std::vector<Eigen::Vector3f> new_object_vertices = object2D.getVertices();
 
-    m_shape_cage.setVertices(new_vertices);
-    m_shape_object.setVertices(new_object_vertices);
+    m_shape_cage.setVertices2d(new_vertices);
+    m_shape_object.setVertices2d(new_object_vertices);
 
     m_isSynced = true;
     if (!m_linkedCage->isSynced()) {
@@ -68,7 +69,7 @@ void SyncCage3D::moveAllAnchors(int vertex, Vector3f pos)
     m_isSynced = false;
 }
 
-void SyncCage3D::moveAllAnchors(int vertex, Vector3f pos, const std::unordered_set<int>& anchors)
+void SyncCage2D::moveAllAnchors(int vertex, Vector3f pos, const std::unordered_set<int>& anchors)
 {
     std::vector<Eigen::Vector3f> new_vertices = m_shape_cage.getVertices();
 
@@ -81,17 +82,17 @@ void SyncCage3D::moveAllAnchors(int vertex, Vector3f pos, const std::unordered_s
 
     // Update cage vertex positions
     updateCage(new_vertices, vertex, pos);
-    heMesh.updateVertexPos(new_vertices);
 
     // Update object vertex positions
-    object3D.updateVertices(heMesh);
-    std::vector<Eigen::Vector3f> new_object_vertices = object3D.getVertices();
+    //    object2D.updateVertices(cagePoints, cageEdges);
+    object2D.updateVertices(cagePoints, cageEdges, controlPoints);
+    std::vector<Eigen::Vector3f> new_object_vertices = object2D.getVertices();
 
-    m_shape_cage.setVertices(new_vertices);
-    m_shape_object.setVertices(new_object_vertices);
+    m_shape_cage.setVertices2d(new_vertices);
+    m_shape_object.setVertices2d(new_object_vertices);
 }
 
-bool SyncCage3D::isSynced()
+bool SyncCage2D::isSynced()
 {
     return m_isSynced;
 }

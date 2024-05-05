@@ -1,18 +1,20 @@
-#include "glwidget2d.h"
-
+#include "staticglwidget2d.h"
 #include <QApplication>
 #include <QKeyEvent>
 
 #define SPEED 1.5
 #define ROTATE_SPEED 0.0025
 
-GLWidget2D::GLWidget2D() :
-    m_cage(Mode2D::MVC),
-    m_rightClickSelectModeOnCage(SelectMode::None),
-    m_rightClickSelectModeOnCtrlPt(SelectMode::None)
+int StaticGLWidget2D::m_lastSelectedVertexOnCage = -1;
+int StaticGLWidget2D::m_lastSelectedVertexOnCtrlPt = -1;
+SelectMode StaticGLWidget2D::m_rightClickSelectModeOnCage = SelectMode::None;
+SelectMode StaticGLWidget2D::m_rightClickSelectModeOnCtrlPt = SelectMode::None;
+
+StaticGLWidget2D::StaticGLWidget2D(SyncCage2D *syncCage) :
+    m_syncCage2d(syncCage)
 {}
 
-void GLWidget2D::initializeGL()
+void StaticGLWidget2D::initializeGL()
 {
     if (!m_initialized) {
         return;
@@ -38,7 +40,7 @@ void GLWidget2D::initializeGL()
 
     // Initialize ARAP, and get parameters needed to decide the camera position, etc
     Vector3f coeffMin, coeffMax;
-    m_cage.init(coeffMin, coeffMax);
+    m_syncCage2d->init(coeffMin, coeffMax);
 
     Vector3f center = (coeffMax + coeffMin) / 2.0f;
     float extentLength  = (coeffMax - coeffMin).norm();
@@ -68,7 +70,7 @@ void GLWidget2D::initializeGL()
     m_intervalTimer.start(1000 / 60);
 }
 
-void GLWidget2D::paintGL()
+void StaticGLWidget2D::paintGL()
 {
     if (!m_initialized) {
         return;
@@ -81,7 +83,7 @@ void GLWidget2D::paintGL()
     m_defaultShader->bind();
     m_defaultShader->setUniform("proj", m_camera.getProjection());
     m_defaultShader->setUniform("view", m_camera.getView());
-    m_cage.draw(m_defaultShader, GL_TRIANGLES);
+    m_syncCage2d->draw(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();
 
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -92,11 +94,11 @@ void GLWidget2D::paintGL()
     m_pointShader->setUniform("vSize",  m_vSize);
     m_pointShader->setUniform("width",  width());
     m_pointShader->setUniform("height", height());
-    m_cage.draw(m_pointShader, GL_POINTS);
+    m_syncCage2d->draw(m_pointShader, GL_POINTS);
     m_pointShader->unbind();
 }
 
-void GLWidget2D::mousePressEvent(QMouseEvent *event)
+void StaticGLWidget2D::mousePressEvent(QMouseEvent *event)
 {
     // Get current mouse coordinates
     const int currX = event->position().x();
@@ -104,8 +106,8 @@ void GLWidget2D::mousePressEvent(QMouseEvent *event)
 
     // Get closest vertex to ray
     const Vector3f ray = transformToWorldRay(currX, currY);
-    const int closestVertexOnCage = m_cage.getClosestVertexOnCage(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
-    const int closestVertexOnCtrlPt = m_cage.getClosestVertexOnCtrlPt(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
+    const int closestVertexOnCage = m_syncCage2d->getClosestVertexOnCage(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
+    const int closestVertexOnCtrlPt = m_syncCage2d->getClosestVertexOnCtrlPt(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
 
     // Switch on button
     switch (event->button()) {
@@ -113,8 +115,8 @@ void GLWidget2D::mousePressEvent(QMouseEvent *event)
         // Capture
         m_rightCapture = true;
         // Anchor/un-anchor the vertex
-        m_rightClickSelectModeOnCage = m_cage.selectOnCage(m_pointShader, closestVertexOnCage);
-        m_rightClickSelectModeOnCtrlPt = m_cage.selectOnCtrlPt(m_pointShader, closestVertexOnCtrlPt);
+        m_rightClickSelectModeOnCage = m_syncCage2d->selectOnCage(m_pointShader, closestVertexOnCage);
+        m_rightClickSelectModeOnCtrlPt = m_syncCage2d->selectOnCtrlPt(m_pointShader, closestVertexOnCtrlPt);
         break;
     }
     case Qt::MouseButton::LeftButton: {
@@ -133,7 +135,7 @@ void GLWidget2D::mousePressEvent(QMouseEvent *event)
     m_lastY = currY;
 }
 
-void GLWidget2D::mouseMoveEvent(QMouseEvent *event)
+void StaticGLWidget2D::mouseMoveEvent(QMouseEvent *event)
 {
     // Return if neither mouse button is currently held down
     if (!(m_leftCapture || m_rightCapture)) {
@@ -151,40 +153,40 @@ void GLWidget2D::mouseMoveEvent(QMouseEvent *event)
     // If right is held down
     if (m_rightCapture) {
         // Get closest vertex to ray
-        const int closestVertexOnCage = m_cage.getClosestVertexOnCage(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
+        const int closestVertexOnCage = m_syncCage2d->getClosestVertexOnCage(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
 
         // Anchor/un-anchor the vertex on cage
         if (m_rightClickSelectModeOnCage == SelectMode::None) {
-            m_rightClickSelectModeOnCage = m_cage.selectOnCage(m_pointShader, closestVertexOnCage);
+            m_rightClickSelectModeOnCage = m_syncCage2d->selectOnCage(m_pointShader, closestVertexOnCage);
         } else {
-            m_cage.selectWithSpecifiedModeOnCage(m_pointShader, closestVertexOnCage, m_rightClickSelectModeOnCage);
+            m_syncCage2d->selectWithSpecifiedModeOnCage(m_pointShader, closestVertexOnCage, m_rightClickSelectModeOnCage);
         }
 
         // Get closest vertex to ray
-        const int closestVertexOnCtrlPt = m_cage.getClosestVertexOnCtrlPt(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
+        const int closestVertexOnCtrlPt = m_syncCage2d->getClosestVertexOnCtrlPt(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
 
         // Anchor/un-anchor the vertex on cage
         if (m_rightClickSelectModeOnCtrlPt == SelectMode::None) {
-            m_rightClickSelectModeOnCtrlPt = m_cage.selectOnCtrlPt(m_pointShader, closestVertexOnCtrlPt);
+            m_rightClickSelectModeOnCtrlPt = m_syncCage2d->selectOnCtrlPt(m_pointShader, closestVertexOnCtrlPt);
         } else {
-            m_cage.selectWithSpecifiedModeOnCtrlPt(m_pointShader, closestVertexOnCtrlPt, m_rightClickSelectModeOnCtrlPt);
+            m_syncCage2d->selectWithSpecifiedModeOnCtrlPt(m_pointShader, closestVertexOnCtrlPt, m_rightClickSelectModeOnCtrlPt);
         }
 
         return;
     }
 
     // Selected point on cage is an anchor point and shift is pressed
-    if (m_lastSelectedVertexOnCage != -1 && m_shiftFlag && m_cage.getAnchorPosOnCage(m_lastSelectedVertexOnCage, pos, ray, m_camera.getPosition())) {
-        m_cage.moveAllAnchors(m_lastSelectedVertexOnCage, pos);
+    if (m_lastSelectedVertexOnCage != -1 && m_shiftFlag && m_syncCage2d->getAnchorPosOnCage(m_lastSelectedVertexOnCage, pos, ray, m_camera.getPosition())) {
+        m_syncCage2d->moveAllAnchors(m_lastSelectedVertexOnCage, pos);
     }
     // Selected point on cage is an anchor point
-    else if (m_lastSelectedVertexOnCage != -1 && m_cage.getAnchorPosOnCage(m_lastSelectedVertexOnCage, pos, ray, m_camera.getPosition())) {
+    else if (m_lastSelectedVertexOnCage != -1 && m_syncCage2d->getAnchorPosOnCage(m_lastSelectedVertexOnCage, pos, ray, m_camera.getPosition())) {
         // Move it
-        m_cage.move(m_lastSelectedVertexOnCage, pos);
+        m_syncCage2d->move(m_lastSelectedVertexOnCage, pos);
     }
     // Selected point on control point is an anchor point
-    else if (m_lastSelectedVertexOnCtrlPt != -1 && m_cage.getAnchorPosOnCtrlPt(m_lastSelectedVertexOnCtrlPt, pos, ray, m_camera.getPosition())) {
-        m_cage.moveCtrlPt(m_lastSelectedVertexOnCtrlPt, pos);
+    else if (m_lastSelectedVertexOnCtrlPt != -1 && m_syncCage2d->getAnchorPosOnCtrlPt(m_lastSelectedVertexOnCtrlPt, pos, ray, m_camera.getPosition())) {
+        m_syncCage2d->moveCtrlPt(m_lastSelectedVertexOnCtrlPt, pos);
     } else {
         // Rotate the camera
         const int deltaX = currX - m_lastX;
@@ -199,7 +201,7 @@ void GLWidget2D::mouseMoveEvent(QMouseEvent *event)
     m_lastY = currY;
 }
 
-void GLWidget2D::mouseReleaseEvent(QMouseEvent *event)
+void StaticGLWidget2D::mouseReleaseEvent(QMouseEvent *event)
 {
     m_leftCapture = false;
     m_lastSelectedVertexOnCage = -1;
@@ -210,19 +212,19 @@ void GLWidget2D::mouseReleaseEvent(QMouseEvent *event)
     m_rightClickSelectModeOnCtrlPt = SelectMode::None;
 }
 
-void GLWidget2D::setTextureFilePath(const QString &path)
+void StaticGLWidget2D::setTextureFilePath(const QString &path)
 {
-    m_cage.setTextureFilePath(path);
+    m_syncCage2d->setTextureFilePath(path);
 }
 
-void GLWidget2D::setCageFilePath(const QString &path)
+void StaticGLWidget2D::setCageFilePath(const QString &path)
 {
-    m_cage.setCageFilePath(path);
+    m_syncCage2d->setCageFilePath(path);
 }
 
-void GLWidget2D::init()
+void StaticGLWidget2D::init()
 {
-    if (!m_cage.isTextureFilePathSet() || !m_cage.isCageFilePathSet()) {
+    if (!m_syncCage2d->isTextureFilePathSet() || !m_syncCage2d->isCageFilePathSet()) {
         return;
     }
 

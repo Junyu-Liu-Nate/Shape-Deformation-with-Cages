@@ -49,7 +49,7 @@ private slots:
     void tick();
 
 protected:
-    SyncCage3D *m_syncCage;;
+    SyncCage3D *m_syncCage3d;
 
     static Camera  m_camera;
     Shader *m_defaultShader;

@@ -34,7 +34,7 @@ SelectMode StaticGLWidget3D::m_rightClickSelectMode = SelectMode::None;
 
 StaticGLWidget3D::StaticGLWidget3D(QWidget *parent, SyncCage3D *syncCage) :
     QOpenGLWidget(parent),
-    m_syncCage(syncCage),
+    m_syncCage3d(syncCage),
     m_defaultShader(),
     m_pointShader(),
     // Movement
@@ -88,7 +88,7 @@ void StaticGLWidget3D::initializeGL()
 
     // Initialize ARAP, and get parameters needed to decide the camera position, etc
     Vector3f coeffMin, coeffMax;
-    m_syncCage->init(coeffMin, coeffMax);
+    m_syncCage3d->init(coeffMin, coeffMax);
 
     Vector3f center = (coeffMax + coeffMin) / 2.0f;
     float extentLength  = (coeffMax - coeffMin).norm();
@@ -131,7 +131,7 @@ void StaticGLWidget3D::paintGL()
     m_defaultShader->bind();
     m_defaultShader->setUniform("proj", m_camera.getProjection());
     m_defaultShader->setUniform("view", m_camera.getView());
-    m_syncCage->draw(m_defaultShader, GL_TRIANGLES);
+    m_syncCage3d->draw(m_defaultShader, GL_TRIANGLES);
     m_defaultShader->unbind();
 
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -142,7 +142,7 @@ void StaticGLWidget3D::paintGL()
     m_pointShader->setUniform("vSize",  m_vSize);
     m_pointShader->setUniform("width",  width());
     m_pointShader->setUniform("height", height());
-    m_syncCage->draw(m_pointShader, GL_POINTS);
+    m_syncCage3d->draw(m_pointShader, GL_POINTS);
     m_pointShader->unbind();
 }
 
@@ -177,7 +177,7 @@ void StaticGLWidget3D::mousePressEvent(QMouseEvent *event)
 
     // Get closest vertex to ray
     const Vector3f ray = transformToWorldRay(currX, currY);
-    const int closest_vertex = m_syncCage->getClosestVertex(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
+    const int closest_vertex = m_syncCage3d->getClosestVertex(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
 
     // Switch on button
     switch (event->button()) {
@@ -185,7 +185,7 @@ void StaticGLWidget3D::mousePressEvent(QMouseEvent *event)
         // Capture
         m_rightCapture = true;
         // Anchor/un-anchor the vertex
-        m_rightClickSelectMode = m_syncCage->select(m_pointShader, closest_vertex);
+        m_rightClickSelectMode = m_syncCage3d->select(m_pointShader, closest_vertex);
         break;
     }
     case Qt::MouseButton::LeftButton: {
@@ -221,25 +221,25 @@ void StaticGLWidget3D::mouseMoveEvent(QMouseEvent *event)
     // If right is held down
     if (m_rightCapture) {
         // Get closest vertex to ray
-        const int closest_vertex = m_syncCage->getClosestVertex(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
+        const int closest_vertex = m_syncCage3d->getClosestVertex(m_camera.getPosition(), ray, m_vertexSelectionThreshold);
 
         // Anchor/un-anchor the vertex
         if (m_rightClickSelectMode == SelectMode::None) {
-            m_rightClickSelectMode = m_syncCage->select(m_pointShader, closest_vertex);
+            m_rightClickSelectMode = m_syncCage3d->select(m_pointShader, closest_vertex);
         } else {
-            m_syncCage->selectWithSpecifiedMode(m_pointShader, closest_vertex, m_rightClickSelectMode);
+            m_syncCage3d->selectWithSpecifiedMode(m_pointShader, closest_vertex, m_rightClickSelectMode);
         }
 
         return;
     }
 
-    if (m_lastSelectedVertex != -1 && m_shiftFlag && m_syncCage->getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
-        m_syncCage->moveAllAnchors(m_lastSelectedVertex, pos);
+    if (m_lastSelectedVertex != -1 && m_shiftFlag && m_syncCage3d->getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
+        m_syncCage3d->moveAllAnchors(m_lastSelectedVertex, pos);
     }
     // If the selected point is an anchor point
-    else if (m_lastSelectedVertex != -1 && m_syncCage->getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
+    else if (m_lastSelectedVertex != -1 && m_syncCage3d->getAnchorPos(m_lastSelectedVertex, pos, ray, m_camera.getPosition())) {
         // Move it
-        m_syncCage->move(m_lastSelectedVertex, pos);
+        m_syncCage3d->move(m_lastSelectedVertex, pos);
     } else {
         // Rotate the camera
         const int deltaX = currX - m_lastX;
@@ -327,17 +327,17 @@ void StaticGLWidget3D::tick()
 
 void StaticGLWidget3D::setObjectFilePath(const QString &path)
 {
-    m_syncCage->setObjectFilePath(path);
+    m_syncCage3d->setObjectFilePath(path);
 }
 
 void StaticGLWidget3D::setCageFilePath(const QString &path)
 {
-    m_syncCage->setCageFilePath(path);
+    m_syncCage3d->setCageFilePath(path);
 }
 
 void StaticGLWidget3D::init()
 {
-    if (!m_syncCage->isObjectFilePathSet() || !m_syncCage->isCageFilePathSet()) {
+    if (!m_syncCage3d->isObjectFilePathSet() || !m_syncCage3d->isCageFilePathSet()) {
         return;
     }
 

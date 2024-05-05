@@ -9,9 +9,10 @@
 using namespace std;
 using namespace Eigen;
 
-Cage2D::Cage2D()
+Cage2D::Cage2D(Mode2D mode) :
+    object2D(mode)
 {
-
+    m_mode = mode;
 }
 
 void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
