@@ -4,8 +4,7 @@
 #define GL_SILENCE_DEPRECATION
 #endif
 
-#include "cage3d.h"
-//#include "cage2d.h"
+#include "synccage3d.h"
 #include "graphics/camera.h"
 #include "graphics/shader.h"
 
@@ -14,13 +13,13 @@
 #include <QTimer>
 #include <memory>
 
-class GLWidget3D : public QOpenGLWidget
+class StaticGLWidget3D : public QOpenGLWidget
 {
     Q_OBJECT
 
 public:
-    GLWidget3D(QWidget *parent = nullptr);
-    ~GLWidget3D();
+    StaticGLWidget3D(QWidget *parent = nullptr, SyncCage3D *syncCage = nullptr);
+    ~StaticGLWidget3D();
 
     void init();
     void setObjectFilePath(const QString &path);
@@ -50,37 +49,37 @@ private slots:
     void tick();
 
 protected:
-    Camera  m_camera;
+    SyncCage3D *m_syncCage;;
+
+    static Camera  m_camera;
     Shader *m_defaultShader;
     Shader *m_pointShader;
 
-    float m_movementScaling;
-    float m_vertexSelectionThreshold;
-    float m_vSize;
+    static float m_movementScaling;
+    static float m_vertexSelectionThreshold;
+    static float m_vSize;
 
     // Timing
     QElapsedTimer m_deltaTimeProvider; // For measuring elapsed time
     QTimer        m_intervalTimer;     // For triggering timed events
 
     // Mouse handler stuff
-    int m_lastX;
-    int m_lastY;
-    bool m_leftCapture;
-    bool m_rightCapture;
-    bool m_shiftFlag = false;
+    static int m_lastX;
+    static int m_lastY;
+    static bool m_leftCapture;
+    static bool m_rightCapture;
+    static bool m_shiftFlag;
 
     // Execution flow control
-    bool m_initialized = false;
+    static bool m_initialized;
 
 private:
-    Cage3D m_arap;
-
     // Movement
-    int m_forward;
-    int m_sideways;
-    int m_vertical;
+    static int m_forward;
+    static int m_sideways;
+    static int m_vertical;
 
     // Mouse handler stuff
-    int m_lastSelectedVertex = -1;
-    SelectMode m_rightClickSelectMode;
+    static int m_lastSelectedVertex;
+    static SelectMode m_rightClickSelectMode;
 };
