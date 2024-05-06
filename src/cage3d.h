@@ -59,6 +59,7 @@ public:
         }else {
             m_shape_cage.draw(shader, GL_LINE_LOOP);
             m_shape_object.draw(shader, GL_TRIANGLES);
+//            m_shape_object.draw(shader, GL_LINE_LOOP);
         }
     }
 
