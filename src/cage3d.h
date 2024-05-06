@@ -26,13 +26,13 @@ protected:
     bool m_useGreen = false;
 
 public:
-
     Cage3D(bool useGreen);
 
     void init(Eigen::Vector3f &min, Eigen::Vector3f &max);
     virtual void move(int vertex, Eigen::Vector3f pos);
     virtual void moveAllAnchors(int vertex, Eigen::Vector3f pos);
 
+    static bool m_showSkeleton;
     HalfEdgeMesh heMesh;
     
     void updateCage(std::vector<Eigen::Vector3f> new_vertices, int vertex, Vector3f targetPosition);
@@ -58,7 +58,11 @@ public:
             m_shape_cage.draw(shader, mode);
         }else {
             m_shape_cage.draw(shader, GL_LINE_LOOP);
-            m_shape_object.draw(shader, GL_TRIANGLES);
+            if (!m_showSkeleton) {
+                m_shape_object.draw(shader, GL_TRIANGLES);
+            } else {
+                m_shape_object.draw(shader, GL_LINE_LOOP);
+            }
         }
     }
 

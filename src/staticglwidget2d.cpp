@@ -230,6 +230,7 @@ void StaticGLWidget2D::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Escape: QApplication::quit(); break;
     case Qt::Key_Shift: m_shiftFlag = true; break;
     case Qt::Key_0: m_syncCage2d->clearAnchors(); break;
+    case Qt::Key_Slash: m_syncCage2d->m_showSkeleton = !m_syncCage2d->m_showSkeleton; break;
     }
 }
 

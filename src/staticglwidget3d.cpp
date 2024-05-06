@@ -287,6 +287,7 @@ void StaticGLWidget3D::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Escape: QApplication::quit(); break;
     case Qt::Key_Shift: m_shiftFlag = true; break;
     case Qt::Key_0: m_syncCage3d->clearAnchors(); break;
+    case Qt::Key_Slash: m_syncCage3d->m_showSkeleton = !m_syncCage3d->m_showSkeleton; break;
     }
 }
 

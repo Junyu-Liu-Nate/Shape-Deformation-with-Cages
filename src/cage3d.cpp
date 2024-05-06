@@ -9,6 +9,8 @@
 using namespace std;
 using namespace Eigen;
 
+bool Cage3D::m_showSkeleton = false;
+
 Cage3D::Cage3D(bool useGreen) :
     object3D(useGreen)
 {

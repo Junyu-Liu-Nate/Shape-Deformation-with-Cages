@@ -11,7 +11,6 @@ public:
     void moveAllAnchors(int vertex, Vector3f pos, const std::unordered_set<int>& anchors);
 
 private:
-
     bool m_isSynced = false;
     SyncCage3D *m_linkedCage = nullptr;
 

@@ -37,6 +37,8 @@ public:
     vector<TwoDVertex> cagePoints;
     vector<TwoDEdge> cageEdges;
 
+    static bool m_showSkeleton;
+
     void updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition);
 
     void findMarginEdges(vector<Vector3i>& triangles, vector<Vector3f>& vertices, vector<Vector3f>& controlPts);
@@ -83,8 +85,11 @@ public:
             }
         } else {
             m_shape_cage.draw(shader, GL_LINE_LOOP);
-            m_shape_object.draw(shader, GL_TRIANGLES);
-//            m_shape_object.draw(shader, GL_LINES);
+            if (!m_showSkeleton) {
+                m_shape_object.draw(shader, GL_TRIANGLES);
+            } else {
+                m_shape_object.draw(shader, GL_LINE_LOOP);
+            }
         }
     }
 

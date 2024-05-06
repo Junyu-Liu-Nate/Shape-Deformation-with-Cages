@@ -10,6 +10,8 @@
 using namespace std;
 using namespace Eigen;
 
+bool Cage2D::m_showSkeleton = false;
+
 Cage2D::Cage2D(Mode2D mode) :
     object2D(mode)
 {
