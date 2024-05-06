@@ -162,7 +162,7 @@ void Shape::initWithTexture(const vector<Vector3f> &vertices,
 
 void Shape::initPoints(const vector<Vector3f> &vertices)
 {
-    m_isPoints = true;
+    m_isCtrlPtShape = true;
 
     m_vertices.clear();
     copy(vertices.begin(), vertices.end(), back_inserter(m_vertices));
@@ -328,7 +328,7 @@ SelectMode Shape::select(Shader *shader, int closest_vertex)
         m_anchors.erase(closest_vertex);
     }
 
-    if (!m_isPoints) {
+    if (!m_isCtrlPtShape) {
         selectHelper();
     } else {
         selectHelperForCtrlPt();
@@ -355,7 +355,7 @@ bool Shape::selectWithSpecifiedMode(Shader *shader, int closest_vertex, SelectMo
     }
     }
 
-    if (!m_isPoints) {
+    if (!m_isCtrlPtShape) {
         selectHelper();
     } else {
         selectHelperForCtrlPt();

@@ -37,6 +37,8 @@ public:
     vector<TwoDVertex> cagePoints;
     vector<TwoDEdge> cageEdges;
 
+    static bool m_showSkeleton;
+
     void updateCage(std::vector<Eigen::Vector3f>& new_vertices, int vertex, Vector3f targetPosition);
 
     void findMarginEdges(vector<Vector3i>& triangles, vector<Vector3f>& vertices, vector<Vector3f>& controlPts);
@@ -78,11 +80,16 @@ public:
     {
         if (mode == GL_POINTS) {
             m_shape_cage.draw(shader, mode);
-            m_shape_control_points.draw(shader, mode);
+            if (m_mode == Mode2D::HigherOrderGreen) {
+                m_shape_control_points.draw(shader, mode);
+            }
         } else {
             m_shape_cage.draw(shader, GL_LINE_LOOP);
-            m_shape_object.draw(shader, GL_TRIANGLES);
-//            m_shape_object.draw(shader, GL_LINES);
+            if (!m_showSkeleton) {
+                m_shape_object.draw(shader, GL_TRIANGLES);
+            } else {
+                m_shape_object.draw(shader, GL_LINE_LOOP);
+            }
         }
     }
 
@@ -114,6 +121,11 @@ public:
     bool getAnchorPosOnCtrlPt(int lastSelected, Eigen::Vector3f& pos, Eigen::Vector3f ray, Eigen::Vector3f start)
     {
         return m_shape_control_points.getAnchorPos(lastSelected, pos, ray, start);
+    }
+
+    bool clearAnchors() {
+        m_shape_cage.clearAnchors();
+        m_shape_control_points.clearAnchors();
     }
 };
 
