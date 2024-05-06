@@ -73,12 +73,12 @@ protected:
     // Execution flow control
     static bool m_initialized;
 
-private:
     // Movement
     static int m_forward;
     static int m_sideways;
     static int m_vertical;
 
+private:
     // Mouse handler stuff
     static int m_lastSelectedVertex;
     static SelectMode m_rightClickSelectMode;

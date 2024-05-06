@@ -10,6 +10,8 @@
 using namespace std;
 using namespace Eigen;
 
+bool Cage2D::m_showSkeleton = false;
+
 Cage2D::Cage2D(Mode2D mode) :
     object2D(mode)
 {
@@ -38,7 +40,7 @@ void Cage2D::init(Eigen::Vector3f &coeffMin, Eigen::Vector3f &coeffMax)
 
     //----- Read in object
     QImage img(QString::fromStdString(m_textureFilePath));
-    float h = float(img.height()) / float(img.width()) * 0.5f;
+    float h = float(img.height()) / img.width() * 0.5f;
     vector<Vector3f> objectVertices = {
         Vector3f( 0.5f, -h, 0),
         Vector3f( 0.5f,  h, 0),

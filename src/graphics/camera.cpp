@@ -18,9 +18,7 @@ Camera::Camera()
       m_near(0.1f),
       m_far(50.f),
       m_zoom(1)
-{
-    std::cout << "hello" << std::endl;
-}
+{}
 
 // ================== Position
 

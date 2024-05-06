@@ -48,6 +48,16 @@ public:
     const std::vector<Eigen::Vector3i>& getFaces();
     const std::unordered_set<int>& getAnchors();
 
+    void clearAnchors() {
+        m_anchors.clear();
+
+        if (!m_isCtrlPtShape) {
+            selectHelper();
+        } else {
+            selectHelperForCtrlPt();
+        }
+    }
+
 private:
     GLuint m_surfaceVao;
     GLuint m_surfaceVbo;
@@ -61,7 +71,7 @@ private:
     float m_green;
     float m_alpha;
     bool m_isTextured = false;
-    bool m_isPoints = false;
+    bool m_isCtrlPtShape = false;
 
     std::vector<Eigen::Vector3i> m_faces;
     std::vector<Eigen::Vector3f> m_vertices;
