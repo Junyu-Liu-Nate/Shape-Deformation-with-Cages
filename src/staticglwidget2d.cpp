@@ -212,6 +212,27 @@ void StaticGLWidget2D::mouseReleaseEvent(QMouseEvent *event)
     m_rightClickSelectModeOnCtrlPt = SelectMode::None;
 }
 
+void StaticGLWidget2D::keyPressEvent(QKeyEvent *event)
+{
+    if (event->isAutoRepeat()) return;
+
+    switch (event->key())
+    {
+    case Qt::Key_W: m_forward  += SPEED; break;
+    case Qt::Key_S: m_forward  -= SPEED; break;
+    case Qt::Key_A: m_sideways -= SPEED; break;
+    case Qt::Key_D: m_sideways += SPEED; break;
+    case Qt::Key_F: m_vertical -= SPEED; break;
+    case Qt::Key_R: m_vertical += SPEED; break;
+    case Qt::Key_C: m_camera.toggleIsOrbiting(); break;
+    case Qt::Key_Equal: m_vSize *= 11.0f / 10.0f; break;
+    case Qt::Key_Minus: m_vSize *= 10.0f / 11.0f; break;
+    case Qt::Key_Escape: QApplication::quit(); break;
+    case Qt::Key_Shift: m_shiftFlag = true; break;
+    case Qt::Key_0: m_syncCage2d->clearAnchors(); break;
+    }
+}
+
 void StaticGLWidget2D::setTextureFilePath(const QString &path)
 {
     m_syncCage2d->setTextureFilePath(path);

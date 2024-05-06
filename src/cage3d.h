@@ -81,4 +81,8 @@ public:
     bool isObjectFilePathSet();
     void setCageFilePath(const QString &path);
     bool isCageFilePathSet();
+
+    bool clearAnchors() {
+        m_shape_cage.clearAnchors();
+    }
 };

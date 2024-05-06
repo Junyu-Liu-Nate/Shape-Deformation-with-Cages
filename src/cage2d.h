@@ -117,6 +117,11 @@ public:
     {
         return m_shape_control_points.getAnchorPos(lastSelected, pos, ray, start);
     }
+
+    bool clearAnchors() {
+        m_shape_cage.clearAnchors();
+        m_shape_control_points.clearAnchors();
+    }
 };
 
 #endif // CAGE2D_H

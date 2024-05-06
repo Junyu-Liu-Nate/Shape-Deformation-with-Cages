@@ -286,6 +286,7 @@ void StaticGLWidget3D::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Minus: m_vSize *= 10.0f / 11.0f; break;
     case Qt::Key_Escape: QApplication::quit(); break;
     case Qt::Key_Shift: m_shiftFlag = true; break;
+    case Qt::Key_0: m_syncCage3d->clearAnchors(); break;
     }
 }
 
