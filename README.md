@@ -32,9 +32,36 @@ In this program, we use a cage-based deformation system to demonstrate two kinds
 
 The derivation of Higher-order GC can be found in [literature [4]](https://dl.acm.org/doi/10.1145/3588432.3591499).
 
+**3. Demos**
+
+1. [2D Checkboard](https://drive.google.com/file/d/1Tv90_fNeY3msEWVUe6MKIQjMk2p1p7Hs/view?resourcekey) This is a comparison between standard 2D MVC and Green Coordinates.
+2. [2D Textbox](https://drive.google.com/file/d/1eL7cK24PDWqYp1cIfKZ9WoCwSlH22cfV/view?resourcekey) This compares the effects between 2D MVC and Green Coordinates on a long polygon. Shape is preserved better in Green Coordinates.
+3. [2D Polygon](https://drive.google.com/file/d/1Y2jMKp0Q78xqYkU0DVxVk2EkSoMKLAoM/view?resourcekey) This deforms in a non-regular geometric shape.
+4. [2D Partial cage](https://drive.google.com/file/d/1rzItOy5FuhK3ILUQJuMyod_5LOBUMP9s/view?resourcekey) This is a demonstration of how partial cage (when the cage does not fully contain the object) work for MVC and Green Coordinates.
+5. [2D Higher Order Green Coordinate](https://drive.google.com/file/d/1P3DTDgx6zwGS-er37GczWgRKbHiA7IeV/view?resourcekey) This demonstrates the difference between Normal Green Coordinates and Higher Order Green Coordinates.
+6. [3D Comparison](https://drive.google.com/file/d/1JZJuo6hvgi2CI2oz2v3cUJzgsg5bKquL/view?resourcekey) This shows the comparison between MVC and Green Coordinates on 3D meshes.
+7. [Dense Meshes](https://drive.google.com/file/d/19qOvTyO6YCqAK_aAb3zB-NklKSfiVfhZ/view?resourcekey) Performance presentation on very dense 3D mesh shapes.
 
 
-**4. References:**
+**4. Running the Code**
+
+The program requires manual input of cage and mesh shape - both be in .obj file format. If rendering in 2D, all values on Z-axis need to be set to 0 and an image must be passed in as texture as well. After the code successfully compiles, there will be a UI with 5 buttons. Load in cage, mesh and image, then click render2D/render3D based on the type of obj file passed in. The vertices on the cages can be selected - unselected vertices will remain unchanged when deforming.
+
+
+**5. Cage Generation**
+
+There are 3 approaches in attempted cage generation algorithm.
+Method 1: Iteratively inflate along the normal of each face, then conduct quadratic simplification for the inflated shape.
+Method 2: Compute the convex hull of the inflated mesh shape
+Method 3: Voxelization and triangulation of the bounding box (create a bounding box, voxelize it, preserve the voxels that intersect with the mesh surface, then conduct triangulation & simplification on it).
+We attempted method 3 under the instruction of [this paper](http://www.cad.zju.edu.cn/home/hwlin/pdf_files/Automatic-generation-of-coarse-bounding-cages-from-dense-meshes.pdf) and [Benjamin Barral's implementation](https://github.com/BenjBarral/Cage-Based-Deformation-MVC). However, the output of this method is not ideal for the following reasons:
+1. The output cage do not fully contain the mesh shape.
+2. The cage does not preserve the original mesh shape's features well enough.
+3. The cage might have some compromised normals.
+Please check [our presentation Powerpoint](https://docs.google.com/presentation/d/1sWqiZ9bn0oQjIBL6exVA91wCfn0Mvm8iWtjkzzziVLQ/edit#slide=id.g2dad409eede_0_63) (the hidden pages) for detailed steps and conjectures about the sources of these problems. 
+
+
+**6. References:**
 
 References can be found here:
 
