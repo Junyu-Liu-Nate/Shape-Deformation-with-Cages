@@ -94,7 +94,7 @@ void GreenCoordinates2D::constructGreenCoordinatesExterior(const Vector2f& verte
         // TODO: Need to figure out a way to define the EXIT EDGE !!!!!!
         // For the rectangle cage: Currently hardcoded edge idx 1 as the exit edge
         // For the L-shape cage: Currently hardcoded edge idx 0 as the exit edge
-        if (r != 0) {
+        if (r != 1) {
             continue;
         }
 
