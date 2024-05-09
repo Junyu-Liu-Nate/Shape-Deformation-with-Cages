@@ -65,10 +65,10 @@ Please check [our presentation Powerpoint](https://docs.google.com/presentation/
 
 References can be found here:
 
-[[1] Lipman, Y., Levin, D., & Cohen-Or, D. (2008). Green coordinates. ACM transactions on graphics (TOG), 27(3), 1-10.](https://dl.acm.org/doi/10.1145/1360612.1360677#:~:text=The%20coordinates%20are%20motivated%20by,with%20a%20shape%2Dpreserving%20property.)
+[1] Lipman, Y., Levin, D., & Cohen-Or, D. (2008). Green coordinates. ACM transactions on graphics (TOG), 27(3), 1-10.(https://dl.acm.org/doi/10.1145/1360612.1360677#:~:text=The%20coordinates%20are%20motivated%20by,with%20a%20shape%2Dpreserving%20property.)
 
-[2] Hormann, K., & Floater, M. S. (2006). Mean value coordinates for arbitrary planar polygons. ACM Transactions on Graphics (TOG), 25(4), 1424-1441.](https://dl.acm.org/doi/10.1145/1183287.1183295)
+[2] Hormann, K., & Floater, M. S. (2006). Mean value coordinates for arbitrary planar polygons. ACM Transactions on Graphics (TOG), 25(4), 1424-1441.(https://dl.acm.org/doi/10.1145/1183287.1183295)
 
-[[3] Ju, T., Schaefer, S., & Warren, J. (2023). Mean value coordinates for closed triangular meshes. In Seminal Graphics Papers: Pushing the Boundaries, Volume 2 (pp. 223-228).](https://www.cse.wustl.edu/~taoju/research/meanvalue.pdf)
+[3] Ju, T., Schaefer, S., & Warren, J. (2023). Mean value coordinates for closed triangular meshes. In Seminal Graphics Papers: Pushing the Boundaries, Volume 2 (pp. 223-228).(https://www.cse.wustl.edu/~taoju/research/meanvalue.pdf)
 
 [4] Michel, É., & Thiery, J. M. (2023, July). Polynomial 2D Green Coordinates for Polygonal Cages. In ACM SIGGRAPH 2023 Conference Proceedings (pp. 1-9).](https://dl.acm.org/doi/10.1145/3588432.3591499)
