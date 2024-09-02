@@ -2,7 +2,7 @@
 
 
 
-![thumbnail](/Users/liujunyu/Desktop/Course/Brown/CSCI2240/assignment/final_project/Shape-Deformation-with-Green-Coordinates/img/thumbnail.png)
+![thumbnail](img/thumbnail.png)
 
 **1. Project Overview:**
 
@@ -49,11 +49,11 @@ The derivation of Higher-order GC can be found in [literature [4]](https://dl.ac
 
 **4. Gallery**
 
-![2D_gallery_1](/Users/liujunyu/Desktop/Course/Brown/CSCI2240/assignment/final_project/Shape-Deformation-with-Green-Coordinates/img/2D_gallery_1.png)
+![2D_gallery_1](img/2D_gallery_1.png)
 
-![3D_gallery_1](/Users/liujunyu/Desktop/Course/Brown/CSCI2240/assignment/final_project/Shape-Deformation-with-Green-Coordinates/img/3D_gallery_1.png)
+![3D_gallery_1](img/3D_gallery_1.png)
 
-![3D_gallery_2](/Users/liujunyu/Desktop/Course/Brown/CSCI2240/assignment/final_project/Shape-Deformation-with-Green-Coordinates/img/3D_gallery_2.png)
+![3D_gallery_2](img/3D_gallery_2.png)
 
 **5. Running the Code**
 
