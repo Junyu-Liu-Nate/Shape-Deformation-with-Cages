@@ -41,21 +41,26 @@ The derivation of Higher-order GC can be found in [literature [4]](https://dl.ac
 
 1. [2D Checkboard](https://drive.google.com/file/d/1Tv90_fNeY3msEWVUe6MKIQjMk2p1p7Hs/view?resourcekey) This is a comparison between standard 2D MVC and Green Coordinates.
    ![2D_checkerboard](https://github.com/user-attachments/assets/b5d6b840-386e-4379-bdbc-8436f5b27a4b)
+   
 2. [2D Textbox](https://drive.google.com/file/d/1eL7cK24PDWqYp1cIfKZ9WoCwSlH22cfV/view?resourcekey) This compares the effects between 2D MVC and Green Coordinates on a long polygon. Shape is preserved better in Green Coordinates.
    ![2D_long_text](https://github.com/user-attachments/assets/f36db450-8914-40a4-b38e-2b4a35ea87b2)
+   
 3. [2D Polygon](https://drive.google.com/file/d/1Y2jMKp0Q78xqYkU0DVxVk2EkSoMKLAoM/view?resourcekey) This deforms in a non-regular geometric shape.
    ![2D_L_partial](https://github.com/user-attachments/assets/f0fb71b6-6790-4b3f-823a-fe200c59f17f)
+   
 4. [2D Partial cage](https://drive.google.com/file/d/1rzItOy5FuhK3ILUQJuMyod_5LOBUMP9s/view?resourcekey) This is a demonstration of how partial cage (when the cage does not fully contain the object) work for MVC and Green Coordinates.
    ![2D_peopple_partial](https://github.com/user-attachments/assets/fe159c25-8317-45d4-b033-7c374936f7be)
+   
 5. [2D Higher Order Green Coordinate](https://drive.google.com/file/d/1P3DTDgx6zwGS-er37GczWgRKbHiA7IeV/view?resourcekey) This demonstrates the difference between Normal Green Coordinates and Higher Order Green Coordinates.
    | Linear Green Coordinates | Cubic Green Coordinates |
    |--------------------------|-------------------------|
-   |![2D_fish_linear_GC](https://github.com/user-attachments/assets/08a9dd70-c1c1-49a8-8cb4-ca34c836dd41)
-| ![2D_fish_linear_GC](https://github.com/user-attachments/assets/1a47d619-ee03-4a44-b586-0897091ab18e)|
+   | ![2D_fish_linear_GC](https://github.com/user-attachments/assets/08a9dd70-c1c1-49a8-8cb4-ca34c836dd41) | ![2D_fish_linear_GC](https://github.com/user-attachments/assets/1a47d619-ee03-4a44-b586-0897091ab18e) |
+
 6. [3D Comparison](https://drive.google.com/file/d/1JZJuo6hvgi2CI2oz2v3cUJzgsg5bKquL/view?resourcekey) This shows the comparison between MVC and Green Coordinates on 3D meshes.
     ![3D_armadilo](https://github.com/user-attachments/assets/923ab6fe-2450-4f34-897c-01c516c28ab1)
     ![3D_cactus](https://github.com/user-attachments/assets/dbb57956-d739-4682-9477-ea54d1215eaf)
    ![3D_deer](https://github.com/user-attachments/assets/76564a7e-bd4d-4567-bdee-863626f60e9c)
+
 7. [Dense Meshes](https://drive.google.com/file/d/19qOvTyO6YCqAK_aAb3zB-NklKSfiVfhZ/view?resourcekey) Performance presentation on very dense 3D mesh shapes.
     ![3D_boy](https://github.com/user-attachments/assets/c7d321a1-b76f-4a18-b67d-51d0ed28e33e)
 
