@@ -40,12 +40,13 @@ The derivation of Higher-order GC can be found in [literature [4]](https://dl.ac
 **3. Video Demos**
 
 1. [2D Checkboard](https://drive.google.com/file/d/1Tv90_fNeY3msEWVUe6MKIQjMk2p1p7Hs/view?resourcekey) This is a comparison between standard 2D MVC and Green Coordinates.
+   ![2D_checkerboard](https://github.com/user-attachments/assets/b5d6b840-386e-4379-bdbc-8436f5b27a4b)
 2. [2D Textbox](https://drive.google.com/file/d/1eL7cK24PDWqYp1cIfKZ9WoCwSlH22cfV/view?resourcekey) This compares the effects between 2D MVC and Green Coordinates on a long polygon. Shape is preserved better in Green Coordinates.
-3. [2D Polygon](https://drive.google.com/file/d/1Y2jMKp0Q78xqYkU0DVxVk2EkSoMKLAoM/view?resourcekey) This deforms in a non-regular geometric shape.
-4. [2D Partial cage](https://drive.google.com/file/d/1rzItOy5FuhK3ILUQJuMyod_5LOBUMP9s/view?resourcekey) This is a demonstration of how partial cage (when the cage does not fully contain the object) work for MVC and Green Coordinates.
-5. [2D Higher Order Green Coordinate](https://drive.google.com/file/d/1P3DTDgx6zwGS-er37GczWgRKbHiA7IeV/view?resourcekey) This demonstrates the difference between Normal Green Coordinates and Higher Order Green Coordinates.
-6. [3D Comparison](https://drive.google.com/file/d/1JZJuo6hvgi2CI2oz2v3cUJzgsg5bKquL/view?resourcekey) This shows the comparison between MVC and Green Coordinates on 3D meshes.
-7. [Dense Meshes](https://drive.google.com/file/d/19qOvTyO6YCqAK_aAb3zB-NklKSfiVfhZ/view?resourcekey) Performance presentation on very dense 3D mesh shapes.
+4. [2D Polygon](https://drive.google.com/file/d/1Y2jMKp0Q78xqYkU0DVxVk2EkSoMKLAoM/view?resourcekey) This deforms in a non-regular geometric shape.
+5. [2D Partial cage](https://drive.google.com/file/d/1rzItOy5FuhK3ILUQJuMyod_5LOBUMP9s/view?resourcekey) This is a demonstration of how partial cage (when the cage does not fully contain the object) work for MVC and Green Coordinates.
+6. [2D Higher Order Green Coordinate](https://drive.google.com/file/d/1P3DTDgx6zwGS-er37GczWgRKbHiA7IeV/view?resourcekey) This demonstrates the difference between Normal Green Coordinates and Higher Order Green Coordinates.
+7. [3D Comparison](https://drive.google.com/file/d/1JZJuo6hvgi2CI2oz2v3cUJzgsg5bKquL/view?resourcekey) This shows the comparison between MVC and Green Coordinates on 3D meshes.
+8. [Dense Meshes](https://drive.google.com/file/d/19qOvTyO6YCqAK_aAb3zB-NklKSfiVfhZ/view?resourcekey) Performance presentation on very dense 3D mesh shapes.
 
 **4. Gallery**
 
